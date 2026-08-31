@@ -18,7 +18,7 @@
             <img src="{{ $cover->url }}" alt="{{ $cover->alt_text ?: $package->name }}" class="absolute inset-0 h-full w-full object-cover opacity-45">
         @endif
         <div class="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/70 to-emerald-950/30" aria-hidden="true"></div>
-        <div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+        <div class="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
             <nav aria-label="Breadcrumb" class="text-sm text-emerald-100">
                 <ol class="flex flex-wrap items-center gap-2">
                     <li><a href="{{ route('home') }}" class="hover:text-amber-300">Home</a></li>
@@ -40,7 +40,7 @@
         </div>
     </section>
 
-    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
         @if (session('success') || session('status'))
             <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-950" role="status" aria-live="polite">{{ session('success') ?? session('status') }}</div>
         @endif

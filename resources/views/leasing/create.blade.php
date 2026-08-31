@@ -18,7 +18,7 @@
         </div>
     </section>
 
-    <section class="px-4 py-14 sm:px-6 lg:px-8">
+    <section class="px-4 py-16 sm:px-6 lg:px-8">
         <div class="mx-auto grid max-w-7xl gap-10 lg:grid-cols-3">
             <div class="lg:col-span-1">
                 <h2 class="text-2xl font-black text-emerald-950">How it works</h2>

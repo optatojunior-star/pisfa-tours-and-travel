@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('content')
-    <section class="bg-emerald-950 px-4 py-14 text-white sm:px-6 sm:py-20 lg:px-8">
+    <section class="bg-emerald-950 px-4 py-16 text-white sm:px-6 sm:py-20 lg:px-8">
         <div class="mx-auto max-w-7xl">
             <p class="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Explore Uganda</p>
             <h1 class="mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-5xl">Tours and safaris planned with local care</h1>
@@ -9,7 +9,7 @@
         </div>
     </section>
 
-    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
         @if (session('success') || session('status'))
             <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-950" role="status" aria-live="polite">{{ session('success') ?? session('status') }}</div>
         @endif
@@ -87,7 +87,7 @@
             </div>
 
             @if ($packages->isEmpty())
-                <div class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+                <div class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
                     <svg class="mx-auto h-12 w-12 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m3 20 5.5-8 3.5 4 2.5-3L21 20H3Z"/><path d="M14 7a2 2 0 1 0 4 0 2 2 0 0 0-4 0Z"/></svg>
                     <h3 class="mt-4 text-lg font-bold text-slate-900">No tours match these filters</h3>
                     <p class="mt-2 text-sm text-slate-600">Clear a filter or tell us about the journey you have in mind.</p>

@@ -26,7 +26,7 @@
             <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm" aria-labelledby="category-list-heading">
                 <div class="border-b border-slate-200 px-5 py-5 sm:px-6"><h2 id="category-list-heading" class="text-xl font-black text-slate-950">Existing categories</h2><p class="mt-1 text-sm text-slate-500">{{ $categories->count() }} {{ str('category')->plural($categories->count()) }}</p></div>
                 @if ($categories->isEmpty())
-                    <div class="px-6 py-14 text-center"><h3 class="font-bold text-slate-900">No tour categories yet</h3><p class="mt-2 text-sm text-slate-600">Create the first category using the form.</p></div>
+                    <div class="px-6 py-16 text-center"><h3 class="font-bold text-slate-900">No tour categories yet</h3><p class="mt-2 text-sm text-slate-600">Create the first category using the form.</p></div>
                 @else
                     <div class="divide-y divide-slate-200">
                         @foreach ($categories as $category)

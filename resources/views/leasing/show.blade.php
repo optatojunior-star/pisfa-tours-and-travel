@@ -18,7 +18,7 @@
 @endphp
 
 @section('content')
-    <section class="bg-emerald-950 px-4 py-14 text-white sm:px-6 lg:px-8">
+    <section class="bg-emerald-950 px-4 py-16 text-white sm:px-6 lg:px-8">
         <div class="mx-auto max-w-4xl">
             <p class="text-sm font-black uppercase tracking-[0.22em] text-amber-300">Vehicle leasing</p>
             <h1 class="mt-4 text-3xl font-black sm:text-4xl">{{ $application->vehicleLabel() }}</h1>

@@ -172,7 +172,7 @@
     </main>
 
     <footer class="bg-emerald-950 text-emerald-50">
-        <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
+        <div class="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
             <section class="lg:col-span-2" aria-labelledby="footer-about">
                 <h2 id="footer-about" class="text-2xl font-black">PISFA Tours and Travels</h2>
                 <p class="mt-4 max-w-xl leading-7 text-emerald-100">

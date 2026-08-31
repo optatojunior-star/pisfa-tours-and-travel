@@ -10,7 +10,7 @@
 @endphp
 
 @section('content')
-    <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+    <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-16">
         <nav aria-label="Breadcrumb" class="text-sm text-slate-600">
             <ol class="flex flex-wrap items-center gap-2">
                 <li><a href="{{ route('tours.index') }}" class="font-semibold text-emerald-800 hover:text-emerald-950">Tours</a></li>

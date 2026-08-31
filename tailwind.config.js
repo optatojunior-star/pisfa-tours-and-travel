@@ -100,9 +100,30 @@ export default {
                 'gutter-lg': '2rem',
             },
 
+            /*
+             * Three radii, not six.
+             *
+             * The views had reached for sm, md, lg, xl, 2xl and 3xl more or less
+             * at random - 1334 rounded-xl against 446 rounded-3xl and 204
+             * rounded-2xl - so corners disagreed between neighbouring cards.
+             *
+             * Rather than rewrite two thousand class attributes, the stock names
+             * are collapsed onto a three-step rhythm: controls, the default, and
+             * panels. Existing markup keeps working and starts agreeing with
+             * itself. New work should use control/card, which say what they are
+             * for.
+             */
             borderRadius: {
-                card: '1rem',
-                control: '0.75rem',
+                control: '0.625rem',   // inputs, buttons, chips
+                DEFAULT: '0.625rem',
+                card: '1rem',          // cards, panels, dialogs
+
+                sm: '0.375rem',
+                md: '0.625rem',
+                lg: '0.625rem',
+                xl: '0.875rem',
+                '2xl': '1rem',
+                '3xl': '1rem',
             },
 
             maxWidth: {

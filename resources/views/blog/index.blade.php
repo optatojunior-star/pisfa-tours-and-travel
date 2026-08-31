@@ -32,7 +32,7 @@
         </section>
     @endif
 
-    <section class="px-4 py-14 sm:px-6 lg:px-8">
+    <section class="px-4 py-16 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-7xl">
             <form method="GET" action="{{ route('blog.index') }}" class="grid gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-3 sm:items-end">
                 <div class="sm:col-span-2">

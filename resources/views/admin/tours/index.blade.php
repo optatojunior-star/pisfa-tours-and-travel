@@ -33,7 +33,7 @@
                 <div class="flex items-end justify-between gap-4"><div><h2 id="package-list-heading" class="text-xl font-black text-slate-950">Packages</h2><p class="mt-1 text-sm text-slate-500">{{ $packages->total() }} {{ str('package')->plural($packages->total()) }}</p></div></div>
 
                 @if ($packages->isEmpty())
-                    <div class="mt-5 rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center"><h3 class="font-bold text-slate-900">No packages match these filters</h3><p class="mt-2 text-sm text-slate-600">Reset the filters or create a new draft package.</p><a href="{{ route('admin.tours.create') }}" class="mt-5 inline-flex rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-800">Create package</a></div>
+                    <div class="mt-5 rounded-3xl border border-dashed border-slate-300 bg-white px-6 py-16 text-center"><h3 class="font-bold text-slate-900">No packages match these filters</h3><p class="mt-2 text-sm text-slate-600">Reset the filters or create a new draft package.</p><a href="{{ route('admin.tours.create') }}" class="mt-5 inline-flex rounded-xl bg-emerald-700 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-800">Create package</a></div>
                 @else
                     <div class="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                         @foreach ($packages as $package)

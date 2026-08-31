@@ -25,7 +25,7 @@
             <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm" aria-labelledby="admin-booking-list-heading">
                 <div class="border-b border-slate-200 px-5 py-5 sm:px-6"><h2 id="admin-booking-list-heading" class="text-xl font-black text-slate-950">Booking requests</h2><p class="mt-1 text-sm text-slate-500">{{ $bookings->total() }} {{ str('booking')->plural($bookings->total()) }}</p></div>
                 @if ($bookings->isEmpty())
-                    <div class="px-6 py-14 text-center"><h3 class="font-bold text-slate-900">No bookings match these filters</h3><p class="mt-2 text-sm text-slate-600">Reset the filters or wait for a customer request.</p></div>
+                    <div class="px-6 py-16 text-center"><h3 class="font-bold text-slate-900">No bookings match these filters</h3><p class="mt-2 text-sm text-slate-600">Reset the filters or wait for a customer request.</p></div>
                 @else
                     <div class="divide-y divide-slate-200 md:hidden">
                         @foreach ($bookings as $booking)

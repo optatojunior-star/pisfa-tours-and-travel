@@ -59,7 +59,7 @@
                 </div>
 
                 @if ($bookings->isEmpty())
-                    <div class="px-6 py-14 text-center">
+                    <div class="px-6 py-16 text-center">
                         <svg class="mx-auto h-12 w-12 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 3v3m12-3v3M4 9h16M5 5h14a1 1 0 0 1 1 1v14H4V6a1 1 0 0 1 1-1Z"/><path d="M8 13h3v3H8z"/></svg>
                         <h3 class="mt-4 font-bold text-slate-900">No bookings match this view</h3>
                         <p class="mt-2 text-sm text-slate-600">Your tour booking requests will appear here after submission.</p>

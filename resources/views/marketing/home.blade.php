@@ -6,7 +6,7 @@
             <div class="absolute -right-32 -top-32 size-96 rounded-full bg-amber-300 blur-3xl"></div>
             <div class="absolute -bottom-36 -left-20 size-96 rounded-full bg-emerald-400 blur-3xl"></div>
         </div>
-        <div class="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 sm:py-28 lg:grid-cols-2 lg:px-8 lg:py-32">
+        <div class="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 sm:py-20 lg:grid-cols-2 lg:px-8 lg:py-20">
             <div>
                 <p class="text-sm font-black uppercase tracking-[0.22em] text-amber-300">Discover Uganda with confidence</p>
                 <h1 class="mt-5 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">Journeys planned around people, not packages.</h1>

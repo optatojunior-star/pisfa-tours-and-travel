@@ -7,7 +7,7 @@
 @endphp
 
 @section('content')
-<section class="bg-emerald-950 px-4 py-14 text-white sm:px-6 sm:py-20 lg:px-8">
+<section class="bg-emerald-950 px-4 py-16 text-white sm:px-6 sm:py-20 lg:px-8">
     <div class="mx-auto max-w-7xl">
         <p class="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Vehicle imports</p>
         <h1 class="mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-5xl">Import the vehicle you actually want</h1>

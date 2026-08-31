@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('content')
-<section class="bg-emerald-950 px-4 py-14 text-white sm:px-6 sm:py-20 lg:px-8">
+<section class="bg-emerald-950 px-4 py-16 text-white sm:px-6 sm:py-20 lg:px-8">
     <div class="mx-auto max-w-7xl"><p class="text-sm font-black uppercase tracking-[0.2em] text-amber-300">Car hire</p><h1 class="mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-5xl">Find a vehicle for the road ahead</h1><p class="mt-5 max-w-2xl text-lg leading-8 text-emerald-100">Compare available self-drive and chauffeured vehicles. A request reserves a temporary hold for review; no payment is taken online.</p></div>
 </section>
 

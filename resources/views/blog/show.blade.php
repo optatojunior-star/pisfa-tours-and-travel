@@ -83,7 +83,7 @@
     </article>
 
     @if ($related->isNotEmpty())
-        <section class="bg-stone-50 px-4 py-14 sm:px-6 lg:px-8" aria-labelledby="related-heading">
+        <section class="bg-stone-50 px-4 py-16 sm:px-6 lg:px-8" aria-labelledby="related-heading">
             <div class="mx-auto max-w-7xl">
                 <h2 id="related-heading" class="text-2xl font-black text-emerald-950">More like this</h2>
                 <div class="mt-6 grid gap-6 md:grid-cols-3">

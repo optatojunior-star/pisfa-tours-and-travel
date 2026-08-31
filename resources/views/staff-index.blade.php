@@ -67,7 +67,7 @@
                 </div>
 
                 @if ($staff->isEmpty())
-                    <div class="px-6 py-14 text-center">
+                    <div class="px-6 py-16 text-center">
                         <p class="font-semibold text-slate-800">No team accounts match these filters.</p>
                         <p class="mt-1 text-sm text-slate-500">Clear the filters or invite a new team member.</p>
                     </div>

@@ -6,12 +6,17 @@
     <meta name="theme-color" content="#04574e">
     {{-- Read by the chat widget, which posts JSON rather than a form. --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ isset($title) ? $title.' | PISFA Tours and Travels' : 'PISFA Tours and Travels' }}</title>
-    <meta name="description" content="{{ $description ?? 'Plan Ugandan tours, transport, vehicle, accommodation, and group travel services with PISFA Tours and Travels.' }}">
-    <link rel="canonical" href="{{ url()->current() }}">
+    <x-seo-meta
+        :title="$title ?? null"
+        :description="$description ?? null"
+        :image="$ogImage ?? null"
+        :type="$ogType ?? 'website'"
+        :noindex="$noindex ?? false"
+        :published-at="$publishedAt ?? null" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
     <x-pwa-head />
+    <x-structured-data :schema="$schema ?? null" />
     <style>[x-cloak] { display: none !important; }</style>
 </head>
 <body class="min-h-screen bg-stone-50 text-slate-900 antialiased">

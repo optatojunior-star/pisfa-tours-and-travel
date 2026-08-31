@@ -65,9 +65,9 @@ trait BuildsFlightInquiryFixtures
             'outbound_on' => $outbound->toDateString(),
             'return_on' => $outbound->addDays(7)->toDateString(),
             'passenger_count' => 2,
-            'contact_name' => $customer?->name ?? 'Guest Traveller',
-            'contact_email' => $customer?->email ?? 'guest@example.test',
-            'contact_phone' => $customer?->phone ?? '+256701234567',
+            'contact_name' => $customer->name ?? 'Guest Traveller',
+            'contact_email' => $customer->email ?? 'guest@example.test',
+            'contact_phone' => $customer->phone ?? '+256701234567',
             'notes' => null,
             'acknowledge_enquiry' => '1',
         ], $overrides);

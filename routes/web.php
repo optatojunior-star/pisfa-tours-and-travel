@@ -62,3 +62,4 @@ require __DIR__.'/finance.php';
 require __DIR__.'/corporate.php';
 require __DIR__.'/messaging.php';
 require __DIR__.'/pwa.php';
+require __DIR__.'/seo.php';

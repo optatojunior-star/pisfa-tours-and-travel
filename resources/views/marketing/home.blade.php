@@ -20,22 +20,24 @@
             </div>
             <div class="grid gap-4 sm:grid-cols-2" aria-label="PISFA service highlights">
                 <div class="rounded-3xl bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15">
-                    <span class="text-4xl" aria-hidden="true">🌍</span>
+                    <x-icon name="globe" class="h-9 w-9 text-accent-400" />
                     <h2 class="mt-6 text-xl font-bold">Local insight</h2>
                     <p class="mt-2 text-sm leading-6 text-emerald-100">Plans shaped with practical knowledge of Uganda and its routes.</p>
                 </div>
-                <div class="rounded-3xl bg-amber-400 p-6 text-emerald-950 sm:translate-y-8">
-                    <span class="text-4xl" aria-hidden="true">🧭</span>
+                {{-- Icon and text are ink on the orange ground: an accent-coloured
+                     icon here was orange on orange and effectively invisible. --}}
+                <div class="rounded-3xl bg-accent-500 p-6 text-ink-950 sm:translate-y-8">
+                    <x-icon name="compass" class="h-9 w-9 text-ink-950" />
                     <h2 class="mt-6 text-xl font-bold">One helpful team</h2>
                     <p class="mt-2 text-sm leading-6">A clear starting point for several connected travel services.</p>
                 </div>
                 <div class="rounded-3xl bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15">
-                    <span class="text-4xl" aria-hidden="true">💬</span>
+                    <x-icon name="chat" class="h-9 w-9 text-accent-400" />
                     <h2 class="mt-6 text-xl font-bold">Real follow-up</h2>
                     <p class="mt-2 text-sm leading-6 text-emerald-100">Website inquiries are saved for review instead of showing a fake success.</p>
                 </div>
                 <div class="rounded-3xl bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15 sm:translate-y-8">
-                    <span class="text-4xl" aria-hidden="true">🛡️</span>
+                    <x-icon name="shield" class="h-9 w-9 text-accent-400" />
                     <h2 class="mt-6 text-xl font-bold">Responsible service</h2>
                     <p class="mt-2 text-sm leading-6 text-emerald-100">Prices and availability are checked again before anything is confirmed.</p>
                 </div>
@@ -57,7 +59,9 @@
                 @foreach ($services as $slug => $service)
                     <article class="flex flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg">
                         <div class="flex items-start justify-between gap-4">
-                            <span class="text-4xl" aria-hidden="true">{{ $service['icon'] }}</span>
+                            <span class="grid h-12 w-12 shrink-0 place-items-center rounded-control bg-brand-50 text-brand-700">
+                                <x-icon :name="$service['icon']" class="h-6 w-6" />
+                            </span>
                             {{--
                                 The badge follows the presence of a route in
                                 ServiceCatalogue, so a shipped module cannot sit
@@ -72,7 +76,8 @@
                         <h3 class="mt-7 text-xl font-bold text-emerald-950">{{ $service['name'] }}</h3>
                         <p class="mt-3 flex-1 text-sm leading-6 text-slate-600">{{ $service['summary'] }}</p>
                         <a href="{{ isset($service['route']) ? route($service['route']) : route('request-quotation', ['service' => $slug]) }}" class="mt-6 font-bold text-emerald-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:text-emerald-950">
-                            {{ $service['action'] ?? 'Discuss this service' }} <span aria-hidden="true">→</span>
+                            {{ $service['action'] ?? 'Discuss this service' }}
+                            <svg class="inline-block h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
                         </a>
                     </article>
                 @endforeach

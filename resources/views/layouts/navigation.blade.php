@@ -20,10 +20,11 @@
         <div class="flex min-h-16 items-center justify-between py-3">
             <div class="flex min-w-0 items-center gap-8">
                 <a href="{{ route('dashboard') }}" class="flex shrink-0 items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2" aria-label="PISFA dashboard">
-                    <x-application-logo class="h-10 w-10 text-emerald-700" />
+                    <img src="{{ asset('images/logo-mark.png') }}" alt="" aria-hidden="true"
+                         width="512" height="512" class="h-10 w-10 shrink-0 object-contain">
                     <span class="hidden sm:block">
-                        <span class="block text-base font-bold leading-4 tracking-[0.16em] text-emerald-950">PISFA</span>
-                        <span class="mt-1 block text-[10px] font-semibold uppercase tracking-[0.13em] text-slate-500">Operations</span>
+                        <span class="block text-base font-extrabold leading-4 tracking-tight text-brand-900">PISFA</span>
+                        <span class="mt-1 block text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-500">Operations</span>
                     </span>
                 </a>
 
@@ -46,31 +47,26 @@
 
                     @if ($roleValue === 'driver' && Route::has('drivers.index'))
                 <a href="{{ route('drivers.index') }}" @class([
-                    'block rounded-lg px-3 py-2.5 text-sm font-semibold',
-                    'bg-emerald-50 text-emerald-800' => request()->routeIs('drivers.index'),
-                    'text-slate-700 hover:bg-slate-50' => ! request()->routeIs('drivers.index'),
+                    'rounded-lg px-3 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700',
+                    'bg-brand-50 text-brand-800' => request()->routeIs('drivers.index'),
+                    'text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! request()->routeIs('drivers.index'),
                 ])>My jobs</a>
                 <a href="{{ route('drivers.history') }}" @class([
-                    'block rounded-lg px-3 py-2.5 text-sm font-semibold',
-                    'bg-emerald-50 text-emerald-800' => request()->routeIs('drivers.history'),
-                    'text-slate-700 hover:bg-slate-50' => ! request()->routeIs('drivers.history'),
+                    'rounded-lg px-3 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700',
+                    'bg-brand-50 text-brand-800' => request()->routeIs('drivers.history'),
+                    'text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! request()->routeIs('drivers.history'),
                 ])>Trip history</a>
                 <a href="{{ route('portal.expenses.index') }}" @class([
-                    'block rounded-lg px-3 py-2.5 text-sm font-semibold',
-                    'bg-emerald-50 text-emerald-800' => request()->routeIs('portal.expenses.*'),
-                    'text-slate-700 hover:bg-slate-50' => ! request()->routeIs('portal.expenses.*'),
+                    'rounded-lg px-3 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700',
+                    'bg-brand-50 text-brand-800' => request()->routeIs('portal.expenses.*'),
+                    'text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! request()->routeIs('portal.expenses.*'),
                 ])>My expenses</a>
                 <a href="{{ route('portal.payslips.index') }}" @class([
-                    'block rounded-lg px-3 py-2.5 text-sm font-semibold',
-                    'bg-emerald-50 text-emerald-800' => request()->routeIs('portal.payslips.*'),
-                    'text-slate-700 hover:bg-slate-50' => ! request()->routeIs('portal.payslips.*'),
+                    'rounded-lg px-3 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700',
+                    'bg-brand-50 text-brand-800' => request()->routeIs('portal.payslips.*'),
+                    'text-ink-600 hover:bg-ink-100 hover:text-ink-900' => ! request()->routeIs('portal.payslips.*'),
                 ])>My payslips</a>
             @elseif (in_array($roleValue, ['super_admin', 'manager', 'staff'], true) && Route::has('admin.tours.index'))
-                <a href="{{ route('admin.bookings.index') }}" @class([
-                    'block rounded-lg px-3 py-2.5 text-sm font-semibold',
-                    'bg-emerald-50 text-emerald-800' => request()->routeIs('admin.bookings.*'),
-                    'text-slate-700 hover:bg-slate-50' => ! request()->routeIs('admin.bookings.*'),
-                ])>All bookings</a>
                         <a href="{{ route('admin.bookings.index') }}" @class([
                             'rounded-lg px-3 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600',
                             'bg-emerald-50 text-emerald-800' => request()->routeIs('admin.bookings.*'),

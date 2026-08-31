@@ -108,7 +108,7 @@
                         <div class="rounded-3xl border border-emerald-200 bg-emerald-50 p-6">
                             <h2 class="text-lg font-black text-emerald-950">What is included</h2>
                             @if ($inclusions->isEmpty())<p class="mt-3 text-sm text-emerald-800">No inclusions have been listed.</p>@else
-                                <ul class="mt-4 space-y-3 text-sm text-emerald-950">@foreach ($inclusions as $item)<li class="flex gap-2"><span class="font-black text-emerald-700" aria-hidden="true">✓</span><span>{{ $item->content ?? $item->label }}</span></li>@endforeach</ul>
+                                <ul class="mt-4 space-y-3 text-sm text-emerald-950">@foreach ($inclusions as $item)<li class="flex gap-2"><x-icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-700" /><span>{{ $item->content ?? $item->label }}</span></li>@endforeach</ul>
                             @endif
                         </div>
                         <div class="rounded-3xl border border-amber-200 bg-amber-50 p-6">

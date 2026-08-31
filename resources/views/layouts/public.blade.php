@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#064e3b">
+    <meta name="theme-color" content="#04574e">
     {{-- Read by the chat widget, which posts JSON rather than a form. --}}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ isset($title) ? $title.' | PISFA Tours and Travels' : 'PISFA Tours and Travels' }}</title>
@@ -24,50 +24,97 @@
             Uganda-based travel planning with clear, personal support.
         </div>
         <nav class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-8" aria-label="Main navigation">
-            <a href="{{ route('home') }}" class="flex items-center gap-3 font-black tracking-tight text-emerald-950">
-                <span class="grid size-11 place-items-center rounded-2xl bg-amber-400 text-xl shadow-sm" aria-hidden="true">P</span>
-                <span>
-                    <span class="block text-lg leading-none">PISFA</span>
-                    <span class="mt-1 block text-xs font-semibold tracking-wide text-emerald-700">TOURS &amp; TRAVELS</span>
-                </span>
-            </a>
+            <x-brand-logo :href="route('home')" size="md" />
 
-            <div class="hidden items-center gap-7 text-sm font-semibold md:flex">
-                <a href="{{ route('home') }}" @class(['text-amber-700' => request()->routeIs('home'), 'hover:text-amber-700' => ! request()->routeIs('home')])>Home</a>
-                @if (Route::has('tours.index'))
-                    <a href="{{ route('tours.index') }}" @class(['text-amber-700' => request()->routeIs('tours.*') || request()->routeIs('tour-bookings.*'), 'hover:text-amber-700' => ! request()->routeIs('tours.*') && ! request()->routeIs('tour-bookings.*')])>Tours</a>
-                @endif
-                @if (Route::has('car-hire.index'))
-                    <a href="{{ route('car-hire.index') }}" @class(['text-amber-700' => request()->routeIs('car-hire.*') || request()->routeIs('car-hire-bookings.*'), 'hover:text-amber-700' => ! request()->routeIs('car-hire.*') && ! request()->routeIs('car-hire-bookings.*')])>Car hire</a>
-                @endif
-                @if (Route::has('airport-transfers.index'))
-                    <a href="{{ route('airport-transfers.index') }}" @class(['text-amber-700' => request()->routeIs('airport-transfers.*') || request()->routeIs('airport-transfer-bookings.*'), 'hover:text-amber-700' => ! request()->routeIs('airport-transfers.*') && ! request()->routeIs('airport-transfer-bookings.*')])>Transfers</a>
-                @endif
-                @if (Route::has('flight-inquiries.create'))
-                    <a href="{{ route('flight-inquiries.create') }}" @class(['text-amber-700' => request()->routeIs('flight-inquiries.*'), 'hover:text-amber-700' => ! request()->routeIs('flight-inquiries.*')])>Flights</a>
-                @endif
-                @if (Route::has('vehicle-imports.create'))
-                    <a href="{{ route('vehicle-imports.create') }}" @class(['text-amber-700' => request()->routeIs('vehicle-imports.*'), 'hover:text-amber-700' => ! request()->routeIs('vehicle-imports.*')])>Imports</a>
-                @endif
-                @if (Route::has('showroom.index'))
-                    <a href="{{ route('showroom.index') }}" @class(['text-amber-700' => request()->routeIs('showroom.*'), 'hover:text-amber-700' => ! request()->routeIs('showroom.*')])>Cars for sale</a>
-                @endif
-                @if (Route::has('accommodation.index'))
-                    <a href="{{ route('accommodation.index') }}" @class(['text-amber-700' => request()->routeIs('accommodation.*'), 'hover:text-amber-700' => ! request()->routeIs('accommodation.*')])>Stays</a>
-                @endif
-                @if (Route::has('leasing.create'))
-                    <a href="{{ route('leasing.create') }}" @class(['text-amber-700' => request()->routeIs('leasing.*'), 'hover:text-amber-700' => ! request()->routeIs('leasing.*')])>Lease to us</a>
-                @endif
-                <a href="{{ route('home') }}#services" class="hover:text-amber-700">Services</a>
-                <a href="{{ route('about') }}" @class(['text-amber-700' => request()->routeIs('about'), 'hover:text-amber-700' => ! request()->routeIs('about')])>About</a>
-                <a href="{{ route('blog.index') }}" @class(['text-amber-700' => request()->routeIs('blog.*'), 'hover:text-amber-700' => ! request()->routeIs('blog.*')])>Journal</a>
-                <a href="{{ route('contact') }}" @class(['text-amber-700' => request()->routeIs('contact'), 'hover:text-amber-700' => ! request()->routeIs('contact')])>Contact</a>
+            <div class="hidden items-center gap-1 text-sm font-semibold md:flex">
+                {{--
+                    Six top-level items, not thirteen. Every service used to sit
+                    in the bar, which pushed the row onto two lines and made the
+                    important links compete with the obscure ones. They are now
+                    grouped behind Services, which is also where somebody
+                    actually looks for them.
+                --}}
+                <a href="{{ route('home') }}" @class([
+                    'rounded-control px-3 py-2 transition hover:bg-brand-50',
+                    'text-accent-800' => request()->routeIs('home'),
+                    'text-ink-700 hover:text-brand-800' => ! request()->routeIs('home'),
+                ])>Home</a>
+
+                @php
+                    $serviceLinks = collect([
+                        ['tours.index', 'Tours & safaris', 'compass', 'tours.*', 'Safaris, cultural journeys and day trips'],
+                        ['car-hire.index', 'Car hire', 'car', 'car-hire*', 'Self-drive or with a driver'],
+                        ['airport-transfers.index', 'Airport transfers', 'plane', 'airport-transfer*', 'Entebbe pickups and drop-offs'],
+                        ['accommodation.index', 'Places to stay', 'home', 'accommodation.*', 'Lodges, hotels and longer stays'],
+                        ['showroom.index', 'Cars for sale', 'tag', 'showroom.*', 'Inspected vehicles from our fleet'],
+                        ['vehicle-imports.create', 'Vehicle imports', 'ship', 'vehicle-imports.*', 'Sourcing, shipping and clearance'],
+                        ['flight-inquiries.create', 'Flight enquiries', 'globe', 'flight-inquiries.*', 'We find and quote the fare'],
+                        ['leasing.create', 'Lease your car to us', 'handshake', 'leasing.*', 'Put your vehicle to work'],
+                    ])->filter(fn ($l) => Route::has($l[0]));
+
+                    $onService = $serviceLinks->contains(fn ($l) => request()->routeIs($l[3]));
+                @endphp
+
+                <div x-data="{ open: false }" @keydown.escape.window="open = false" class="relative">
+                    <button type="button"
+                            @click="open = ! open"
+                            :aria-expanded="open ? 'true' : 'false'"
+                            aria-haspopup="true"
+                            @class([
+                                'inline-flex items-center gap-1.5 rounded-control px-3 py-2 transition hover:bg-brand-50',
+                                'text-accent-800' => $onService,
+                                'text-ink-700 hover:text-brand-800' => ! $onService,
+                            ])>
+                        Services
+                        <svg class="h-4 w-4 transition-transform" :class="open && 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+
+                    <div x-show="open" x-cloak
+                         @click.outside="open = false"
+                         x-transition.opacity.duration.150ms
+                         class="absolute left-1/2 z-30 mt-2 w-[34rem] -translate-x-1/2 rounded-card border border-ink-200 bg-white p-2 shadow-xl">
+                        <ul class="grid grid-cols-2 gap-1">
+                            @foreach ($serviceLinks as [$route, $label, $icon, $pattern, $blurb])
+                                <li>
+                                    <a href="{{ route($route) }}" class="flex gap-3 rounded-control p-3 transition hover:bg-brand-50">
+                                        <span class="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-control bg-brand-50 text-brand-700">
+                                            <x-icon :name="$icon" class="h-5 w-5" />
+                                        </span>
+                                        <span>
+                                            <span class="block font-bold text-ink-900">{{ $label }}</span>
+                                            <span class="mt-0.5 block text-xs font-medium leading-5 text-ink-600">{{ $blurb }}</span>
+                                        </span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+
+                <a href="{{ route('about') }}" @class([
+                    'rounded-control px-3 py-2 transition hover:bg-brand-50',
+                    'text-accent-800' => request()->routeIs('about'),
+                    'text-ink-700 hover:text-brand-800' => ! request()->routeIs('about'),
+                ])>About</a>
+                <a href="{{ route('blog.index') }}" @class([
+                    'rounded-control px-3 py-2 transition hover:bg-brand-50',
+                    'text-accent-800' => request()->routeIs('blog.*'),
+                    'text-ink-700 hover:text-brand-800' => ! request()->routeIs('blog.*'),
+                ])>Journal</a>
+                <a href="{{ route('contact') }}" @class([
+                    'rounded-control px-3 py-2 transition hover:bg-brand-50',
+                    'text-accent-800' => request()->routeIs('contact'),
+                    'text-ink-700 hover:text-brand-800' => ! request()->routeIs('contact'),
+                ])>Contact</a>
+
+                <span class="mx-2 h-6 w-px bg-ink-200" aria-hidden="true"></span>
+
                 @auth
-                    <a href="{{ route('dashboard') }}" class="hover:text-amber-700">Dashboard</a>
+                    <a href="{{ route('dashboard') }}" class="rounded-control px-3 py-2 text-ink-700 transition hover:bg-brand-50 hover:text-brand-800">Dashboard</a>
                 @else
-                    <a href="{{ route('login') }}" class="hover:text-amber-700">Sign in</a>
+                    <a href="{{ route('login') }}" class="rounded-control px-3 py-2 text-ink-700 transition hover:bg-brand-50 hover:text-brand-800">Sign in</a>
                 @endauth
-                <a href="{{ route('request-quotation') }}" class="rounded-full bg-emerald-800 px-5 py-3 text-white shadow-sm transition hover:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2">Request a quotation</a>
+                <a href="{{ route('request-quotation') }}" class="ml-1 whitespace-nowrap rounded-full bg-brand-800 px-5 py-2.5 text-white shadow-sm transition hover:bg-brand-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2">Request a quotation</a>
             </div>
 
             <details class="relative md:hidden">

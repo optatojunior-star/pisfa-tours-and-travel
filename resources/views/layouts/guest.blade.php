@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="theme-color" content="#065f46">
+        <meta name="theme-color" content="#04574e">
 
         <title>{{ isset($title) ? $title.' | ' : '' }}PISFA</title>
 
@@ -24,13 +24,7 @@
                 <div class="absolute -right-8 top-16 h-52 w-52 rounded-full border border-emerald-600/40" aria-hidden="true"></div>
                 <div class="absolute bottom-24 left-16 h-px w-72 rotate-[-24deg] bg-gradient-to-r from-transparent via-amber-300/70 to-transparent" aria-hidden="true"></div>
 
-                <a href="{{ url('/') }}" class="relative inline-flex w-fit items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 focus-visible:ring-offset-4 focus-visible:ring-offset-emerald-950" aria-label="PISFA home">
-                    <x-application-logo class="h-12 w-12 text-emerald-600 shadow-lg shadow-emerald-950/30" />
-                    <span>
-                        <span class="block text-xl font-bold tracking-[0.18em]">PISFA</span>
-                        <span class="block text-xs font-medium uppercase tracking-[0.14em] text-emerald-200">Tour &amp; Travel</span>
-                    </span>
-                </a>
+                <x-brand-logo :href="url('/')" size="lg" inverse class="relative w-fit" />
 
                 <div class="relative max-w-lg">
                     <p class="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-700 bg-emerald-900/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-emerald-100">
@@ -54,10 +48,7 @@
 
             <main id="main-content" class="flex min-h-screen flex-col px-4 py-6 sm:px-8 lg:px-12">
                 <div class="mx-auto flex w-full max-w-lg items-center justify-between lg:justify-end">
-                    <a href="{{ url('/') }}" class="inline-flex items-center gap-2 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 lg:hidden" aria-label="PISFA home">
-                        <x-application-logo class="h-10 w-10 text-emerald-700" />
-                        <span class="font-bold tracking-[0.14em] text-emerald-950">PISFA</span>
-                    </a>
+                    <x-brand-logo :href="url('/')" size="sm" class="lg:hidden" />
                     <span class="text-xs font-medium uppercase tracking-[0.12em] text-slate-400">Secure access</span>
                 </div>
 

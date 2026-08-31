@@ -73,11 +73,16 @@ class MarketingPagesTest extends TestCase
         ];
 
         foreach ($shipped as $slug => $route) {
-            $this->assertSame(
-                $route,
-                ServiceCatalogue::SERVICES[$slug]['route'] ?? null,
-                "The {$slug} service has a live public page but the catalogue does not link to it.",
+            $service = ServiceCatalogue::SERVICES[$slug];
+
+            $this->assertArrayHasKey(
+                'route',
+                $service,
+                "The {$slug} service has a live public page but the catalogue does not link to it, "
+                .'so the homepage advertises it as unavailable.',
             );
+
+            $this->assertSame($route, $service['route'], "The {$slug} card links to the wrong route.");
         }
     }
 

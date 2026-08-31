@@ -1,0 +1,22 @@
+brand   50   #f0faf9  on-white  1.06:1      white-on  1.06:1   
+brand   100  #e0f5f3  on-white  1.13:1      white-on  1.13:1   
+brand   200  #b3f9f2  on-white  1.18:1      white-on  1.18:1   
+brand   300  #7af5e8  on-white  1.31:1      white-on  1.31:1   
+brand   400  #38f0dd  on-white  1.43:1      white-on  1.43:1   
+brand   500  #08a090  on-white  3.26:1      white-on  3.26:1   
+brand   600  #07887a  on-white  4.36:1      white-on  4.36:1   
+brand   700  #066f64  on-white  6.06:1 AA   white-on  6.06:1 AA
+brand   800  #04574e  on-white  8.47:1 AA   white-on  8.47:1 AA
+brand   900  #03443d  on-white 11.06:1 AA   white-on 11.06:1 AA
+brand   950  #022b27  on-white 15.25:1 AA   white-on 15.25:1 AA
+accent  50   #faf3f0  on-white  1.10:1      white-on  1.10:1   
+accent  100  #f5e8e0  on-white  1.20:1      white-on  1.20:1   
+accent  200  #f8cdb4  on-white  1.46:1      white-on  1.46:1   
+accent  300  #f3a77d  on-white  1.97:1      white-on  1.97:1   
+accent  400  #ec7b3b  on-white  2.81:1      white-on  2.81:1   
+accent  500  #f07028  on-white  2.98:1      white-on  2.98:1   
+accent  600  #ee6011  on-white  3.32:1      white-on  3.32:1   
+accent  700  #d6570f  on-white  4.02:1      white-on  4.02:1   
+accent  800  #be4d0d  on-white  4.93:1 AA   white-on  4.93:1 AA
+accent  900  #ab450c  on-white  5.85:1 AA   white-on  5.85:1 AA
+accent  950  #933c0a  on-white  7.26:1 AA   white-on  7.26:1 AA

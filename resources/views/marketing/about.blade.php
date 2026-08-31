@@ -29,22 +29,22 @@
             </div>
             <div class="grid gap-5 sm:grid-cols-2">
                 <article class="rounded-3xl bg-emerald-50 p-7 ring-1 ring-emerald-100">
-                    <span class="text-3xl" aria-hidden="true">🤲</span>
+                    <x-icon name="heart-hands" class="h-8 w-8 text-brand-700" />
                     <h3 class="mt-5 text-xl font-bold text-emerald-950">Service</h3>
                     <p class="mt-3 leading-7 text-slate-600">Listen carefully, communicate clearly, and help people make informed choices.</p>
                 </article>
                 <article class="rounded-3xl bg-amber-50 p-7 ring-1 ring-amber-100">
-                    <span class="text-3xl" aria-hidden="true">🌱</span>
+                    <x-icon name="leaf" class="h-8 w-8 text-brand-700" />
                     <h3 class="mt-5 text-xl font-bold text-emerald-950">Responsibility</h3>
                     <p class="mt-3 leading-7 text-slate-600">Build durable relationships and treat personal information with care.</p>
                 </article>
                 <article class="rounded-3xl bg-amber-50 p-7 ring-1 ring-amber-100">
-                    <span class="text-3xl" aria-hidden="true">📍</span>
+                    <x-icon name="pin" class="h-8 w-8 text-brand-700" />
                     <h3 class="mt-5 text-xl font-bold text-emerald-950">Local context</h3>
                     <p class="mt-3 leading-7 text-slate-600">Plan with a grounded understanding of Ugandan destinations and travel realities.</p>
                 </article>
                 <article class="rounded-3xl bg-emerald-50 p-7 ring-1 ring-emerald-100">
-                    <span class="text-3xl" aria-hidden="true">✅</span>
+                    <x-icon name="check-circle" class="h-8 w-8 text-brand-700" />
                     <h3 class="mt-5 text-xl font-bold text-emerald-950">Clarity</h3>
                     <p class="mt-3 leading-7 text-slate-600">Label what is available today and what remains part of the planned platform.</p>
                 </article>

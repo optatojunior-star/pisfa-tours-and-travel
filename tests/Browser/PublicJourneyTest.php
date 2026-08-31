@@ -140,6 +140,37 @@ class PublicJourneyTest extends DuskTestCase
         });
     }
 
+    public function test_the_services_dropdown_opens_and_lists_every_service(): void
+    {
+        // The navigation used to carry thirteen top-level items, which wrapped
+        // onto two lines and buried the important links. They are now grouped
+        // behind one Alpine dropdown — behaviour only a browser can verify.
+        $this->browse(function (Browser $browser): void {
+            $browser->visit('/')
+                ->waitFor('nav', 10)
+                ->assertDontSee('Lease your car to us')   // hidden until opened
+                ->press('Services')
+                ->waitForText('Lease your car to us', 10)
+                ->assertSee('Tours & safaris')
+                ->assertSee('Airport transfers')
+                ->assertSee('Cars for sale');
+
+            $expanded = $browser->driver->executeScript(
+                "return [...document.querySelectorAll('button')]"
+                ."  .find(b => b.textContent.trim().startsWith('Services'))"
+                ."  .getAttribute('aria-expanded');"
+            );
+
+            $this->assertSame('true', $expanded, 'The dropdown does not report its state to assistive technology.');
+
+            // Escape must close it: a keyboard user who opens it by accident
+            // needs a way out that is not the mouse.
+            $browser->keys('body', ['{escape}'])
+                ->pause(400)
+                ->assertDontSee('Lease your car to us');
+        });
+    }
+
     public function test_the_offline_page_stands_on_its_own(): void
     {
         $this->browse(function (Browser $browser): void {

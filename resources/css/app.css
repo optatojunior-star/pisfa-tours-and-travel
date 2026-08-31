@@ -1,3 +1,49 @@
+@import './fonts.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    /*
+     * Inter's default figures are proportional, which makes prices and
+     * reference numbers jitter as they change. Tabular figures keep every digit
+     * the same width, so a column of money lines up and a countdown does not
+     * shuffle. cv11 gives the single-storey 'a' that matches the logo's
+     * wordmark.
+     */
+    html {
+        font-feature-settings: 'cv11', 'ss01';
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Money, references, dates and counts. */
+    .tabular,
+    time,
+    [data-money] {
+        font-variant-numeric: tabular-nums;
+    }
+
+    /*
+     * A visible focus ring on every interactive element, in the brand colour.
+     * Keyboard users navigate by focus; without this they are lost on any
+     * control whose own styles forgot to include one.
+     */
+    :focus-visible {
+        outline: 2px solid theme('colors.brand.700');
+        outline-offset: 2px;
+    }
+
+    /* Honour a reduced-motion preference rather than assuming everyone wants animation. */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}

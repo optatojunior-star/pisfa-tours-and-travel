@@ -61,7 +61,17 @@ step "Running migrations"
 $PHP artisan migrate --force
 
 step "Linking public storage"
-$PHP artisan storage:link || true
+# Only when missing. storage:link reports "link already exists" as an ERROR,
+# which it will on every deploy after the first, and a red line in deploy output
+# that is always there is a line people stop reading.
+#
+# Created with ln rather than the artisan command because Hostinger disables
+# exec(), which storage:link needs.
+if [ ! -e public/storage ]; then
+    ln -s "$(pwd)/storage/app/public" "$(pwd)/public/storage" && echo "  created public/storage"
+else
+    echo "  public/storage already present"
+fi
 
 # ---------------------------------------------------------------------------
 # Caches.

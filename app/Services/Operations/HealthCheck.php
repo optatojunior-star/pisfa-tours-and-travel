@@ -256,10 +256,15 @@ class HealthCheck
             $lastRun = Cache::get('operations:scheduler-heartbeat');
 
             if (! is_string($lastRun)) {
+                // Deliberately a warning, not a failure. The heartbeat lives in
+                // the cache, and a deployment clears the cache — so a perfectly
+                // healthy scheduler has no heartbeat for up to a minute after
+                // every release. Failing here would cry wolf on every deploy.
                 return [
                     HealthStatus::Warning,
-                    'No scheduler heartbeat recorded yet. If this deployment is new, it appears after '
-                    .'the first scheduled minute; otherwise check the cron entry.',
+                    'No scheduler heartbeat yet. Expected right after a deployment, which clears the '
+                    .'cache the heartbeat lives in — it returns within a minute. If it is still '
+                    .'missing after two, check the cron entry.',
                 ];
             }
 

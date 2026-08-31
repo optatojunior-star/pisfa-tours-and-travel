@@ -63,8 +63,15 @@ class CustomerSnapshot
                 $source->statusValuesInStage(BookingStage::InProgress),
             );
 
+            // customerColumn(), not a hardcoded 'customer_id': a group booking
+            // belongs to its organiser and has no customer_id at all. SQLite
+            // hid this for months — it quotes identifiers with double quotes,
+            // and when the column does not exist it falls back to treating
+            // "customer_id" as a string literal, silently matching nothing.
+            // MySQL rightly errors, so the portal 500'd on the first real
+            // deployment.
             $records = DB::table($source->table())
-                ->where('customer_id', $customer->getKey())
+                ->where($source->customerColumn(), $customer->getKey())
                 ->whereIn('status', $openStatuses)
                 ->where($serviceDate, '>=', $from)
                 ->orderBy($serviceDate)
@@ -99,7 +106,7 @@ class CustomerSnapshot
             );
 
             $total += DB::table($source->table())
-                ->where('customer_id', $customer->getKey())
+                ->where($source->customerColumn(), $customer->getKey())
                 ->whereIn('status', $openStatuses)
                 ->count();
         }

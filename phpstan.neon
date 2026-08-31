@@ -1,0 +1,25 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+    - phpstan-baseline.neon
+
+parameters:
+    paths:
+        - app
+        - config
+        - database
+        - routes
+        - tests
+
+    # Level 5 is what the codebase satisfies today. Pre-existing findings are
+    # captured in phpstan-baseline.neon so CI fails on NEW findings only; the
+    # baseline is expected to shrink, never grow. Raise the level once the
+    # remaining feature slices land and the baseline is empty.
+    level: 5
+
+    checkModelProperties: true
+
+    checkOctaneCompatibility: false
+
+    treatPhpDocTypesAsCertain: false
+
+    reportUnmatchedIgnoredErrors: false

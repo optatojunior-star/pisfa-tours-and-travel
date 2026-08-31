@@ -1,0 +1,1621 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferBooking\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/AssignAirportTransferResources.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:holdingResources\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Actions/AirportTransfers/AssignAirportTransferResources.php
+
+		-
+			message: '#^Parameter \#2 \$oldDriver of method App\\Actions\\AirportTransfers\\AssignAirportTransferResources\:\:dispatchAssignmentNotifications\(\) expects App\\Models\\User\|null, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/AirportTransfers/AssignAirportTransferResources.php
+
+		-
+			message: '#^Parameter \#3 \$oldVehicle of method App\\Actions\\AirportTransfers\\AssignAirportTransferResources\:\:dispatchAssignmentNotifications\(\) expects App\\Models\\Vehicle\|null, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/AirportTransfers/AssignAirportTransferResources.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferBooking\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/CancelAirportTransferBooking.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferBooking\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/ChangeAirportTransferRateStatus.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$currency\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/ChangeAirportTransferRateStatus.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$vehicle_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/ChangeAirportTransferRateStatus.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Actions/AirportTransfers/ChangeAirportTransferRateStatus.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Airport\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/CreateAirportTransferBooking.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferBooking\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/CreateAirportTransferBooking.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$currency\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/CreateAirportTransferBooking.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$vehicle_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/CreateAirportTransferBooking.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Carbon\\CarbonImmutable\|null and false will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Actions/AirportTransfers/QuoteAirportTransfer.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferBooking\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/RescheduleAirportTransferBooking.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$currency\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/RescheduleAirportTransferBooking.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$vehicle_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/RescheduleAirportTransferBooking.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:holdingResources\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Actions/AirportTransfers/RescheduleAirportTransferBooking.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Airport\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/SaveAirport.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Airport\:\:\$country_code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/SaveAirport.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferBooking\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/SaveAirport.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferBooking\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/SaveAirportTransferLocation.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferLocation\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/SaveAirportTransferLocation.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferBooking\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/SaveAirportTransferRate.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$currency\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/SaveAirportTransferRate.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$vehicle_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/SaveAirportTransferRate.php
+
+		-
+			message: '#^Cannot call method isAfter\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/AirportTransfers/SaveAirportTransferRate.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferBooking\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/AirportTransfers/TransitionAirportTransferBooking.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: app/Actions/AirportTransfers/TransitionAirportTransferBooking.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/CarHire/AssignCarHireDriver.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/CarHire/CancelCarHireBooking.php
+
+		-
+			message: '#^Cannot call method isFuture\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/CarHire/CreateCarHireBooking.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: mixed$#'
+			identifier: match.unhandled
+			count: 1
+			path: app/Actions/CarHire/CreateCarHireBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$customer_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/CarHire/DeleteCarHireDocument.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$hold_expires_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/CarHire/DeleteCarHireDocument.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$reference\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/CarHire/DeleteCarHireDocument.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$selfDriveApplication\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/CarHire/DeleteCarHireDocument.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/CarHire/DeleteCarHireDocument.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Actions/CarHire/DeleteCarHireDocument.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Actions/CarHire/ReviewSelfDriveApplication.php
+
+		-
+			message: '#^Cannot call method toDateString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/CarHire/ReviewSelfDriveApplication.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Actions/CarHire/SaveSelfDriveApplication.php
+
+		-
+			message: '#^Cannot call method isCustomerEditable\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/CarHire/SaveSelfDriveApplication.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/CarHire/SaveSelfDriveApplication.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Actions/CarHire/SaveVehicle.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/CarHire/SaveVehicle.php
+
+		-
+			message: '#^Parameter \#1 \$from of method App\\Actions\\CarHire\\SaveVehicle\:\:assertCatalogueTransition\(\) expects App\\Enums\\VehicleCatalogueStatus, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/CarHire/SaveVehicle.php
+
+		-
+			message: '#^Cannot call method isAfter\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/CarHire/SaveVehicleRate.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/CarHire/StoreCarHireDocument.php
+
+		-
+			message: '#^Match arm comparison between ''image/png'' and ''image/png'' is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/Actions/CarHire/StoreCarHireDocument.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$email_verified_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/CarHire/TransitionCarHireBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/CarHire/TransitionCarHireBooking.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:hasRole\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/CarHire/TransitionCarHireBooking.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/CarHire/TransitionCarHireBooking.php
+
+		-
+			message: '#^Cannot call method isAfter\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/CarHire/TransitionCarHireBooking.php
+
+		-
+			message: '#^Cannot call method toDateString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/CarHire/TransitionCarHireBooking.php
+
+		-
+			message: '#^Match arm comparison between App\\Enums\\CarHireBookingStatus\:\:Expired and App\\Enums\\CarHireBookingStatus\:\:Expired is always true\.$#'
+			identifier: match.alwaysTrue
+			count: 1
+			path: app/Actions/CarHire/TransitionCarHireBooking.php
+
+		-
+			message: '#^Cannot call method toDateString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/CarHire/VerifySelfDriveOriginals.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\FlightInquiry\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/FlightInquiries/AssignFlightInquiry.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/FlightInquiries/AssignFlightInquiry.php
+
+		-
+			message: '#^Cannot call method label\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/FlightInquiries/AssignFlightInquiry.php
+
+		-
+			message: '#^Cannot call method toDateString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/FlightInquiries/AssignFlightInquiry.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/FlightInquiries/AssignFlightInquiry.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\FlightInquiry\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/FlightInquiries/CreateFlightInquiry.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/FlightInquiries/CreateFlightInquiry.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: app/Actions/FlightInquiries/CreateFlightInquiry.php
+
+		-
+			message: '#^Cannot call method label\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Actions/FlightInquiries/CreateFlightInquiry.php
+
+		-
+			message: '#^Cannot call method toDateString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 4
+			path: app/Actions/FlightInquiries/CreateFlightInquiry.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\FlightInquiry\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/FlightInquiries/RecordFlightInquiryEntry.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/FlightInquiries/RecordFlightInquiryEntry.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\FlightInquiry\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/FlightInquiries/TransitionFlightInquiry.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/FlightInquiries/TransitionFlightInquiry.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 3
+			path: app/Actions/FlightInquiries/TransitionFlightInquiry.php
+
+		-
+			message: '#^Cannot call method isReopening\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/FlightInquiries/TransitionFlightInquiry.php
+
+		-
+			message: '#^Cannot call method label\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: app/Actions/FlightInquiries/TransitionFlightInquiry.php
+
+		-
+			message: '#^Cannot call method toDateString\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/FlightInquiries/TransitionFlightInquiry.php
+
+		-
+			message: '#^Cannot call method getTimestamp\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/Fortify/RedirectIfTwoFactorAuthenticatable.php
+
+		-
+			message: '#^Instanceof between App\\Models\\User and Illuminate\\Contracts\\Auth\\MustVerifyEmail will always evaluate to true\.$#'
+			identifier: instanceof.alwaysTrue
+			count: 1
+			path: app/Actions/Fortify/UpdateUserProfileInformation.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Tours/AssignTourDriver.php
+
+		-
+			message: '#^Cannot call method isFuture\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/Tours/AssignTourDriver.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/Tours/AssignTourDriver.php
+
+		-
+			message: '#^Parameter \#2 \$endsAt of method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\CarHireDriverAssignment\>\:\:overlapping\(\) expects DateTimeInterface, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/Tours/AssignTourDriver.php
+
+		-
+			message: '#^Parameter \#2 \$endsAt of method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\TourAssignment\>\:\:overlapping\(\) expects DateTimeInterface, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/Tours/AssignTourDriver.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Tours/CancelTourBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$accessibility_notes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_of_birth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$dietary_notes\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$full_name\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_lead\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$nationality\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$sort_order\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$traveler_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:holdingCapacity\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Cannot call method isAfter\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 1
+			path: app/Actions/Tours/CreateTourBooking.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:holdingCapacity\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Tours/SaveTourDeparture.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:exclusions\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Tours/SaveTourPackage.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:inclusions\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Tours/SaveTourPackage.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Actions/Tours/SaveTourPackage.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Actions/Tours/SaveTourPackage.php
+
+		-
+			message: '#^Parameter \#1 \$from of method App\\Actions\\Tours\\SaveTourPackage\:\:assertStatusTransition\(\) expects App\\Enums\\TourPackageStatus, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Actions/Tours/SaveTourPackage.php
+
+		-
+			message: '#^Parameter \#1 \$records of method Illuminate\\Database\\Eloquent\\Relations\\HasOneOrMany\<Illuminate\\Database\\Eloquent\\Model,Illuminate\\Database\\Eloquent\\Model,Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\>\:\:createMany\(\) expects iterable\<array\<model property of Illuminate\\Database\\Eloquent\\Model, mixed\>\>, array\<array\> given\.$#'
+			identifier: argument.type
+			count: 2
+			path: app/Actions/Tours/SaveTourPackage.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Tours/TransitionTourBooking.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:holdingCapacity\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Actions/Tours/TransitionTourBooking.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$airport_name_snapshot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/ExpireAirportTransferRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$assignments\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/ExpireAirportTransferRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/ExpireAirportTransferRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$contact_name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Console/Commands/ExpireAirportTransferRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$customer\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/ExpireAirportTransferRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$location_name_snapshot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/ExpireAirportTransferRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$reference\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Console/Commands/ExpireAirportTransferRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$service_starts_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Console/Commands/ExpireAirportTransferRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/ExpireAirportTransferRequests.php
+
+		-
+			message: '#^Parameter \#1 \$booking of method App\\Console\\Commands\\ExpireAirportTransferRequests\:\:customerViewUrl\(\) expects App\\Models\\AirportTransferBooking, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/ExpireAirportTransferRequests.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$airport_name_snapshot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendAirportTransferPickupReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendAirportTransferPickupReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$contact_name\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Console/Commands/SendAirportTransferPickupReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$customer\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendAirportTransferPickupReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$location_name_snapshot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendAirportTransferPickupReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$reference\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendAirportTransferPickupReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$service_starts_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Console/Commands/SendAirportTransferPickupReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendAirportTransferPickupReminders.php
+
+		-
+			message: '#^Parameter \#1 \$booking of method App\\Console\\Commands\\SendAirportTransferPickupReminders\:\:customerViewUrl\(\) expects App\\Models\\AirportTransferBooking, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Console/Commands/SendAirportTransferPickupReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$customer\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendCarHireReturnReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$pickup_location\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendCarHireReturnReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$reference\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendCarHireReturnReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$return_at\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Console/Commands/SendCarHireReturnReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendCarHireReturnReminders.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$vehicle_name_snapshot\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Console/Commands/SendCarHireReturnReminders.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Airport\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/AirportTransferSettingController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Airport\:\:\$country_code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/AirportTransferSettingController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferLocation\:\:\$slug\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Admin/AirportTransferSettingController.php
+
+		-
+			message: '#^Parameter \#2 \$application of method App\\Actions\\CarHire\\ReviewSelfDriveApplication\:\:execute\(\) expects App\\Models\\CarHireSelfDriveApplication, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Admin/CarHireBookingController.php
+
+		-
+			message: '#^Parameter \#2 \$application of method App\\Actions\\CarHire\\VerifySelfDriveOriginals\:\:execute\(\) expects App\\Models\\CarHireSelfDriveApplication, Illuminate\\Database\\Eloquent\\Model given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Http/Controllers/Admin/CarHireBookingController.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/Admin/TourPackageController.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: app/Http/Controllers/Admin/TourPackageController.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Http/Controllers/Admin/VehicleController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\|Illuminate\\Database\\Eloquent\\Relations\\Relation\:\:active\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/CarHire/CarHireBookingController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:active\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/CarHire/CarHireCatalogueController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:holdingVehicle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/CarHire/CarHireCatalogueController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\|Illuminate\\Database\\Eloquent\\Relations\\Relation\:\:active\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Http/Controllers/CarHire/CarHireCatalogueController.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Http/Controllers/CarHire/CarHireDocumentController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Support\\Collection\<int, App\\Models\\User\>\:\:modelKeys\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/StaffController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$capacity\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Tours/TourBookingController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:acceptingBookings\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Tours/TourCatalogueController.php
+
+		-
+			message: '#^Cannot call method isOpen\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Http/Requests/Admin/TransitionFlightInquiryRequest.php
+
+		-
+			message: '#^Result of \|\| is always false\.$#'
+			identifier: booleanOr.alwaysFalse
+			count: 1
+			path: app/Http/Requests/AirportTransfers/AirportTransferQuoteRequest.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Carbon\\CarbonImmutable\|null and false will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: app/Http/Requests/AirportTransfers/AirportTransferQuoteRequest.php
+
+		-
+			message: '#^Result of \|\| is always false\.$#'
+			identifier: booleanOr.alwaysFalse
+			count: 1
+			path: app/Http/Requests/AirportTransfers/StoreAirportTransferBookingRequest.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Carbon\\CarbonImmutable\|null and false will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: app/Http/Requests/AirportTransfers/StoreAirportTransferBookingRequest.php
+
+		-
+			message: '#^Result of \|\| is always false\.$#'
+			identifier: booleanOr.alwaysFalse
+			count: 1
+			path: app/Http/Requests/CarHire/CarHireCatalogueRequest.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Carbon\\CarbonImmutable\|null and false will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: app/Http/Requests/CarHire/CarHireCatalogueRequest.php
+
+		-
+			message: '#^Result of \|\| is always false\.$#'
+			identifier: booleanOr.alwaysFalse
+			count: 1
+			path: app/Http/Requests/CarHire/StoreCarHireBookingRequest.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Carbon\\CarbonImmutable\|null and false will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 2
+			path: app/Http/Requests/CarHire/StoreCarHireBookingRequest.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between Carbon\\CarbonImmutable\|null and false will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: app/Http/Requests/FlightInquiries/StoreFlightInquiryRequest.php
+
+		-
+			message: '#^Cannot call method isAfter\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Models/AirportTransferRate.php
+
+		-
+			message: '#^Cannot call method isAfter\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/CarHireBooking.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:nonVoided\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/CarHireContract.php
+
+		-
+			message: '#^Cannot call method isCustomerEditable\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/CarHireSelfDriveApplication.php
+
+		-
+			message: '#^Trait App\\Models\\Concerns\\Auditable is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: app/Models/Concerns/Auditable.php
+
+		-
+			message: '#^PHPDoc tag @use has invalid type Database\\Factories\\ContactMessageFactory\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/ContactMessage.php
+
+		-
+			message: '#^Type Database\\Factories\\ContactMessageFactory in generic type Illuminate\\Database\\Eloquent\\Factories\\HasFactory\<Database\\Factories\\ContactMessageFactory\> in PHPDoc tag @use is not subtype of template type TFactory of Illuminate\\Database\\Eloquent\\Factories\\Factory of trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory\.$#'
+			identifier: generics.notSubtype
+			count: 1
+			path: app/Models/ContactMessage.php
+
+		-
+			message: '#^Cannot call method canTransitionTo\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/FlightInquiry.php
+
+		-
+			message: '#^Cannot call method isOpen\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/FlightInquiry.php
+
+		-
+			message: '#^Cannot call method isCommunication\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/FlightInquiryEntry.php
+
+		-
+			message: '#^PHPDoc tag @use has invalid type Database\\Factories\\NewsletterSubscriberFactory\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Models/NewsletterSubscriber.php
+
+		-
+			message: '#^Type Database\\Factories\\NewsletterSubscriberFactory in generic type Illuminate\\Database\\Eloquent\\Factories\\HasFactory\<Database\\Factories\\NewsletterSubscriberFactory\> in PHPDoc tag @use is not subtype of template type TFactory of Illuminate\\Database\\Eloquent\\Factories\\Factory of trait Illuminate\\Database\\Eloquent\\Factories\\HasFactory\.$#'
+			identifier: generics.notSubtype
+			count: 1
+			path: app/Models/NewsletterSubscriber.php
+
+		-
+			message: '#^Cannot call method isFuture\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/StaffInvitation.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$base_price_minor\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/TourDeparture.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$currency\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Models/TourDeparture.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:upcoming\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/TourDeparture.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:active\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/TourPackage.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Cannot call method canAccessAdministration\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:acceptingHire\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Vehicle.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:holdingVehicle\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Vehicle.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:published\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Models/Vehicle.php
+
+		-
+			message: '#^Cannot call method acceptsHire\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Vehicle.php
+
+		-
+			message: '#^Cannot call method isAfter\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Models/Vehicle.php
+
+		-
+			message: '#^Cannot call method isAfter\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Models/VehicleHireRate.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: app/Policies/FlightInquiryPolicy.php
+
+		-
+			message: '#^Parameter \#1 \$role of static method App\\Enums\\StaffRoles\:\:isManageable\(\) expects App\\Enums\\UserRole, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/StaffAccessGuard.php
+
+		-
+			message: '#^Cannot call method timezone\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: app/Services/StaffInvitationNotification.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:notify\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: app/Services/StaffInvitationService.php
+
+		-
+			message: '#^Cannot access property \$value on string\.$#'
+			identifier: property.nonObject
+			count: 2
+			path: app/Services/StaffInvitationService.php
+
+		-
+			message: '#^Cannot call method toIso8601String\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: app/Services/StaffInvitationService.php
+
+		-
+			message: '#^Parameter \#1 \$role of static method App\\Enums\\StaffRoles\:\:isManageable\(\) expects App\\Enums\\UserRole, string given\.$#'
+			identifier: argument.type
+			count: 3
+			path: app/Services/StaffInvitationService.php
+
+		-
+			message: '#^Parameter \#1 \$role of static method App\\Enums\\StaffRoles\:\:isManageable\(\) expects App\\Enums\\UserRole, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/StaffUserPolicy.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Airport\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: database/factories/AirportTransferBookingFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$currency\.$#'
+			identifier: property.notFound
+			count: 1
+			path: database/factories/AirportTransferBookingFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$vehicle_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: database/factories/AirportTransferBookingFactory.php
+
+		-
+			message: '#^Anonymous function should return App\\Enums\\AirportTransferType but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: database/factories/AirportTransferBookingFactory.php
+
+		-
+			message: '#^Return type \(array\<string, mixed\>\) of method Database\\Factories\\UserFactory\:\:definition\(\) should be compatible with return type \(array\<model property of App\\Models\\User, mixed\>\) of method Illuminate\\Database\\Eloquent\\Factories\\Factory\<App\\Models\\User\>\:\:definition\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: database/factories/UserFactory.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Airport\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 2
+			path: tests/Feature/AirportTransfers/AirportTransferAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$currency\.$#'
+			identifier: property.notFound
+			count: 2
+			path: tests/Feature/AirportTransfers/AirportTransferAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferRate\:\:\$vehicle_type\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/AirportTransfers/AirportTransferAdministrationHttpTest.php
+
+		-
+			message: '#^Cannot call method addDay\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Feature/AirportTransfers/AirportTransferAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Airport\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/AirportTransfers/AirportTransferPlannerHttpTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AirportTransferBooking\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: tests/Feature/AirportTransfers/AirportTransferPlannerHttpTest.php
+
+		-
+			message: '#^Cannot call method equalTo\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Feature/Auth/TwoFactorAuthenticationTest.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: string$#'
+			identifier: match.unhandled
+			count: 1
+			path: tests/Feature/CarHire/BookingAvailabilityTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$accepted_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/BookingCreationTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$content_sha256\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/BookingCreationTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$snapshot\.$#'
+			identifier: property.notFound
+			count: 3
+			path: tests/Feature/CarHire/BookingCreationTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/BookingCreationTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$terms_snapshot\.$#'
+			identifier: property.notFound
+			count: 3
+			path: tests/Feature/CarHire/BookingCreationTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$version\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/BookingCreationTest.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:isCustomerEditable\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Feature/CarHire/BookingCreationTest.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:coveringInterval\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Feature/CarHire/CarHireCatalogueHttpTest.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Support\\Collection\<\(int\|string\), mixed\>\:\:modelKeys\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: tests/Feature/CarHire/CarHireCatalogueHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$booking\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/CarHireDomainModelTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$driving_permit_number\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/CarHireDomainModelTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$national_id_number\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/CarHireDomainModelTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$status\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/CarHireDomainModelTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Feature/CarHire/CarHireDomainModelTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$originals_verified_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/CarHireRouteAuthorizationTest.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_reverse expects array, string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Feature/CarHire/ContractAndLifecycleTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$driver_user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/DriverAssignmentTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$ends_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/DriverAssignmentTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$starts_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/DriverAssignmentTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$unassigned_at\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/DriverAssignmentTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$unassignment_reason\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/CarHire/DriverAssignmentTest.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:active\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: tests/Feature/CarHire/DriverAssignmentTest.php
+
+		-
+			message: '#^Method Tests\\Feature\\CarHire\\SelfDriveReviewTest\:\:submittedApplicationFixture\(\) should return array\{App\\Models\\CarHireBooking, App\\Models\\CarHireSelfDriveApplication\} but returns array\{App\\Models\\CarHireBooking, Illuminate\\Database\\Eloquent\\Model\|null\}\.$#'
+			identifier: return.type
+			count: 1
+			path: tests/Feature/CarHire/SelfDriveReviewTest.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:effectiveAt\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Feature/CarHire/VehicleCatalogueAndRateTest.php
+
+		-
+			message: '#^Cannot call method equalTo\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Feature/CarHire/VehicleCatalogueAndRateTest.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\FlightInquiry\:\:\$contact_email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: tests/Feature/FlightInquiries/FlightInquirySubmissionTest.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>email" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: tests/Feature/FlightInquiries/FlightInquiryWorkflowTest.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>name" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: tests/Feature/FlightInquiries/FlightInquiryWorkflowTest.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>phone" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: tests/Feature/FlightInquiries/FlightInquiryWorkflowTest.php
+
+		-
+			message: '#^Cannot call method betweenIncluded\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Feature/StaffProvisioningTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$activities\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/AdministrationDomainTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_cover\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/AdministrationDomainTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/AdministrationDomainTest.php
+
+		-
+			message: '#^Parameter \#2 \$package of method App\\Actions\\Tours\\SaveTourDeparture\:\:execute\(\) expects App\\Models\\TourPackage, Illuminate\\Database\\Eloquent\\Model\|null given\.$#'
+			identifier: argument.type
+			count: 3
+			path: tests/Feature/Tours/AdministrationDomainTest.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:holdingCapacity\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingCancellationTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$category\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingCreationTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_of_birth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingCreationTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_lead\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingCreationTest.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Relations\\HasMany\:\:holdingCapacity\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingCreationTest.php
+
+		-
+			message: '#^Call to an undefined method Mockery\\ExpectationInterface\|Mockery\\HigherOrderMessage\:\:once\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingCreationTest.php
+
+		-
+			message: '#^Cannot call method equalTo\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: tests/Feature/Tours/BookingCreationTest.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: string$#'
+			identifier: match.unhandled
+			count: 1
+			path: tests/Feature/Tours/BookingCreationTest.php
+
+		-
+			message: '#^Offset ''booking_id'' does not exist on string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingTransitionTest.php
+
+		-
+			message: '#^Offset ''booking_reference'' does not exist on string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingTransitionTest.php
+
+		-
+			message: '#^Offset ''currency'' does not exist on string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingTransitionTest.php
+
+		-
+			message: '#^Offset ''customer_id'' does not exist on string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingTransitionTest.php
+
+		-
+			message: '#^Offset ''total_minor'' does not exist on string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: tests/Feature/Tours/BookingTransitionTest.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Support\\Collection\<\(int\|string\), mixed\>\:\:modelKeys\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: tests/Feature/Tours/CatalogueHttpTest.php
+
+		-
+			message: '#^Offset ''booking_reference'' does not exist on string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: tests/Feature/Tours/DepartureReminderCommandTest.php
+
+		-
+			message: '#^Offset ''departure_starts_at'' does not exist on string\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: tests/Feature/Tours/DepartureReminderCommandTest.php
+
+		-
+			message: '#^Cannot call method equalTo\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: tests/Feature/Tours/DriverAssignmentTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$activities\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$alt_text\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$caption\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$currency\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$day_number\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$description\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$is_cover\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$meals\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$overnight_location\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$title\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$url\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: string$#'
+			identifier: match.unhandled
+			count: 1
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Parameter \#1 \$callback of method Illuminate\\Database\\Eloquent\\Collection\<int,Illuminate\\Database\\Eloquent\\Model\>\:\:map\(\) contains unresolvable type\.$#'
+			identifier: argument.unresolvableType
+			count: 2
+			path: tests/Feature/Tours/TourAdministrationHttpTest.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Support\\Collection\<\(int\|string\), mixed\>\:\:modelKeys\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: tests/Feature/Tours/TourBookingIndexDateFilterTest.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model\:\:\$date_of_birth\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Feature/Tours/TourRouteAuthorizationTest.php
+
+		-
+			message: '#^Call to method PHPUnit\\Framework\\Assert\:\:assertTrue\(\) with true will always evaluate to true\.$#'
+			identifier: method.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/ExampleTest.php

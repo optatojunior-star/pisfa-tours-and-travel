@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Production-engine test configuration.
+
+    phpunit.xml pins DB_CONNECTION=sqlite for fast local runs. That is useful
+    for iteration but cannot exercise row locks, InnoDB unique-constraint
+    races, or MySQL date semantics. This configuration deliberately omits every
+    DB_* override so the connection comes from the environment, which makes a
+    silent fallback to SQLite impossible: if the environment is not configured,
+    the suite fails to connect rather than passing against the wrong engine.
+
+    Usage: php artisan test --configuration=phpunit.mysql.xml
+-->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Feature">
+            <directory>tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>app</directory>
+        </include>
+    </source>
+    <php>
+        <!--
+            DomPDF holds font metrics and its object graph for the life of the
+            process. PHPUnit runs the whole suite in one, so the fifteen or so
+            PDF renders across the billing, fleet, and car-hire suites
+            accumulate past PHP's 128M default.
+
+            This is a harness characteristic, not a production risk: a single
+            render peaks at roughly 32 MB, and each production request is a
+            fresh process.
+        -->
+        <ini name="memory_limit" value="512M"/>
+        <env name="APP_ENV" value="testing" force="true"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file" force="true"/>
+        <env name="BCRYPT_ROUNDS" value="4" force="true"/>
+        <env name="BROADCAST_CONNECTION" value="null" force="true"/>
+        <env name="CACHE_STORE" value="array" force="true"/>
+        <env name="MAIL_MAILER" value="array" force="true"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <env name="SESSION_DRIVER" value="array" force="true"/>
+        <env name="PULSE_ENABLED" value="false" force="true"/>
+        <env name="TELESCOPE_ENABLED" value="false" force="true"/>
+        <env name="NIGHTWATCH_ENABLED" value="false" force="true"/>
+    </php>
+</phpunit>

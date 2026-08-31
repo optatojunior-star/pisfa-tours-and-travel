@@ -1,0 +1,41 @@
+*.log
+.DS_Store
+.env
+.env.backup
+.env.production
+.phpactor.json
+.phpunit.result.cache
+/.fleet
+/.idea
+/.nova
+/.phpunit.cache
+/.vscode
+/.zed
+/auth.json
+/node_modules
+# NOT ignored: /public/build
+#
+# The compiled frontend is committed on purpose. Hostinger shared hosting has
+# no Node, so `npm run build` cannot run on the server, and @vite reads
+# public/build/manifest.json at runtime -- without it Laravel throws a hard 500
+# on every page, not merely an unstyled one. Committing the build output is what
+# makes `git pull` a complete deployment.
+#
+# The cost is a diff in public/build on every release. Run `npm run build`
+# before committing a frontend change, or the deployed CSS/JS goes stale.
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+Homestead.json
+Homestead.yaml
+Thumbs.db
+
+# Browser tests (F30). The Dusk environment file IS committed — it holds no
+# real credentials and every integration in it is deliberately unconfigured —
+# but its database and its failure artifacts are local noise.
+/database/dusk.sqlite
+/tests/Browser/screenshots
+/tests/Browser/console
+/tests/Browser/source

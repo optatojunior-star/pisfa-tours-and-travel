@@ -1,0 +1,35 @@
+@extends('layouts.public')
+
+@section('content')
+@php
+    $timezone = config('pisfa.business_timezone', 'Africa/Kampala');
+    $initialPickup = old('pickup_at', $filters['pickup_at'] ?? '');
+    $initialReturn = old('return_at', $filters['return_at'] ?? '');
+    $initialMode = old('hire_mode', $filters['hire_mode'] ?? '');
+    $initialCurrency = old('currency', $filters['currency'] ?? auth()->user()->preferred_currency ?? config('pisfa.currency.default', 'UGX'));
+@endphp
+<div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <nav aria-label="Breadcrumb" class="text-sm text-slate-600"><a href="{{ route('car-hire.index') }}" class="font-bold text-emerald-800">Car hire</a><span class="mx-2">/</span><a href="{{ route('car-hire.show', $vehicle) }}" class="font-bold text-emerald-800">{{ $vehicle->make }} {{ $vehicle->model }}</a><span class="mx-2">/</span><span aria-current="page">Request</span></nav>
+    <div class="mt-7"><p class="text-xs font-black uppercase tracking-[0.16em] text-emerald-700">Car hire request</p><h1 class="mt-2 text-3xl font-black text-emerald-950">Request the {{ $vehicle->year }} {{ $vehicle->make }} {{ $vehicle->model }}</h1><p class="mt-3 max-w-3xl leading-7 text-slate-600">Choose the exact interval and hire mode. Availability and the matching rate are checked again atomically when you submit.</p></div>
+    @if ($errors->any())<div class="mt-6 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800" role="alert" tabindex="-1"><p class="font-bold">The request was not submitted.</p><ul class="mt-2 list-disc pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+    <form method="POST" action="{{ route('car-hire-bookings.store', $vehicle) }}" class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+        @csrf
+        <input type="hidden" name="idempotency_key" value="{{ old('idempotency_key', $idempotencyKey) }}">
+        <section class="space-y-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-labelledby="request-details-heading">
+            <h2 id="request-details-heading" class="text-xl font-black text-emerald-950">Hire details</h2>
+            <div class="grid gap-5 sm:grid-cols-2">
+                <div><label for="booking-pickup" class="block text-sm font-semibold text-slate-800">Pickup date and time</label><input id="booking-pickup" name="pickup_at" type="datetime-local" required min="{{ $minimumPickup->format('Y-m-d\TH:i') }}" value="{{ $initialPickup }}" class="mt-1 block w-full rounded-xl border-slate-300"><p class="mt-1 text-xs text-slate-500">Africa/Kampala time</p></div>
+                <div><label for="booking-return" class="block text-sm font-semibold text-slate-800">Return date and time</label><input id="booking-return" name="return_at" type="datetime-local" required value="{{ $initialReturn }}" class="mt-1 block w-full rounded-xl border-slate-300"><p class="mt-1 text-xs text-slate-500">Maximum {{ config('car_hire.maximum_hire_days', 90) }} days</p></div>
+                <div><label for="booking-mode" class="block text-sm font-semibold text-slate-800">Hire mode</label><select id="booking-mode" name="hire_mode" required class="mt-1 block w-full rounded-xl border-slate-300"><option value="">Select a mode</option>@foreach(\App\Enums\HireMode::cases() as $case)<option value="{{ $case->value }}" @selected($initialMode === $case->value)>{{ $case->label() }}</option>@endforeach</select></div>
+                <div><label for="booking-currency" class="block text-sm font-semibold text-slate-800">Currency</label><select id="booking-currency" name="currency" required class="mt-1 block w-full rounded-xl border-slate-300">@foreach(config('car_hire.currencies',['UGX','USD']) as $code)<option value="{{ $code }}" @selected($initialCurrency === $code)>{{ $code }}</option>@endforeach</select></div>
+                <div class="sm:col-span-2"><label for="pickup-location" class="block text-sm font-semibold text-slate-800">Pickup location</label><input id="pickup-location" name="pickup_location" required maxlength="500" value="{{ old('pickup_location') }}" placeholder="Address, hotel, airport, or agreed meeting point" class="mt-1 block w-full rounded-xl border-slate-300"></div>
+                <div class="sm:col-span-2"><label for="return-location" class="block text-sm font-semibold text-slate-800">Return location <span class="font-normal text-slate-500">(leave blank if the same)</span></label><input id="return-location" name="return_location" maxlength="500" value="{{ old('return_location') }}" class="mt-1 block w-full rounded-xl border-slate-300"></div>
+                <div><label for="contact-phone" class="block text-sm font-semibold text-slate-800">Contact phone</label><input id="contact-phone" name="contact_phone" type="tel" required maxlength="40" value="{{ old('contact_phone', auth()->user()->phone) }}" autocomplete="tel" class="mt-1 block w-full rounded-xl border-slate-300"></div>
+                <div class="sm:col-span-2"><label for="special-requests" class="block text-sm font-semibold text-slate-800">Special requests <span class="font-normal text-slate-500">(optional)</span></label><textarea id="special-requests" name="special_requests" rows="4" maxlength="2000" class="mt-1 block w-full rounded-xl border-slate-300">{{ old('special_requests') }}</textarea></div>
+            </div>
+            <label class="flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4"><input name="acknowledge_request" type="checkbox" value="1" required @checked(old('acknowledge_request')) class="mt-1 rounded border-amber-400 text-emerald-700 focus:ring-emerald-600"><span class="text-sm leading-6 text-amber-950"><strong>I understand this is a hire request.</strong> No payment is collected now. PISFA must review the vehicle, rate, and any self-drive documents before confirmation.</span></label>
+        </section>
+        <aside class="rounded-3xl border border-emerald-900/10 bg-emerald-950 p-6 text-white shadow-xl lg:sticky lg:top-6"><h2 class="text-lg font-black">Vehicle summary</h2><p class="mt-3 text-xl font-black">{{ $vehicle->year }} {{ $vehicle->make }} {{ $vehicle->model }}</p><dl class="mt-5 space-y-3 text-sm"><div class="flex justify-between gap-4"><dt class="text-emerald-200">Seats</dt><dd class="font-bold">{{ $vehicle->seating_capacity }}</dd></div><div class="flex justify-between gap-4"><dt class="text-emerald-200">Transmission</dt><dd class="font-bold">{{ str($vehicle->transmission)->replace('_',' ')->title() }}</dd></div></dl><div class="mt-6 rounded-2xl bg-white/10 p-4 text-sm leading-6 text-emerald-100">The exact daily rate, billable days, deposit, and total are snapshotted after server-side validation. You will see them on the request detail page.</div><button type="submit" class="mt-6 min-h-12 w-full rounded-xl bg-amber-300 px-5 py-3 font-black text-emerald-950 hover:bg-amber-200">Submit hire request</button><p class="mt-3 text-center text-xs text-emerald-200">No payment is taken by this form.</p></aside>
+    </form>
+</div>
+@endsection

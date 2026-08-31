@@ -1,0 +1,155 @@
+name: PISFA quality checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    # Feature tests must run against the production engine, not SQLite, so
+    # that row locks, unique constraints, and date handling are exercised the
+    # way Hostinger will run them.
+    services:
+      mysql:
+        image: mariadb:11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: pisfa_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: bcmath, ctype, curl, dom, fileinfo, mbstring, openssl, pdo_mysql, pdo_sqlite, tokenizer, xml, zip
+          coverage: none
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Validate composer manifest
+        run: composer validate --strict
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build production assets
+        run: npm run build
+
+      - name: Check formatting
+        run: vendor/bin/pint --test
+
+      - name: Static analysis
+        run: php -d memory_limit=2G vendor/bin/phpstan analyse --no-progress
+
+      - name: Run migrations against MariaDB
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: pisfa_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan migrate --force
+
+      - name: Verify migrations roll back cleanly
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: pisfa_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan migrate:rollback --force --step=100
+
+      # phpunit.mysql.xml omits every DB_* override, so the connection can only
+      # come from this environment. A misconfiguration fails to connect instead
+      # of quietly passing against SQLite.
+      - name: Run automated tests on MariaDB
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: pisfa_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan test --configuration=phpunit.mysql.xml
+
+      # The fast SQLite path is what contributors run locally, so it must stay
+      # green too.
+      - name: Run automated tests on SQLite
+        run: php artisan test
+
+      # Browser tests run last: they are the slowest and the most likely to
+      # flake, so a failure here should already have every cheaper check green
+      # behind it. GitHub's Ubuntu runners ship Chrome and ChromeDriver, and
+      # DuskTestCase uses a driver that is already running rather than starting
+      # its own.
+      # The DatabaseMigrations trait migrates per test; this only has to create
+      # the file, because SQLite will not open one that does not exist.
+      - name: Prepare the browser test environment
+        run: touch database/dusk.sqlite
+
+      - name: Start ChromeDriver
+        run: |
+          chromedriver --port=9515 &
+          # Wait for it rather than sleeping a fixed time.
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:9515/status > /dev/null && break
+            sleep 1
+          done
+
+      - name: Serve the application for browser tests
+        run: |
+          php artisan serve --env=dusk.local --host=127.0.0.1 --port=8000 &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8000/ > /dev/null && break
+            sleep 1
+          done
+
+      - name: Run browser tests
+        run: php artisan dusk
+
+      # Screenshots and console logs are the only way to diagnose a browser
+      # failure after the runner is gone.
+      - name: Upload browser failure artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dusk-failures
+          path: |
+            tests/Browser/screenshots
+            tests/Browser/console
+          retention-days: 7
+
+      - name: Audit Composer dependencies
+        run: composer audit
+
+      - name: Audit npm production dependencies
+        run: npm audit --omit=dev

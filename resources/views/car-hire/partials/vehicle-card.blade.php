@@ -1,0 +1,47 @@
+@php
+    $cover = $vehicle->coverMedia;
+    $selectedMode = $mode ?? null;
+    $rate = $vehicle->hireRates->first();
+    $selectedMinor = $selectedMode === \App\Enums\HireMode::WithDriver
+        ? $rate?->with_driver_daily_minor
+        : ($selectedMode === \App\Enums\HireMode::SelfDrive ? $rate?->self_drive_daily_minor : null);
+    $detailQuery = collect(request()->only(['pickup_at', 'return_at', 'hire_mode', 'currency']))->filter(fn ($value) => filled($value))->all();
+@endphp
+
+<article class="flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg" aria-labelledby="vehicle-{{ $vehicle->id }}-title">
+    <a href="{{ route('car-hire.show', ['vehicle' => $vehicle] + $detailQuery) }}" class="relative block aspect-[16/10] overflow-hidden bg-emerald-950 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400 focus-visible:ring-inset" aria-label="View {{ $vehicle->year }} {{ $vehicle->make }} {{ $vehicle->model }}">
+        @if ($cover)
+            <img src="{{ $cover->url }}" alt="{{ $cover->alt_text ?: $vehicle->make.' '.$vehicle->model }}" class="h-full w-full object-cover transition duration-500 hover:scale-105" loading="lazy">
+        @else
+            <div class="flex h-full items-center justify-center text-sm font-bold text-emerald-100">Image coming soon</div>
+        @endif
+        @if ($vehicle->is_featured)<span class="absolute left-4 top-4 rounded-full bg-amber-300 px-3 py-1 text-xs font-black text-emerald-950">Featured</span>@endif
+    </a>
+    <div class="flex flex-1 flex-col p-5">
+        <div class="flex items-start justify-between gap-4">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">{{ str($vehicle->vehicle_type)->replace('_', ' ')->title() }}</p>
+                <h2 id="vehicle-{{ $vehicle->id }}-title" class="mt-1 text-xl font-black text-emerald-950"><a href="{{ route('car-hire.show', ['vehicle' => $vehicle] + $detailQuery) }}" class="rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600">{{ $vehicle->year }} {{ $vehicle->make }} {{ $vehicle->model }}</a></h2>
+            </div>
+            <span class="whitespace-nowrap rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">Available</span>
+        </div>
+        <p class="mt-3 flex-1 text-sm leading-6 text-slate-600">{{ $vehicle->summary }}</p>
+        <dl class="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
+            <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Seats</dt><dd class="mt-1 font-bold text-slate-900">{{ $vehicle->seating_capacity }}</dd></div>
+            <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Gearbox</dt><dd class="mt-1 font-bold text-slate-900">{{ str($vehicle->transmission)->replace('_', ' ')->title() }}</dd></div>
+            <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Fuel</dt><dd class="mt-1 font-bold text-slate-900">{{ str($vehicle->fuel_type)->replace('_', ' ')->title() }}</dd></div>
+        </dl>
+        <div class="mt-5 border-t border-slate-100 pt-4">
+            @if ($selectedMinor !== null)
+                <p class="text-xs text-slate-500">{{ $selectedMode->label() }} from</p>
+                <p class="text-lg font-black text-emerald-950">{{ \App\Support\Money::format((int) $selectedMinor, $rate->currency) }} <span class="text-xs font-medium text-slate-500">/ day</span></p>
+            @else
+                <div class="space-y-1 text-sm">
+                    @if ($rate?->self_drive_daily_minor)<p><span class="text-slate-500">Self-drive:</span> <strong>{{ \App\Support\Money::format((int) $rate->self_drive_daily_minor, $rate->currency) }}/day</strong></p>@endif
+                    @if ($rate?->with_driver_daily_minor)<p><span class="text-slate-500">With driver:</span> <strong>{{ \App\Support\Money::format((int) $rate->with_driver_daily_minor, $rate->currency) }}/day</strong></p>@endif
+                </div>
+            @endif
+            <a href="{{ route('car-hire.show', ['vehicle' => $vehicle] + $detailQuery) }}" class="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-emerald-800 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">View vehicle</a>
+        </div>
+    </div>
+</article>

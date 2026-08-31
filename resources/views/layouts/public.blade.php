@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#064e3b">
+    {{-- Read by the chat widget, which posts JSON rather than a form. --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ isset($title) ? $title.' | PISFA Tours and Travels' : 'PISFA Tours and Travels' }}</title>
+    <meta name="description" content="{{ $description ?? 'Plan Ugandan tours, transport, vehicle, accommodation, and group travel services with PISFA Tours and Travels.' }}">
+    <link rel="canonical" href="{{ url()->current() }}">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
+    <x-pwa-head />
+    <style>[x-cloak] { display: none !important; }</style>
+</head>
+<body class="min-h-screen bg-stone-50 text-slate-900 antialiased">
+    <a href="#main-content" class="sr-only z-50 rounded-md bg-white px-4 py-3 text-emerald-900 focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
+        Skip to main content
+    </a>
+
+    <header class="border-b border-emerald-900/15 bg-white">
+        <div class="bg-emerald-950 px-4 py-2 text-center text-sm text-emerald-50">
+            Uganda-based travel planning with clear, personal support.
+        </div>
+        <nav class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-4 py-4 sm:px-6 lg:px-8" aria-label="Main navigation">
+            <a href="{{ route('home') }}" class="flex items-center gap-3 font-black tracking-tight text-emerald-950">
+                <span class="grid size-11 place-items-center rounded-2xl bg-amber-400 text-xl shadow-sm" aria-hidden="true">P</span>
+                <span>
+                    <span class="block text-lg leading-none">PISFA</span>
+                    <span class="mt-1 block text-xs font-semibold tracking-wide text-emerald-700">TOURS &amp; TRAVELS</span>
+                </span>
+            </a>
+
+            <div class="hidden items-center gap-7 text-sm font-semibold md:flex">
+                <a href="{{ route('home') }}" @class(['text-amber-700' => request()->routeIs('home'), 'hover:text-amber-700' => ! request()->routeIs('home')])>Home</a>
+                @if (Route::has('tours.index'))
+                    <a href="{{ route('tours.index') }}" @class(['text-amber-700' => request()->routeIs('tours.*') || request()->routeIs('tour-bookings.*'), 'hover:text-amber-700' => ! request()->routeIs('tours.*') && ! request()->routeIs('tour-bookings.*')])>Tours</a>
+                @endif
+                @if (Route::has('car-hire.index'))
+                    <a href="{{ route('car-hire.index') }}" @class(['text-amber-700' => request()->routeIs('car-hire.*') || request()->routeIs('car-hire-bookings.*'), 'hover:text-amber-700' => ! request()->routeIs('car-hire.*') && ! request()->routeIs('car-hire-bookings.*')])>Car hire</a>
+                @endif
+                @if (Route::has('airport-transfers.index'))
+                    <a href="{{ route('airport-transfers.index') }}" @class(['text-amber-700' => request()->routeIs('airport-transfers.*') || request()->routeIs('airport-transfer-bookings.*'), 'hover:text-amber-700' => ! request()->routeIs('airport-transfers.*') && ! request()->routeIs('airport-transfer-bookings.*')])>Transfers</a>
+                @endif
+                @if (Route::has('flight-inquiries.create'))
+                    <a href="{{ route('flight-inquiries.create') }}" @class(['text-amber-700' => request()->routeIs('flight-inquiries.*'), 'hover:text-amber-700' => ! request()->routeIs('flight-inquiries.*')])>Flights</a>
+                @endif
+                @if (Route::has('vehicle-imports.create'))
+                    <a href="{{ route('vehicle-imports.create') }}" @class(['text-amber-700' => request()->routeIs('vehicle-imports.*'), 'hover:text-amber-700' => ! request()->routeIs('vehicle-imports.*')])>Imports</a>
+                @endif
+                @if (Route::has('showroom.index'))
+                    <a href="{{ route('showroom.index') }}" @class(['text-amber-700' => request()->routeIs('showroom.*'), 'hover:text-amber-700' => ! request()->routeIs('showroom.*')])>Cars for sale</a>
+                @endif
+                @if (Route::has('accommodation.index'))
+                    <a href="{{ route('accommodation.index') }}" @class(['text-amber-700' => request()->routeIs('accommodation.*'), 'hover:text-amber-700' => ! request()->routeIs('accommodation.*')])>Stays</a>
+                @endif
+                @if (Route::has('leasing.create'))
+                    <a href="{{ route('leasing.create') }}" @class(['text-amber-700' => request()->routeIs('leasing.*'), 'hover:text-amber-700' => ! request()->routeIs('leasing.*')])>Lease to us</a>
+                @endif
+                <a href="{{ route('home') }}#services" class="hover:text-amber-700">Services</a>
+                <a href="{{ route('about') }}" @class(['text-amber-700' => request()->routeIs('about'), 'hover:text-amber-700' => ! request()->routeIs('about')])>About</a>
+                <a href="{{ route('blog.index') }}" @class(['text-amber-700' => request()->routeIs('blog.*'), 'hover:text-amber-700' => ! request()->routeIs('blog.*')])>Journal</a>
+                <a href="{{ route('contact') }}" @class(['text-amber-700' => request()->routeIs('contact'), 'hover:text-amber-700' => ! request()->routeIs('contact')])>Contact</a>
+                @auth
+                    <a href="{{ route('dashboard') }}" class="hover:text-amber-700">Dashboard</a>
+                @else
+                    <a href="{{ route('login') }}" class="hover:text-amber-700">Sign in</a>
+                @endauth
+                <a href="{{ route('request-quotation') }}" class="rounded-full bg-emerald-800 px-5 py-3 text-white shadow-sm transition hover:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2">Request a quotation</a>
+            </div>
+
+            <details class="relative md:hidden">
+                <summary class="cursor-pointer list-none rounded-lg border border-slate-300 px-4 py-2 font-semibold">Menu</summary>
+                <div class="absolute right-0 z-20 mt-3 grid w-64 gap-1 rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">
+                    <a href="{{ route('home') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Home</a>
+                    @if (Route::has('tours.index'))
+                        <a href="{{ route('tours.index') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Tours &amp; safaris</a>
+                    @endif
+                    @if (Route::has('car-hire.index'))
+                        <a href="{{ route('car-hire.index') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Car hire</a>
+                    @endif
+                    @if (Route::has('airport-transfers.index'))
+                        <a href="{{ route('airport-transfers.index') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Airport transfers</a>
+                    @endif
+                    @if (Route::has('flight-inquiries.create'))
+                        <a href="{{ route('flight-inquiries.create') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Flight enquiries</a>
+                    @endif
+                    @if (Route::has('vehicle-imports.create'))
+                        <a href="{{ route('vehicle-imports.create') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Vehicle imports</a>
+                    @endif
+                    @if (Route::has('showroom.index'))
+                        <a href="{{ route('showroom.index') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Cars for sale</a>
+                    @endif
+                    @if (Route::has('accommodation.index'))
+                        <a href="{{ route('accommodation.index') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Places to stay</a>
+                    @endif
+                    @if (Route::has('leasing.create'))
+                        <a href="{{ route('leasing.create') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Lease your car to us</a>
+                    @endif
+                    <a href="{{ route('home') }}#services" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Services</a>
+                    <a href="{{ route('about') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">About</a>
+                    <a href="{{ route('blog.index') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Journal</a>
+                    <a href="{{ route('contact') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Contact</a>
+                    @auth
+                        <a href="{{ route('dashboard') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Dashboard</a>
+                    @else
+                        <a href="{{ route('login') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Sign in</a>
+                        <a href="{{ route('register') }}" class="rounded-lg px-4 py-3 hover:bg-emerald-50">Create account</a>
+                    @endauth
+                    <a href="{{ route('request-quotation') }}" class="mt-2 rounded-lg bg-emerald-800 px-4 py-3 text-center font-semibold text-white">Request a quotation</a>
+                </div>
+            </details>
+        </nav>
+    </header>
+
+    @if (session('contact_success'))
+        <div class="border-b border-emerald-200 bg-emerald-50 px-4 py-4 text-emerald-950" role="status" aria-live="polite">
+            <p class="mx-auto max-w-7xl font-medium">{{ session('contact_success') }}</p>
+        </div>
+    @endif
+
+    <main id="main-content">
+        @yield('content')
+    </main>
+
+    <footer class="bg-emerald-950 text-emerald-50">
+        <div class="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
+            <section class="lg:col-span-2" aria-labelledby="footer-about">
+                <h2 id="footer-about" class="text-2xl font-black">PISFA Tours and Travels</h2>
+                <p class="mt-4 max-w-xl leading-7 text-emerald-100">
+                    Thoughtful travel and transport planning for visitors, families, organisations, and vehicle owners across Uganda.
+                </p>
+                <div class="mt-6 flex flex-wrap gap-4 text-sm font-semibold">
+                    <a href="{{ route('about') }}" class="hover:text-amber-300">About PISFA</a>
+                    <a href="{{ route('contact') }}" class="hover:text-amber-300">Contact us</a>
+                    <a href="{{ route('privacy') }}" class="hover:text-amber-300">Privacy</a>
+                    <a href="{{ route('terms') }}" class="hover:text-amber-300">Terms</a>
+                </div>
+            </section>
+
+            <section aria-labelledby="footer-services">
+                <h2 id="footer-services" class="font-bold text-amber-300">Plan with us</h2>
+                <ul class="mt-4 space-y-3 text-sm text-emerald-100">
+                    <li><a href="{{ route('tours.index') }}" class="hover:text-white">Tours &amp; safaris</a></li>
+                    <li><a href="{{ route('blog.index') }}" class="hover:text-white">Journal</a></li>
+                    <li><a href="{{ route('car-hire.index') }}" class="hover:text-white">Car hire</a></li>
+                    <li><a href="{{ route('airport-transfers.index') }}" class="hover:text-white">Airport transfers</a></li>
+                    <li><a href="{{ route('flight-inquiries.create') }}" class="hover:text-white">Flight enquiries</a></li>
+                    <li><a href="{{ route('vehicle-imports.create') }}" class="hover:text-white">Vehicle imports</a></li>
+                    <li><a href="{{ route('showroom.index') }}" class="hover:text-white">Cars for sale</a></li>
+                    <li><a href="{{ route('accommodation.index') }}" class="hover:text-white">Places to stay</a></li>
+                    <li><a href="{{ route('leasing.create') }}" class="hover:text-white">Lease your car to us</a></li>
+                    <li><a href="{{ route('request-quotation', ['service' => 'corporate-travel']) }}" class="hover:text-white">Corporate travel</a></li>
+                </ul>
+            </section>
+
+            <section aria-labelledby="newsletter-heading">
+                <h2 id="newsletter-heading" class="font-bold text-amber-300">Travel updates</h2>
+                <p class="mt-4 text-sm leading-6 text-emerald-100">Receive useful PISFA news and travel ideas.</p>
+                <form method="POST" action="{{ route('newsletter.store') }}" class="mt-4 space-y-3">
+                    @csrf
+                    <input type="hidden" name="source" value="footer">
+                    <label for="newsletter-email" class="sr-only">Email address</label>
+                    <input id="newsletter-email" name="email" type="email" autocomplete="email" required maxlength="254" value="{{ old('email') }}" placeholder="you@example.com" class="w-full rounded-lg border-0 bg-white px-4 py-3 text-slate-900 ring-1 ring-white/20 focus:ring-2 focus:ring-amber-400">
+                    @error('email', 'newsletter')
+                        <p class="text-sm text-amber-200">{{ $message }}</p>
+                    @enderror
+                    <button type="submit" class="w-full rounded-lg bg-amber-400 px-4 py-3 font-bold text-emerald-950 transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-emerald-950">
+                        Subscribe
+                    </button>
+                </form>
+                @if (session('newsletter_success'))
+                    <p class="mt-3 text-sm font-medium text-amber-200" role="status" aria-live="polite">{{ session('newsletter_success') }}</p>
+                @endif
+            </section>
+        </div>
+        <div class="border-t border-white/10 px-4 py-6 text-center text-sm text-emerald-200">
+            &copy; {{ now(config('pisfa.business_timezone'))->year }} PISFA Tours and Travels. All rights reserved.
+        </div>
+    </footer>
+
+    <x-chat-widget />
+
+    @stack('scripts')
+</body>
+</html>

@@ -90,10 +90,18 @@
 
         <button type="button" onclick="window.location.reload()">Try again</button>
 
-        <span class="tel">
-            Urgent? Call us on
-            <a href="tel:+256700000000">+256 700 000 000</a>.
-        </span>
+        {{--
+            Read from configuration, never hardcoded. This page is shown to
+            somebody whose connection has just dropped mid-booking, so the
+            number on it is the one moment it must be a number that answers.
+        --}}
+        @php($contactPhone = config('pisfa.contact.phone'))
+        @if ($contactPhone)
+            <span class="tel">
+                Urgent? Call us on
+                <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contactPhone) }}">{{ $contactPhone }}</a>.
+            </span>
+        @endif
     </main>
 </body>
 </html>

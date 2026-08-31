@@ -18,54 +18,88 @@
  *
  * Run:  php deploy/make-brand-palette.php
  */
-
-function hex2hsl(string $hex): array {
+function hex2hsl(string $hex): array
+{
     $hex = ltrim($hex, '#');
-    [$r, $g, $b] = [hexdec(substr($hex,0,2))/255, hexdec(substr($hex,2,2))/255, hexdec(substr($hex,4,2))/255];
-    $mx = max($r,$g,$b); $mn = min($r,$g,$b); $l = ($mx+$mn)/2; $d = $mx-$mn;
-    if ($d == 0) return [0, 0, $l*100];
-    $s = $l > 0.5 ? $d/(2-$mx-$mn) : $d/($mx+$mn);
-    if ($mx == $r)      $h = (($g-$b)/$d + ($g < $b ? 6 : 0));
-    elseif ($mx == $g)  $h = (($b-$r)/$d + 2);
-    else                $h = (($r-$g)/$d + 4);
-    return [$h/6*360, $s*100, $l*100];
+    [$r, $g, $b] = [hexdec(substr($hex, 0, 2)) / 255, hexdec(substr($hex, 2, 2)) / 255, hexdec(substr($hex, 4, 2)) / 255];
+    $mx = max($r, $g, $b);
+    $mn = min($r, $g, $b);
+    $l = ($mx + $mn) / 2;
+    $d = $mx - $mn;
+    if ($d == 0) {
+        return [0, 0, $l * 100];
+    }
+    $s = $l > 0.5 ? $d / (2 - $mx - $mn) : $d / ($mx + $mn);
+    if ($mx == $r) {
+        $h = (($g - $b) / $d + ($g < $b ? 6 : 0));
+    } elseif ($mx == $g) {
+        $h = (($b - $r) / $d + 2);
+    } else {
+        $h = (($r - $g) / $d + 4);
+    }
+
+    return [$h / 6 * 360, $s * 100, $l * 100];
 }
 
-function hsl2hex(float $h, float $s, float $l): string {
-    $h /= 360; $s /= 100; $l /= 100;
-    if ($s == 0) { $r = $g = $b = $l; }
-    else {
-        $q = $l < 0.5 ? $l*(1+$s) : $l+$s-$l*$s;
-        $p = 2*$l - $q;
+function hsl2hex(float $h, float $s, float $l): string
+{
+    $h /= 360;
+    $s /= 100;
+    $l /= 100;
+    if ($s == 0) {
+        $r = $g = $b = $l;
+    } else {
+        $q = $l < 0.5 ? $l * (1 + $s) : $l + $s - $l * $s;
+        $p = 2 * $l - $q;
         $t = function ($t) use ($p, $q) {
-            if ($t < 0) $t += 1; if ($t > 1) $t -= 1;
-            if ($t < 1/6) return $p + ($q-$p)*6*$t;
-            if ($t < 1/2) return $q;
-            if ($t < 2/3) return $p + ($q-$p)*(2/3-$t)*6;
+            if ($t < 0) {
+                $t += 1;
+            } if ($t > 1) {
+                $t -= 1;
+            }
+            if ($t < 1 / 6) {
+                return $p + ($q - $p) * 6 * $t;
+            }
+            if ($t < 1 / 2) {
+                return $q;
+            }
+            if ($t < 2 / 3) {
+                return $p + ($q - $p) * (2 / 3 - $t) * 6;
+            }
+
             return $p;
         };
-        $r = $t($h+1/3); $g = $t($h); $b = $t($h-1/3);
+        $r = $t($h + 1 / 3);
+        $g = $t($h);
+        $b = $t($h - 1 / 3);
     }
-    return sprintf('#%02x%02x%02x', round($r*255), round($g*255), round($b*255));
+
+    return sprintf('#%02x%02x%02x', round($r * 255), round($g * 255), round($b * 255));
 }
 
-function luminance(string $hex): float {
-    $hex = ltrim($hex, '#'); $c = [];
-    foreach ([0,2,4] as $i) {
-        $v = hexdec(substr($hex,$i,2))/255;
-        $c[] = $v <= 0.03928 ? $v/12.92 : pow(($v+0.055)/1.055, 2.4);
+function luminance(string $hex): float
+{
+    $hex = ltrim($hex, '#');
+    $c = [];
+    foreach ([0, 2, 4] as $i) {
+        $v = hexdec(substr($hex, $i, 2)) / 255;
+        $c[] = $v <= 0.03928 ? $v / 12.92 : pow(($v + 0.055) / 1.055, 2.4);
     }
-    return 0.2126*$c[0] + 0.7152*$c[1] + 0.0722*$c[2];
+
+    return 0.2126 * $c[0] + 0.7152 * $c[1] + 0.0722 * $c[2];
 }
 
-function ratio(string $a, string $b): float {
-    $l1 = luminance($a); $l2 = luminance($b);
-    return round((max($l1,$l2)+0.05)/(min($l1,$l2)+0.05), 2);
+function ratio(string $a, string $b): float
+{
+    $l1 = luminance($a);
+    $l2 = luminance($b);
+
+    return round((max($l1, $l2) + 0.05) / (min($l1, $l2) + 0.05), 2);
 }
 
 /** Lightness for each step, as an offset from the anchored brand step. */
 $curve = [50 => 96, 100 => 92, 200 => 84, 300 => 72, 400 => 58, 500 => null,
-          600 => -5, 700 => -10, 800 => -15, 900 => -19, 950 => -24];
+    600 => -5, 700 => -10, 800 => -15, 900 => -19, 950 => -24];
 
 $brands = ['brand' => '#08A090', 'accent' => '#F07028'];
 $out = [];
@@ -75,9 +109,16 @@ foreach ($brands as $name => $base) {
     [$h, $s, $l] = hex2hsl($base);
     $scale = [];
     foreach ($curve as $step => $spec) {
-        if ($spec === null)      { $lightness = $l; $sat = $s; }
-        elseif ($spec > 0)       { $lightness = $spec; $sat = $step <= 100 ? min($s, 50) : $s * 0.95; }
-        else                     { $lightness = max(6, $l + $spec); $sat = $s; }
+        if ($spec === null) {
+            $lightness = $l;
+            $sat = $s;
+        } elseif ($spec > 0) {
+            $lightness = $spec;
+            $sat = $step <= 100 ? min($s, 50) : $s * 0.95;
+        } else {
+            $lightness = max(6, $l + $spec);
+            $sat = $s;
+        }
         $scale[$step] = hsl2hex($h, $sat, $lightness);
     }
     $out[$name] = $scale;
@@ -91,9 +132,9 @@ foreach ($brands as $name => $base) {
 }
 
 // Ink: the neutral from the logo's tagline, as a full scale.
-[$ih, $is, ] = hex2hsl('#283848');
+[$ih, $is] = hex2hsl('#283848');
 $inkCurve = [50 => 98, 100 => 96, 200 => 90, 300 => 80, 400 => 62, 500 => 47,
-             600 => 38, 700 => 30, 800 => 24, 900 => 18, 950 => 11];
+    600 => 38, 700 => 30, 800 => 24, 900 => 18, 950 => 11];
 $ink = [];
 foreach ($inkCurve as $step => $lightness) {
     $ink[$step] = hsl2hex($ih, $step <= 200 ? $is * 0.55 : $is, $lightness);

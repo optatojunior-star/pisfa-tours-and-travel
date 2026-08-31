@@ -16,25 +16,35 @@
  *
  * Run:  php deploy/make-logo-assets.php
  */
-
 $source = 'resources/brand/logo-source.png';
 $im = imagecreatefrompng($source);
 $w = imagesx($im);
 $h = imagesy($im);
 
 /** Horizontal content bounds within a vertical slice. */
-function horizontalBounds($im, int $top, int $bottom): array {
+function horizontalBounds($im, int $top, int $bottom): array
+{
     $w = imagesx($im);
-    $left = $w; $right = 0;
+    $left = $w;
+    $right = 0;
     for ($y = $top; $y <= $bottom; $y++) {
         for ($x = 0; $x < $w; $x++) {
             $rgb = imagecolorat($im, $x, $y);
-            $r = ($rgb >> 16) & 0xFF; $g = ($rgb >> 8) & 0xFF; $b = $rgb & 0xFF;
-            if ($r > 232 && $g > 232 && $b > 232) continue;
-            if ($x < $left) $left = $x;
-            if ($x > $right) $right = $x;
+            $r = ($rgb >> 16) & 0xFF;
+            $g = ($rgb >> 8) & 0xFF;
+            $b = $rgb & 0xFF;
+            if ($r > 232 && $g > 232 && $b > 232) {
+                continue;
+            }
+            if ($x < $left) {
+                $left = $x;
+            }
+            if ($x > $right) {
+                $right = $x;
+            }
         }
     }
+
     return [$left, $right];
 }
 
@@ -42,7 +52,8 @@ function horizontalBounds($im, int $top, int $bottom): array {
  * Crops a band, drops the near-white background to transparency, and writes a
  * PNG at the requested width.
  */
-function emit($im, string $path, int $top, int $bottom, int $targetWidth, int $pad = 0, ?array $bg = null, ?int $square = null): void {
+function emit($im, string $path, int $top, int $bottom, int $targetWidth, int $pad = 0, ?array $bg = null, ?int $square = null): void
+{
     [$left, $right] = horizontalBounds($im, $top, $bottom);
     $cw = $right - $left + 1;
     $ch = $bottom - $top + 1;
@@ -83,7 +94,9 @@ function emit($im, string $path, int $top, int $bottom, int $targetWidth, int $p
         for ($y = 0; $y < $canvasH; $y++) {
             for ($x = 0; $x < $canvasW; $x++) {
                 $rgb = imagecolorat($out, $x, $y);
-                $r = ($rgb >> 16) & 0xFF; $g = ($rgb >> 8) & 0xFF; $b = $rgb & 0xFF;
+                $r = ($rgb >> 16) & 0xFF;
+                $g = ($rgb >> 8) & 0xFF;
+                $b = $rgb & 0xFF;
                 if ($r > 236 && $g > 236 && $b > 236) {
                     imagesetpixel($out, $x, $y, imagecolorallocatealpha($out, 255, 255, 255, 127));
                 }
@@ -98,23 +111,23 @@ function emit($im, string $path, int $top, int $bottom, int $targetWidth, int $p
 }
 
 // Bands measured from the source artwork.
-$MARK   = [170, 623];
+$MARK = [170, 623];
 $LOCKUP = [170, 944];
-$FULL   = [170, 1059];
+$FULL = [170, 1059];
 
 echo "logo assets\n";
-emit($im, 'public/images/logo-mark.png',   ...$MARK,   targetWidth: 512);
-emit($im, 'public/images/logo.png',        ...$LOCKUP, targetWidth: 720);
-emit($im, 'public/images/logo-full.png',   ...$FULL,   targetWidth: 900);
+emit($im, 'public/images/logo-mark.png', ...$MARK, targetWidth: 512);
+emit($im, 'public/images/logo.png', ...$LOCKUP, targetWidth: 720);
+emit($im, 'public/images/logo-full.png', ...$FULL, targetWidth: 900);
 
 echo "\npwa + favicon (mark only - a wordmark is unreadable at 48px)\n";
 $brand = [8, 160, 144];   // #08A090, the logo teal
-emit($im, 'public/icons/icon-192.png',           ...$MARK, targetWidth: 176, square: 192);
-emit($im, 'public/icons/icon-512.png',           ...$MARK, targetWidth: 470, square: 512);
+emit($im, 'public/icons/icon-192.png', ...$MARK, targetWidth: 176, square: 192);
+emit($im, 'public/icons/icon-512.png', ...$MARK, targetWidth: 470, square: 512);
 // Maskable: the mark must sit inside the middle 80% so a launcher can crop it
 // to any shape without clipping, and the ground must be opaque.
-emit($im, 'public/icons/icon-maskable-512.png',  ...$MARK, targetWidth: 330, square: 512, bg: [255, 255, 255]);
-emit($im, 'public/icons/apple-touch-icon.png',   ...$MARK, targetWidth: 164, square: 180, bg: [255, 255, 255]);
+emit($im, 'public/icons/icon-maskable-512.png', ...$MARK, targetWidth: 330, square: 512, bg: [255, 255, 255]);
+emit($im, 'public/icons/apple-touch-icon.png', ...$MARK, targetWidth: 164, square: 180, bg: [255, 255, 255]);
 
 imagedestroy($im);
 
@@ -145,7 +158,7 @@ foreach ([16, 32, 48, 180] as $size) {
  */
 $png = file_get_contents('public/images/favicon-32.png');
 $ico = pack('vvv', 0, 1, 1)                       // reserved, type=icon, one image
-     . pack('CCCCvvVV', 32, 32, 0, 0, 1, 32, strlen($png), 22);
+     .pack('CCCCvvVV', 32, 32, 0, 0, 1, 32, strlen($png), 22);
 file_put_contents('public/favicon.ico', $ico.$png);
 printf("  favicon.ico  %d bytes\n", filesize('public/favicon.ico'));
 

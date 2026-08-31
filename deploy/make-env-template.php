@@ -10,7 +10,6 @@
  *
  * Run from the project root:  php deploy/make-env-template.php
  */
-
 $required = [
     // Nothing works or nothing is safe without these.
     'APP_NAME', 'APP_ENV', 'APP_KEY', 'APP_DEBUG', 'APP_URL', 'APP_TIMEZONE',
@@ -40,12 +39,18 @@ foreach (glob('config/*.php') as $file) {
     foreach ($m as $hit) {
         $key = $hit[1];
         foreach ($skipPrefix as $prefix) {
-            if (str_starts_with($key, $prefix)) { continue 2; }
+            if (str_starts_with($key, $prefix)) {
+                continue 2;
+            }
         }
         $default = isset($hit[2]) ? trim($hit[2]) : '';
         $default = trim($default, "'\" \t");
-        if (in_array(strtolower($default), ['null', ''], true)) { $default = ''; }
-        if (isset($seen[$key])) { continue; }
+        if (in_array(strtolower($default), ['null', ''], true)) {
+            $default = '';
+        }
+        if (isset($seen[$key])) {
+            continue;
+        }
         $seen[$key] = true;
         $keys[basename($file, '.php')][$key] = $default;
     }
@@ -69,22 +74,22 @@ $out[] = '';
 $requiredCount = 0;
 foreach ($keys as $section => $entries) {
     ksort($entries);
-    $out[] = '# ' . str_repeat('-', 74);
-    $out[] = '# config/' . $section . '.php';
-    $out[] = '# ' . str_repeat('-', 74);
+    $out[] = '# '.str_repeat('-', 74);
+    $out[] = '# config/'.$section.'.php';
+    $out[] = '# '.str_repeat('-', 74);
     foreach ($entries as $key => $default) {
         if (in_array($key, $required, true)) {
             $out[] = '# REQUIRED';
-            $out[] = $key . '=';
+            $out[] = $key.'=';
             $requiredCount++;
         } else {
-            $out[] = $key . '=' . $default;
+            $out[] = $key.'='.$default;
         }
     }
     $out[] = '';
 }
 
-file_put_contents('deploy/production.env.template', implode("\n", $out) . "\n");
+file_put_contents('deploy/production.env.template', implode("\n", $out)."\n");
 
 printf("Wrote deploy/production.env.template — %d keys, %d marked REQUIRED\n",
     array_sum(array_map('count', $keys)), $requiredCount);

@@ -136,7 +136,13 @@ return new class extends Migration
             $table->text('review_reason')->nullable();
             $table->text('internal_review_notes')->nullable();
             $table->dateTime('originals_verified_at')->nullable();
-            $table->foreignId('originals_verified_by_user_id')->nullable()->constrained('users')->nullOnDelete();
+            // Explicitly named: the generated name would be
+            // car_hire_self_drive_applications_originals_verified_by_user_id_foreign,
+            // which is 70 characters and exceeds MySQL's 64-character identifier
+            // limit. SQLite has no such limit, so this only fails on MySQL/MariaDB.
+            $table->foreignId('originals_verified_by_user_id')->nullable()
+                ->constrained(table: 'users', indexName: 'car_hire_sda_originals_verified_fk')
+                ->nullOnDelete();
             $table->timestamps();
         });
 

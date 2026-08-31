@@ -2,8 +2,26 @@
 
 ## Status
 
-This is the initial deployment runbook for the planned Laravel application. No
-production deployment has been performed from this scaffold. Hostinger plan
+**Deployed to production on 31 August 2026** at https://pisfatoursandtravel.com,
+on Hostinger shared hosting (uk-fast-web1475), PHP 8.2.30, MariaDB 11.8.8.
+
+Three problems surfaced only on the real host, none of which local testing could
+have caught. Each is fixed at source, so a rebuild will not hit them:
+
+1. **A 70-character foreign key name.** MySQL caps identifiers at 64 characters;
+   SQLite enforces no limit, so the whole local suite passed and the migration
+   failed on first deploy. Now named explicitly in the car hire migration.
+2. **`storage:link` requires `exec()`**, which Hostinger disables. Create the
+   symlink by hand instead:
+   `ln -s <app>/storage/app/public <app>/public/storage`
+   This is the same restriction `DatabaseDump` was already designed around,
+   appearing somewhere it was not anticipated.
+3. **`DB_HOST=127.0.0.1` is rejected** where `localhost` is granted. MySQL treats
+   the TCP and socket hosts as different identities when checking permissions.
+
+The document root is fixed at `public_html` on this plan, so the layout used is
+the symlink form: `public_html -> pisfa/public`. That keeps `git pull` a complete
+deployment while exposing only Laravel's public directory. Hostinger plan
 capabilities and command paths can change; verify each prerequisite inside the
 actual account before relying on it.
 
@@ -135,9 +153,15 @@ vendor/bin/pint --test
 npm run build
 ```
 
-Static analysis remains a planned gate; do not claim a PHPStan result until a
-compatible analyzer and maintained configuration have been added to the
-repository. After all current gates pass, prepare production dependencies:
+Static analysis is a real gate: Larastan/PHPStan level 5 with
+`phpstan-baseline.neon`. The baseline may shrink but must never grow, and new
+code must be clean without suppressions:
+
+```bash
+php -d memory_limit=2G vendor/bin/phpstan analyse --no-progress
+```
+
+After all gates pass, prepare production dependencies:
 
 ```bash
 composer install --no-dev --prefer-dist --optimize-autoloader
@@ -153,132 +177,41 @@ not assume unavailable binaries.
 
 ## 5. Environment configuration
 
-Create `.env` directly in the private application directory. Begin with the
-maintained `.env.example`, then set production values. At minimum review:
+Create `.env` directly in the private application directory.
 
-```dotenv
-APP_NAME="PISFA Tours and Travels"
-APP_ENV=production
-APP_DEBUG=false
-APP_URL=https://example.com
-APP_TIMEZONE=UTC
-APP_BUSINESS_TIMEZONE=Africa/Kampala
-
-LOG_CHANNEL=stack
-LOG_LEVEL=warning
-
-SESSION_DRIVER=database
-SESSION_SECURE_COOKIE=true
-SESSION_SAME_SITE=lax
-SESSION_ENCRYPT=true
-AUTH_PASSWORD_TIMEOUT=900
-
-CACHE_STORE=database
-QUEUE_CONNECTION=database
-DB_QUEUE_RETRY_AFTER=120
-
-MAIL_MAILER=smtp
-MAIL_SCHEME=smtp
-MAIL_HOST=smtp.hostinger.com
-MAIL_PORT=587
-MAIL_USERNAME=<mailbox-address>
-MAIL_PASSWORD=<mailbox-password>
-MAIL_FROM_ADDRESS=<verified-sender-address>
-
-PISFA_TWO_FACTOR_REQUIRED_ROLES=super_admin,manager
-PISFA_TWO_FACTOR_CHALLENGE_TTL=300
-PISFA_STAFF_INVITATION_EXPIRY_HOURS=72
-PISFA_SUPPORTED_CURRENCIES=UGX,USD
-PISFA_TOUR_CANCELLATION_CUTOFF_HOURS=48
-PISFA_TOUR_MAXIMUM_BOOKING_TRAVELERS=50
-PISFA_TOUR_REMINDER_LEAD_MINUTES=1440
-PISFA_TOUR_REMINDER_WINDOW_MINUTES=15
-PISFA_TOUR_MAIL_MAX_PER_MINUTE=8
-PISFA_CAR_HIRE_MAXIMUM_DAYS=90
-PISFA_CAR_HIRE_MINIMUM_NOTICE_HOURS=2
-PISFA_CAR_HIRE_CANCELLATION_CUTOFF_HOURS=48
-PISFA_CAR_HIRE_PENDING_HOLD_MINUTES=1440
-PISFA_PRIVATE_DOCUMENT_DISK=local
-PISFA_CAR_HIRE_DOCUMENT_MAX_KB=5120
-PISFA_CAR_HIRE_CONTRACT_VERSION=2026-08-20
-PISFA_CAR_HIRE_RETURN_REMINDER_LEAD_MINUTES=1440
-PISFA_CAR_HIRE_RETURN_REMINDER_WINDOW_MINUTES=15
-PISFA_CAR_HIRE_MAIL_MAX_PER_MINUTE=8
-PISFA_AIRPORT_TRANSFER_MAXIMUM_PASSENGERS=50
-PISFA_AIRPORT_TRANSFER_MAXIMUM_LUGGAGE=100
-PISFA_AIRPORT_TRANSFER_MINIMUM_NOTICE_HOURS=2
-PISFA_AIRPORT_TRANSFER_MAXIMUM_ADVANCE_DAYS=365
-PISFA_AIRPORT_TRANSFER_REQUEST_EXPIRY_MINUTES=1440
-PISFA_AIRPORT_TRANSFER_CANCELLATION_CUTOFF_HOURS=4
-PISFA_AIRPORT_TRANSFER_RATE_MINIMUM_DURATION_MINUTES=15
-PISFA_AIRPORT_TRANSFER_RATE_MAXIMUM_DURATION_MINUTES=1440
-PISFA_AIRPORT_TRANSFER_GUEST_CONFIRMATION_EXPIRY_HOURS=168
-PISFA_AIRPORT_TRANSFER_MAIL_MAX_PER_MINUTE=8
-PISFA_AIRPORT_TRANSFER_PICKUP_REMINDER_LEAD_MINUTES=1440
-PISFA_AIRPORT_TRANSFER_PICKUP_REMINDER_WINDOW_MINUTES=15
-```
-
-F03 accepts only the configured intersection of `UGX` and `USD`; adding another
-currency to `PISFA_SUPPORTED_CURRENCIES` does not enable it for tours. Set
-`PISFA_TOUR_MAIL_MAX_PER_MINUTE` at or below the rate verified for the selected
-mailbox/provider, verify its daily allowance, and use a suitable transactional
-provider or hosting upgrade when expected volume exceeds those limits.
-
-F04 uses the same configured currency intersection. Its private document disk
-must resolve outside the public web root and remain writable by PHP. Set the
-car-hire email throttle at or below the verified provider allowance. Preserve
-`APP_KEY`, because F04 encrypts identity and permit numbers with it.
-
-F05 also uses the configured UGX/USD intersection. Preserve `APP_KEY`, because
-exact transfer addresses and flight numbers are encrypted. Set the transfer
-mail throttle at or below the verified provider allowance, and configure
-approved airports, service locations, rates, capacities, and durations in the
-protected application rather than copying legacy demonstration fares.
-
-Also configure, as implemented:
-
-- Database credentials
-- Mail provider
-- Payment-provider credentials and webhook secrets
-- SMS provider
-- Meta WhatsApp identifiers and secrets
-- Public/private media provider
-- Hosted broadcasting provider, if used
-- Analytics identifier
-- Exchange-rate provider or managed rate
-- Backup destination and encryption
-
-Use sandbox provider credentials on staging and production credentials only on
-the production domain. Never print `.env`, upload it into public storage, commit
-it, send it in a ticket, or expose values through a health endpoint.
-
-Generate `APP_KEY` exactly once for a new environment:
+**Do not hand-write the list of keys.** An earlier version of this document
+carried one, and it silently fell 71 keys behind as features shipped. Generate
+it from `config/` instead:
 
 ```bash
-php artisan key:generate
+php deploy/make-env-template.php      # writes deploy/production.env.template
 ```
 
-Back up the production key securely. Replacing it later can make encrypted
-application data unreadable, including TOTP secrets and recovery codes, and
-invalidate sessions.
+That produces every key the application reads, with its default, and marks the
+38 that must be set for production. Copy it to `.env` on the server and fill in
+the REQUIRED values.
 
-Do not run `key:generate` during ordinary releases, restores, or server moves.
-Restore the exact existing production `APP_KEY` from the protected secrets
-backup before serving traffic.
+The values that matter most, and why:
 
-Use a real SMTP transport in production. Do not leave `MAIL_MAILER=log` enabled:
-invitation emails contain one-time setup links, and the log mailer would write
-those links into application logs.
+| Key | Why it matters |
+|---|---|
+| `APP_DEBUG=false` | A debug page prints the stack trace, the query, and the environment. On a public site that is a credential dump behind any 500. |
+| `APP_URL=https://...` | Signed document URLs and the PWA manifest are built from it. |
+| `APP_KEY` | Encrypts stored customer data and signs private document links. Generate once with `key:generate`; never regenerate on a live system, and keep it in a secret store — it is deliberately excluded from backups. |
+| `SESSION_SECURE_COOKIE=true` | Without it the session cookie travels in clear text on an HTTPS site. |
+| `DB_HOST` | Use `localhost`, not `127.0.0.1`. MySQL treats the socket and TCP hosts as different identities when checking grants, so a user granted for `localhost` is refused over `127.0.0.1` even with the right password. |
+| `MAIL_*` | With `MAIL_MAILER=log` nothing reaches a customer. `pisfa:preflight` fails on it deliberately. |
+| `PISFA_RATE_USD_UGX` | Stamped onto each payment so historic revenue is immutable. |
 
-This deployment profile assumes `SESSION_DRIVER=database`,
-`CACHE_STORE=database`, and `QUEUE_CONNECTION=database`. Apply the migrations
-that create the sessions, cache/locks, jobs, and failed-jobs tables before
-traffic is enabled. Database sessions are part of the staff-security design:
-role or status changes delete the affected user's stored sessions immediately.
-The database cache provides shared throttling and scheduler-overlap locks across
-web and cron processes. Do not switch either driver to local files on a
-multi-process deployment without revalidating those security and locking
-properties.
+Verify the result before taking traffic:
+
+```bash
+php artisan pisfa:preflight
+```
+
+Non-zero exit means do not go live. It checks debug mode, HTTPS, cookie flags,
+the document root, writable paths, migrations, mail, queue, and the scheduler
+heartbeat.
 
 ## 6. First deployment
 

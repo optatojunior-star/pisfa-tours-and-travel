@@ -1428,9 +1428,21 @@ Operational context — booking references, phone numbers — is deliberately ke
 an operator has to be able to trace a booking, and those already sit in a
 database the same person can read.
 
+**Deployed to production 31 August 2026.** `pisfa:preflight` passes on the live
+host: 21 checks OK, one warning (document root, which cannot be seen from the
+CLI and was verified externally instead — `.env` and `.git/config` return 403,
+source and `vendor/` return 404).
+
+Two findings the hosting pass produced for this feature. `storage:link` calls
+`exec()`, which Hostinger disables, so the symlink is created by hand — the same
+restriction `DatabaseDump` was designed around, appearing somewhere it was not
+anticipated. And the scheduler heartbeat proved its worth immediately: it is the
+only evidence that cron is firing, and it read OK within minutes of the cron
+entries being added.
+
 **Remaining gaps:** an automated restore drill (the procedure is documented and
-manual), and off-site backup verified against a real remote disk — both belong
-to the hosting pass.
+manual), and off-site backup — `PISFA_BACKUP_DISK` is still `local` on the live
+deployment, which survives a bad migration but not a lost account.
 
 ---
 

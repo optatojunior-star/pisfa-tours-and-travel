@@ -131,15 +131,36 @@ class TourAdministrationHttpTest extends TestCase
         }
     }
 
+    public function test_a_package_publishes_without_an_itinerary(): void
+    {
+        // The case that was broken: creation collects three steps, so a new
+        // package has no itinerary and no inclusions, and demanding them meant
+        // nothing could ever go live.
+        $staff = $this->operationsUser();
+        $package = $this->completeDraftPackage();
+
+        $package->itineraryDays()->delete();
+        $package->inclusions()->delete();
+        $package->exclusions()->delete();
+
+        $this->actingAs($staff)
+            ->patch(route('admin.tours.publish', $package))
+            ->assertRedirect()
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame(TourPackageStatus::Published, $package->fresh()->status);
+    }
+
     /** @return array<string, array{string}> */
     public static function missingPublishContent(): array
     {
+        // Itinerary, inclusions and exclusions are deliberately absent. They
+        // were removed as publication prerequisites along with the form fields
+        // that fed them — a gate demanding data no screen collects can never be
+        // satisfied, and it blocked publishing outright.
         return [
             'inactive category' => ['inactive-category'],
-            'cover image' => ['cover'],
-            'complete itinerary' => ['itinerary'],
-            'inclusions' => ['inclusions'],
-            'exclusions' => ['exclusions'],
+            'no photograph' => ['photographs'],
         ];
     }
 
@@ -151,10 +172,7 @@ class TourAdministrationHttpTest extends TestCase
 
         match ($missing) {
             'inactive-category' => $package->category->update(['is_active' => false]),
-            'cover' => $package->media()->delete(),
-            'itinerary' => $package->itineraryDays()->where('day_number', 2)->delete(),
-            'inclusions' => $package->inclusions()->delete(),
-            'exclusions' => $package->exclusions()->delete(),
+            'photographs' => $package->media()->delete(),
         };
 
         $url = route('admin.tours.show', $package);

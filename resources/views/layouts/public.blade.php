@@ -233,6 +233,7 @@
     </footer>
 
     <x-chat-widget />
+    <x-whatsapp-button />
 
     @stack('scripts')
 </body>

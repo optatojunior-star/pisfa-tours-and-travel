@@ -34,9 +34,17 @@ return [
         'tagline' => env('PISFA_COMPANY_TAGLINE', 'Uganda travel, transport and fleet services'),
         'email' => env('PISFA_CONTACT_EMAIL', 'info@example.com'),
         'phone' => env('PISFA_CONTACT_PHONE', '+256700000000'),
-        'address' => env('PISFA_COMPANY_ADDRESS', 'Kampala, Uganda'),
+        'address' => env('PISFA_COMPANY_ADDRESS', 'Kitebi Starlink Building, Kitebi, Bunamwaya, Rubaga Division, Kampala, Uganda'),
         'registration_number' => env('PISFA_COMPANY_REGISTRATION', ''),
         'tax_identification_number' => env('PISFA_COMPANY_TIN', ''),
+
+        /*
+         * The WhatsApp number customers message, which is not always the office
+         * line — a floating button that opens a chat to a landline helps nobody.
+         * Digits only, with the country code and no plus: that is the shape
+         * wa.me expects, and the accessor below enforces it whatever is typed.
+         */
+        'whatsapp' => env('PISFA_WHATSAPP_NUMBER', '256758375435'),
     ],
 
     'staff' => [

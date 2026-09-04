@@ -188,25 +188,28 @@ class TourPackageController extends Controller
                 ]);
             }
 
+            /*
+             * What a package genuinely needs before the public sees it.
+             *
+             * The itinerary, inclusion and exclusion requirements were removed
+             * with the form fields that fed them: a gate demanding data no
+             * screen collects cannot be satisfied, and it blocked publishing
+             * entirely. An itinerary is still supported and still shown when
+             * present — it is simply no longer compulsory.
+             *
+             * A cover photograph stays required. A tour on the public page with
+             * no picture is worse than one not yet listed.
+             */
             $errors = [];
+
             if (! $category->is_active) {
                 $errors['category_id'] = 'The package category must be active before publication.';
             }
-            if (! $package->itineraryDays()->exists()) {
-                $errors['itinerary'] = 'Add at least one itinerary day before publication.';
-            }
-            $dayNumbers = $package->itineraryDays()->orderBy('day_number')->pluck('day_number')->all();
-            if ($dayNumbers !== range(1, $package->duration_days)) {
-                $errors['itinerary'] = 'Add one itinerary entry for every day, numbered in order.';
-            }
-            if (! $package->inclusions()->exists()) {
-                $errors['inclusions'] = 'Add at least one inclusion before publication.';
-            }
-            if (! $package->exclusions()->exists()) {
-                $errors['exclusions'] = 'Add at least one exclusion before publication.';
-            }
-            if ($package->media()->where('is_cover', true)->count() !== 1) {
-                $errors['media'] = 'Select exactly one cover image before publication.';
+
+            if (! $package->media()->exists()) {
+                $errors['images'] = 'Add at least one photograph before publication.';
+            } elseif ($package->media()->where('is_cover', true)->count() > 1) {
+                $errors['images'] = 'Only one photograph can be the cover.';
             }
             if ($errors !== []) {
                 throw ValidationException::withMessages($errors);

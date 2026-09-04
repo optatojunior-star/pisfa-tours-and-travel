@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DocumentCategory;
 use App\Enums\TourPackageItemType;
 use App\Enums\TourPackageStatus;
 use App\Models\Concerns\HasReviews;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class TourPackage extends Model
 {
@@ -60,6 +62,23 @@ class TourPackage extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(TourCategory::class, 'tour_category_id');
+    }
+
+    /**
+     * Uploaded photograph files.
+     *
+     * Distinct from media(): media() holds the display rows the public views
+     * read, this holds the stored files behind them. Keeping both means tour
+     * uploads go through the same inspection as every other upload without
+     * changing anything that renders a tour.
+     *
+     * @return MorphMany<Document, $this>
+     */
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable')
+            ->where('category', DocumentCategory::TourMedia->value)
+            ->orderBy('id');
     }
 
     public function media(): HasMany

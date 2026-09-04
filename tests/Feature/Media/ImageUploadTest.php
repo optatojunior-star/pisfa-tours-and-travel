@@ -7,6 +7,8 @@ use App\Enums\DocumentCategory;
 use App\Enums\UserRole;
 use App\Http\Middleware\EnsureTwoFactorAuthenticationIsConfigured;
 use App\Models\Document;
+use App\Models\TourCategory;
+use App\Models\TourPackage;
 use App\Models\User;
 use App\Models\VehicleListing;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -157,6 +159,52 @@ class ImageUploadTest extends TestCase
             ->assertOk()
             ->assertSee('enctype="multipart/form-data"', false)
             ->assertSee('type="file"', false);
+    }
+
+    public function test_a_tour_package_accepts_photographs_from_the_machine(): void
+    {
+        $category = TourCategory::factory()->create(['is_active' => true]);
+        $package = TourPackage::factory()->create();
+
+        $this->actingAs($this->manager())
+            ->patch(route('admin.tours.update', $package), [
+                'category_id' => $category->id,
+                'cancellation_cutoff_hours' => 48,
+                'name' => $package->name,
+                'destination' => $package->destination,
+                'summary' => $package->summary,
+                'description' => $package->description,
+                'duration_days' => $package->duration_days,
+                'base_price' => '1200000',
+                'currency' => 'UGX',
+                'min_travelers' => 1,
+                'max_travelers' => 8,
+                'images' => [$this->image('bwindi.png'), $this->image('gorilla.png')],
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect();
+
+        // Both the stored files and the display rows the public views read.
+        $this->assertSame(2, $package->documents()->count(), 'The files were not stored.');
+        $this->assertSame(2, $package->media()->count(), 'The display rows were not created.');
+
+        // The first photograph becomes the cover, so a tour card has something
+        // to show without anybody choosing.
+        $this->assertSame(1, $package->media()->where('is_cover', true)->count());
+    }
+
+    public function test_the_tour_form_offers_a_file_input_not_a_url_box(): void
+    {
+        $package = TourPackage::factory()->create();
+
+        $this->actingAs($this->manager())
+            ->get(route('admin.tours.edit', $package))
+            ->assertOk()
+            ->assertSee('enctype="multipart/form-data"', false)
+            ->assertSee('type="file"', false)
+            // The URL repeater it replaced.
+            ->assertDontSee('Image URL or path')
+            ->assertDontSee('name="media[0][url]"', false);
     }
 
     public function test_a_customer_cannot_upload(): void

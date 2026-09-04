@@ -68,14 +68,18 @@ class SaveTourPackageRequest extends FormRequest
             'media.*.alt_text' => ['nullable', 'required_with:media.*.url', 'string', 'max:180'],
             'media.*.caption' => ['nullable', 'string', 'max:300'],
             'media.*.is_cover' => ['sometimes', 'boolean'],
-            'itinerary' => ['required', 'array', 'min:1', 'max:'.config('tours.maximum_duration_days', 90)],
+            // Optional since package creation was reduced to three steps.
+            // The data is still supported and still rendered publicly; it is
+            // simply no longer captured on this form, and requiring it here
+            // would make the form impossible to submit.
+            'itinerary' => ['nullable', 'array', 'max:'.config('tours.maximum_duration_days', 90)],
             'itinerary.*.day_number' => ['required', 'integer', 'min:1', 'max:'.config('tours.maximum_duration_days', 90), 'distinct'],
             'itinerary.*.title' => ['required', 'string', 'max:180'],
             'itinerary.*.description' => ['required', 'string', 'max:3000'],
             'itinerary.*.activities' => ['nullable', 'string', 'max:1000'],
             'itinerary.*.meals' => ['nullable', 'string', 'max:300'],
             'itinerary.*.overnight_location' => ['nullable', 'string', 'max:300'],
-            'inclusions' => ['required', 'array', 'min:1', 'max:50'],
+            'inclusions' => ['nullable', 'array', 'max:50'],
             'inclusions.*' => ['required', 'string', 'max:300', 'distinct'],
             'exclusions' => ['nullable', 'array', 'max:50'],
             'exclusions.*' => ['nullable', 'string', 'max:300', 'distinct'],
@@ -103,13 +107,26 @@ class SaveTourPackageRequest extends FormRequest
             static fn (string $value): bool => $value !== '',
         ));
 
-        $this->merge([
+        $merge = [
             'currency' => strtoupper((string) $this->input('currency', 'UGX')),
             'is_featured' => $this->boolean('is_featured'),
-            'media' => $media,
-            'itinerary' => $itinerary,
-            'inclusions' => $inclusions,
-            'exclusions' => $exclusions,
-        ]);
+        ];
+
+        /*
+         * Only merged when the form actually sent them.
+         *
+         * SaveTourPackage replaces a collection whenever its key is present, so
+         * merging an empty array for a field the form no longer carries would
+         * silently delete the itinerary and inclusions of every package edited
+         * after this change. Absent has to stay absent.
+         */
+        foreach (['media' => $media, 'itinerary' => $itinerary,
+            'inclusions' => $inclusions, 'exclusions' => $exclusions] as $key => $value) {
+            if ($this->has($key)) {
+                $merge[$key] = $value;
+            }
+        }
+
+        $this->merge($merge);
     }
 }

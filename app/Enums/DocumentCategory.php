@@ -12,6 +12,7 @@ enum DocumentCategory: string
     case InsuranceDocument = 'insurance_document';
     case VehicleRegistration = 'vehicle_registration';
     case ExpenseReceipt = 'expense_receipt';
+    case TourMedia = 'tour_media';
     case VehicleMedia = 'vehicle_media';
     case PropertyMedia = 'property_media';
     case BlogMedia = 'blog_media';
@@ -36,6 +37,7 @@ enum DocumentCategory: string
             self::InsuranceDocument => 'Insurance document',
             self::VehicleRegistration => 'Vehicle registration',
             self::ExpenseReceipt => 'Expense receipt',
+            self::TourMedia => 'Tour photograph',
             self::VehicleMedia => 'Vehicle photograph',
             self::PropertyMedia => 'Property photograph',
             self::BlogMedia => 'Blog image',
@@ -57,7 +59,8 @@ enum DocumentCategory: string
     public function visibility(): DocumentVisibility
     {
         return match ($this) {
-            self::VehicleMedia, self::PropertyMedia, self::BlogMedia, self::ReviewMedia => DocumentVisibility::Public,
+            self::TourMedia, self::VehicleMedia, self::PropertyMedia,
+            self::BlogMedia, self::ReviewMedia => DocumentVisibility::Public,
             default => DocumentVisibility::Private,
         };
     }
@@ -112,6 +115,7 @@ enum DocumentCategory: string
     public function isCollection(): bool
     {
         return in_array($this, [
+            self::TourMedia,
             self::VehicleMedia,
             self::PropertyMedia,
             self::BlogMedia,

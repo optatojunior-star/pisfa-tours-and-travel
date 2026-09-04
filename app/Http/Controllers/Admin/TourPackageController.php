@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\Tours\SaveTourPackage;
+use App\Enums\DocumentCategory;
 use App\Enums\TourBookingStatus;
 use App\Enums\TourDepartureStatus;
 use App\Enums\TourPackageStatus;
+use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SaveTourPackageRequest;
 use App\Models\TourCategory;
@@ -20,6 +22,8 @@ use Illuminate\View\View;
 
 class TourPackageController extends Controller
 {
+    use HandlesImageUploads;
+
     public function index(Request $request): View
     {
         $this->authorize('viewAny', TourPackage::class);
@@ -96,9 +100,13 @@ class TourPackageController extends Controller
             attributes: $attributes,
         );
 
-        return redirect()
-            ->route('admin.tours.show', $package)
-            ->with('success', 'Tour package saved as a draft. Review it, then publish when ready.');
+        $rejected = $this->storeTourPhotographs($request, $package);
+
+        return $this->withRejectedImages(
+            redirect()->route('admin.tours.show', $package)
+                ->with('success', 'Tour package saved as a draft. Review it, then publish when ready.'),
+            $rejected,
+        );
     }
 
     public function show(TourPackage $tourPackage): View
@@ -145,9 +153,12 @@ class TourPackageController extends Controller
             package: $tourPackage,
         );
 
-        return redirect()
-            ->route('admin.tours.show', $package)
-            ->with('success', 'Tour package updated.');
+        $rejected = $this->storeTourPhotographs($request, $package);
+
+        return $this->withRejectedImages(
+            redirect()->route('admin.tours.show', $package)->with('success', 'Tour package updated.'),
+            $rejected,
+        );
     }
 
     public function publish(Request $request, TourPackage $tourPackage, AuditLogger $auditLogger): RedirectResponse
@@ -289,5 +300,47 @@ class TourPackageController extends Controller
         });
 
         return back()->with('success', 'Tour package restored to draft.');
+    }
+
+    /**
+     * Stores uploaded photographs and points the package's media rows at them.
+     *
+     * A tour keeps its images in TourPackageMedia, which holds a URL string
+     * rather than a document. Rather than give tours a second, weaker upload
+     * path, the file goes through StoreDocument — the same inspection every
+     * other upload gets, reading the real content rather than the extension —
+     * and the resulting public URL is written into the row the views already
+     * read. One storage path, one set of checks, and nothing that displays a
+     * tour has to change.
+     *
+     * @return list<string>
+     */
+    private function storeTourPhotographs(Request $request, TourPackage $package): array
+    {
+        if (! $request->hasFile('images')) {
+            return [];
+        }
+
+        // An id boundary rather than an offset: skip() without limit() emits
+        // OFFSET with no LIMIT, which SQLite rejects outright.
+        $lastId = (int) $package->documents()->max('id');
+
+        $rejected = $this->storeUploadedImages($request, $package, DocumentCategory::TourMedia);
+
+        $sort = (int) $package->media()->max('sort_order');
+        $hasCover = $package->media()->where('is_cover', true)->exists();
+
+        foreach ($package->documents()->where('id', '>', $lastId)->get() as $document) {
+            $package->media()->create([
+                'url' => $document->url(),
+                'alt_text' => $package->name,
+                'is_cover' => ! $hasCover && $sort === 0,
+                'sort_order' => ++$sort,
+            ]);
+
+            $hasCover = true;
+        }
+
+        return $rejected;
     }
 }

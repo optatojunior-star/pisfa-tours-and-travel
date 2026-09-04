@@ -10,6 +10,25 @@
 @php
     $maxKb = (int) config('documents.images.maximum_kilobytes', 5120);
     $field = $multiple ? $name.'[]' : $name;
+
+    /*
+     * Existing images arrive as one of two shapes. A Document exposes url() as
+     * a method and knows its own file name; a TourPackageMedia row stores url
+     * as a plain column. Reading whichever is there keeps one component usable
+     * for both rather than forcing the models to converge for the sake of a
+     * preview.
+     */
+    $sourceOf = static function (object $image): string {
+        if (method_exists($image, 'url')) {
+            return (string) $image->url();
+        }
+
+        return (string) ($image->url ?? '');
+    };
+
+    $captionOf = static fn (object $image): string => (string) (
+        $image->original_name ?? $image->alt_text ?? 'Photograph'
+    );
 @endphp
 
 {{--
@@ -88,12 +107,12 @@
                 @foreach ($existing as $image)
                     <figure class="overflow-hidden rounded-control border border-ink-200 bg-white">
                         <div class="aspect-square overflow-hidden bg-ink-100">
-                            <img src="{{ $image->url() }}" alt="{{ $image->original_name }}" loading="lazy"
+                            <img src="{{ $sourceOf($image) }}" alt="{{ $captionOf($image) }}" loading="lazy"
                                  class="h-full w-full object-cover">
                         </div>
                         <figcaption class="space-y-1 px-2 py-1.5">
-                            <p class="truncate text-[11px] text-ink-600" title="{{ $image->original_name }}">
-                                {{ $image->original_name }}
+                            <p class="truncate text-[11px] text-ink-600" title="{{ $captionOf($image) }}">
+                                {{ $captionOf($image) }}
                             </p>
                             @if ($deleteRoute)
                                 {{-- Its own form: a delete button nested inside the

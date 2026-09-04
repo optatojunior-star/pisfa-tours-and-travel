@@ -524,14 +524,35 @@ class TourAdministrationHttpTest extends TestCase
             $package->itineraryDays()->where('day_number', 1)->sole()->activities,
         );
 
+        // The itinerary is no longer edited through this form — it was removed
+        // to keep package creation to three steps. The data is still stored and
+        // still rendered publicly, and SaveTourPackage only touches it when the
+        // key is present, so what was captured here survives an edit.
         $this->actingAs($staff)
             ->get(route('admin.tours.edit', $package))
             ->assertOk()
-            ->assertSee('name="itinerary[6][day_number]"', false)
-            ->assertSee('Journey day 7')
-            ->assertSee('data-max="90"', false)
-            ->assertSee('data-fill-duration', false)
-            ->assertSee('Add days to match duration');
+            ->assertDontSee('name="itinerary[6][day_number]"', false);
+
+        $this->actingAs($staff)
+            ->patch(route('admin.tours.update', $package), [
+                'tour_category_id' => $category->id,
+                'name' => $package->name,
+                'destination' => $package->destination,
+                'summary' => $package->summary,
+                'description' => $package->description,
+                'duration_days' => $package->duration_days,
+                'base_price' => '1200000',
+                'currency' => 'UGX',
+                'min_travelers' => 1,
+                'max_travelers' => 8,
+            ])
+            ->assertRedirect();
+
+        $this->assertSame(
+            7,
+            $package->fresh()->itineraryDays()->count(),
+            'Editing a package without an itinerary field discarded the itinerary.',
+        );
     }
 
     /** @return array<string, mixed> */

@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Actions\CarHire\CreateCarHireBooking;
+use App\Models\Setting;
+use App\Services\Settings\SettingsRepository;
 use App\Support\LegalDocuments;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -127,5 +129,50 @@ class MarketingLegalPagesTest extends TestCase
         $this->get(route('cancellation-policy'))
             ->assertOk()
             ->assertSee('never refundable once purchased');
+    }
+
+    /**
+     * The address on the terms is the address on the invoice.
+     *
+     * This shipped broken. The terms page read config() while every document
+     * read the settings repository, so the live site said "Kampala, Uganda" in
+     * clause 1.1 while invoices carried the Kitebi Starlink Building address.
+     * Two different addresses for one company, on documents the same customer
+     * holds at the same time.
+     */
+    public function test_the_terms_show_the_same_company_details_as_the_documents(): void
+    {
+        Setting::setValue('company.address', 'Somewhere Else Entirely, Jinja');
+        Setting::setValue('company.registration_number', '99999999999999');
+        Setting::setValue('company.legal_name', 'A Renamed Company Limited');
+
+        $brand = app(SettingsRepository::class)->brand();
+
+        // The values actually took, or the assertions below prove nothing.
+        $this->assertSame('Somewhere Else Entirely, Jinja', $brand['address']);
+
+        $this->get(route('booking-terms'))
+            ->assertOk()
+            ->assertSee($brand['address'])
+            ->assertSee($brand['registration_number'])
+            ->assertSee($brand['legal_name']);
+
+        $this->get(route('privacy'))
+            ->assertOk()
+            ->assertSee($brand['address'])
+            ->assertSee($brand['legal_name']);
+    }
+
+    public function test_the_terms_read_settings_rather_than_configuration(): void
+    {
+        // Config is the fallback, not the source. Reading it directly is what
+        // let the two drift apart.
+        $source = file_get_contents(
+            (new \ReflectionClass(LegalDocuments::class))->getFileName() ?: '',
+        );
+
+        $this->assertIsString($source);
+        $this->assertStringNotContainsString("config('pisfa.company.address')", $source);
+        $this->assertStringNotContainsString("config('pisfa.company.registration_number')", $source);
     }
 }

@@ -74,6 +74,15 @@ final class SettingDefinition
                 rules: ['required', 'string', 'max:40', 'regex:/\A\+?[0-9][0-9\s().-]{6,39}\z/'],
             ),
             new self(
+                key: 'company.legal_name',
+                label: 'Registered company name',
+                group: 'company',
+                type: Setting::TYPE_STRING,
+                description: 'The name on the certificate of incorporation, which a limited company\'s invoices and contracts must carry. Left blank, documents fall back to the trading name above.',
+                configFallback: 'pisfa.company.legal_name',
+                rules: ['nullable', 'string', 'max:200'],
+            ),
+            new self(
                 key: 'company.address',
                 label: 'Postal address',
                 group: 'company',

@@ -3,6 +3,11 @@
 @php
     $title = 'Privacy policy';
     $description = 'How PISFA Tours and Travels collects, uses, shares and protects personal information, under the Uganda Data Protection and Privacy Act 2019.';
+
+    // From the settings the invoices read, not from config, so the address
+    // here can never contradict the one on a document the same customer is
+    // holding.
+    $company = app(\App\Services\Settings\SettingsRepository::class)->brand();
 @endphp
 
 @section('content')
@@ -24,15 +29,15 @@
         <section>
             <h2 class="text-2xl font-black text-emerald-950">Who is responsible</h2>
             <p class="mt-3">
-                {{ config('pisfa.company.legal_name') }}
-                @if (filled(config('pisfa.company.registration_number')))
-                    (registration number {{ config('pisfa.company.registration_number') }}),
+                {{ $company['legal_name'] }}
+                @if (filled($company['registration_number']))
+                    (registration number {{ $company['registration_number'] }}),
                 @endif
-                trading as {{ config('pisfa.company.name') }}, of {{ config('pisfa.company.address') }}, decides how and why
+                trading as {{ $company['name'] }}, of {{ $company['address'] }}, decides how and why
                 your personal information is used, and is the data collector and processor for it under the
                 Uganda Data Protection and Privacy Act 2019. You can reach us at
-                <a href="mailto:{{ config('pisfa.contact.email') }}" class="font-bold text-emerald-800 underline">{{ config('pisfa.contact.email') }}</a>
-                or on {{ config('pisfa.contact.phone') }}.
+                <a href="mailto:{{ $company['email'] }}" class="font-bold text-emerald-800 underline">{{ $company['email'] }}</a>
+                or on {{ $company['phone'] }}.
             </p>
         </section>
 
@@ -125,7 +130,7 @@
                     <span>complain to the Personal Data Protection Office if you are not satisfied with how we have handled a request.</span></li>
             </ul>
             <p class="mt-4">
-                Write to <a href="mailto:{{ config('pisfa.contact.email') }}" class="font-bold text-emerald-800 underline">{{ config('pisfa.contact.email') }}</a>
+                Write to <a href="mailto:{{ $company['email'] }}" class="font-bold text-emerald-800 underline">{{ $company['email'] }}</a>
                 and we will answer within thirty days. We may ask you to confirm who you are first &mdash; handing
                 somebody's records to the wrong person is the failure this whole policy exists to prevent.
             </p>

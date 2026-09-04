@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Services\Settings\SettingsRepository;
+
 /**
  * The terms PISFA trades on, in one place.
  *
@@ -44,6 +46,24 @@ final class LegalDocuments
     public const VERSION = '2026-09-04';
 
     /**
+     * Company identity, from the same place every document reads it.
+     *
+     * Not config(). The address and registration number are managed on the
+     * admin settings screen, which stores them in the database and falls back
+     * to configuration — so reading config() directly would mean the terms page
+     * showing one address while the invoice beside it showed another. That is
+     * exactly the contradiction this class exists to prevent, and it shipped
+     * once already: the live terms page said "Kampala, Uganda" while the
+     * configured address was the Kitebi Starlink Building.
+     *
+     * @return array<string, string>
+     */
+    private static function company(): array
+    {
+        return app(SettingsRepository::class)->brand();
+    }
+
+    /**
      * Booking terms, by service.
      *
      * @return array<string, array{title: string, intro: string, clauses: list<string>}>
@@ -55,7 +75,9 @@ final class LegalDocuments
                 'title' => 'Terms that apply to everything',
                 'intro' => 'These apply to every service PISFA provides, whether it was arranged on this website, over the telephone, or on WhatsApp.',
                 'clauses' => [
-                    'Your contract is with '.config('pisfa.company.legal_name', 'PISFA Tour and Travel Limited').', a private company limited by shares incorporated in Uganda under the Companies Act 2012, registration number '.config('pisfa.company.registration_number').', with its place of business at '.config('pisfa.company.address').'. "PISFA", "we" and "us" in these terms mean that company, which trades as '.config('pisfa.company.name').'.',
+                    'Your contract is with '.self::company()['legal_name'].', a private company limited by shares incorporated in Uganda under the Companies Act 2012'
+                        .(filled(self::company()['registration_number']) ? ', registration number '.self::company()['registration_number'] : '')
+                        .', with its place of business at '.self::company()['address'].'. "PISFA", "we" and "us" in these terms mean that company, which trades as '.self::company()['name'].'.',
                     'A request is not a booking. Submitting a form, sending a message or receiving a quotation does not reserve anything. A booking exists only when PISFA confirms it in writing and any required deposit has been received.',
                     'A quotation is valid for '.(int) config('pisfa.billing.quotation_validity_days', 14).' days from the date it is issued, unless it states otherwise on its face. After that, prices are re-checked.',
                     'Prices are quoted in Uganda Shillings or United States Dollars, as stated on the quotation or invoice, and each document is settled in the currency it was issued in. Amounts are never converted between currencies without a written agreement to do so.',

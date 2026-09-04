@@ -68,13 +68,37 @@ class DatabaseDump
     public function tables(): array
     {
         $connection = $this->connection();
+        $database = $connection->getDatabaseName();
 
-        // Laravel's schema builder abstracts the driver difference, which
-        // matters because tests run on SQLite and production on MariaDB.
-        $tables = array_map(
-            static fn (array $table): string => (string) $table['name'],
-            $connection->getSchemaBuilder()->getTables(),
-        );
+        /*
+         * Restricted to this database, and that restriction is the important
+         * part.
+         *
+         * On MySQL, getTables() returns every table the *connection* can see,
+         * not every table in the current database. On a shared server that is
+         * every schema the user has rights to: a real run here returned 369
+         * tables of which 277 belonged to other applications entirely.
+         *
+         * Left unfiltered that is two failures at once. The dump breaks on the
+         * first foreign table it cannot read, so there are no backups at all;
+         * and where the user *can* read them, the backup file quietly fills up
+         * with another business's data.
+         *
+         * Applied only on MySQL, where the schema name and the database name
+         * are the same thing. SQLite reports its schema as 'main' while
+         * getDatabaseName() returns a file path, so comparing the two there
+         * would filter out every table and produce an empty dump.
+         */
+        $scoped = in_array($connection->getDriverName(), ['mysql', 'mariadb'], true);
+        $tables = [];
+
+        foreach ($connection->getSchemaBuilder()->getTables() as $table) {
+            if ($scoped && ($table['schema'] ?? null) !== $database) {
+                continue;
+            }
+
+            $tables[] = (string) $table['name'];
+        }
 
         sort($tables);
 

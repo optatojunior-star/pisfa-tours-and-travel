@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\MediaLibraryController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Content\BlogController;
 use Illuminate\Support\Facades\Route;
@@ -34,4 +35,23 @@ Route::prefix('admin')
         Route::post('/posts/{post}/archive', [AdminPostController::class, 'archive'])
             ->middleware('throttle:30,1')
             ->name('posts.archive');
+    });
+
+/*
+ * The image library. Uploading was the one part of F27 that was never built:
+ * the storage layer, inspector and actions all existed, with no way for a
+ * person to reach them.
+ */
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['auth', 'verified', 'role:staff,manager,super_admin', '2fa.required'])
+    ->group(function (): void {
+        Route::get('/media', [MediaLibraryController::class, 'index'])->name('media.index');
+        Route::post('/media', [MediaLibraryController::class, 'store'])
+            ->middleware('throttle:30,1')
+            ->name('media.store');
+        Route::get('/media/picker', [MediaLibraryController::class, 'picker'])->name('media.picker');
+        Route::delete('/media/{document}', [MediaLibraryController::class, 'destroy'])
+            ->middleware('throttle:30,1')
+            ->name('media.destroy');
     });

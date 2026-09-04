@@ -53,6 +53,12 @@ class SaveVehicleListingRequest extends FormRequest
             // Only meaningful on create; ignored on update, because moving a
             // listing onto a different vehicle would rewrite what was sold.
             'vehicle_id' => ['nullable', 'integer', 'exists:vehicles,id'],
+
+            // Photographs. The real inspection happens in FileInspector, which
+            // reads the file's actual content; these rules only reject the
+            // obviously wrong before a large body is loaded.
+            'images' => ['nullable', 'array', 'max:12'],
+            'images.*' => ['file', 'mimes:jpg,jpeg,png,webp', 'max:'.(int) config('documents.images.maximum_kilobytes', 5120)],
         ];
     }
 

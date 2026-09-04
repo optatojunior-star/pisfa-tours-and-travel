@@ -16,7 +16,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('admin.showroom.store') }}" class="space-y-6">
+            <form method="POST" action="{{ route('admin.showroom.store') }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @include('admin.showroom.partials.form', ['listing' => null])
 

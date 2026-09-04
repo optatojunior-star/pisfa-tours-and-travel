@@ -79,11 +79,13 @@ class StoreDocument
                     ->withTrashed()
                     ->max('version');
 
-                // A versioned category supersedes its predecessor and keeps it.
-                // A single-slot category replaces its predecessor outright.
+                // A collection accumulates: a gallery of photographs, where
+                // nothing is superseded. A versioned category supersedes its
+                // predecessor and keeps it. A single-slot category replaces its
+                // predecessor outright.
                 $supersededFiles = [];
 
-                foreach ($previous as $document) {
+                foreach ($category->isCollection() ? [] : $previous as $document) {
                     if ($category->isVersioned()) {
                         $document->forceFill(['is_current' => false])->save();
 

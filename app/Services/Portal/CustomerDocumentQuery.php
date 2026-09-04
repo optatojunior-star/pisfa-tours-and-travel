@@ -59,7 +59,7 @@ class CustomerDocumentQuery
 
         foreach (BookingSource::cases() as $source) {
             $ids = DB::table($source->table())
-                ->where('customer_id', $customer->getKey())
+                ->where($source->customerColumn(), $customer->getKey())
                 ->pluck('id')
                 ->map(static fn ($id): int => (int) $id)
                 ->all();

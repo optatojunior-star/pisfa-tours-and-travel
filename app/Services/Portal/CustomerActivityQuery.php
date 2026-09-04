@@ -114,8 +114,11 @@ class CustomerActivityQuery
         $projections = [];
 
         foreach (BookingSource::cases() as $source) {
+            // customerColumn(), not a literal: a group booking belongs to its
+            // organiser and has no customer_id. SQLite silently matched nothing;
+            // MySQL rightly refuses the whole UNION.
             $query = DB::table($source->table())
-                ->where('customer_id', $customer->getKey());
+                ->where($source->customerColumn(), $customer->getKey());
 
             $this->applySearch($query, $filters, ['reference']);
 

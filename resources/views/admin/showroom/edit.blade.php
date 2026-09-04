@@ -14,7 +14,7 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <form method="POST" action="{{ route('admin.showroom.update', $listing) }}" class="space-y-6">
+            <form method="POST" action="{{ route('admin.showroom.update', $listing) }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PATCH')
                 @include('admin.showroom.partials.form')

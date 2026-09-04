@@ -178,5 +178,14 @@
                 </p>
             </section>
         @endif
+
+        <section class="rounded-card border border-ink-200 bg-white p-6 shadow-sm">
+            <x-image-upload
+                name="images"
+                label="Photographs"
+                help="The first photograph becomes the one shown on the showroom card. Buyers decide on these, so use daylight and show the whole car."
+                :existing="$listing?->media"
+                :delete-route="$listing ? fn ($image) => route('admin.media.destroy', $image) : null" />
+        </section>
     </aside>
 </div>

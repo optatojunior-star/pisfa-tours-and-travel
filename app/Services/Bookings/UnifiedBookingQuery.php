@@ -44,9 +44,17 @@ class UnifiedBookingQuery
             return DB::query()->selectRaw('1')->whereRaw('1 = 0')->paginate($perPage);
         }
 
-        $sort = in_array($filters['sort'] ?? null, ['service_date', 'created_at', 'amount'], true)
-            ? $filters['sort']
-            : 'created_at';
+        // Mapped to the column the union actually projects. The sort key is
+        // part of the public query string, so 'amount' stays the name a caller
+        // uses, but the union aliases the value as amount_minor and MySQL will
+        // not order by a column that is not in the result set.
+        $sortable = [
+            'service_date' => 'service_date',
+            'created_at' => 'created_at',
+            'amount' => 'amount_minor',
+        ];
+
+        $sort = $sortable[$filters['sort'] ?? ''] ?? 'created_at';
 
         $direction = ($filters['direction'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
 

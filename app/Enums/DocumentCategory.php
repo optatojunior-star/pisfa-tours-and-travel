@@ -97,6 +97,28 @@ enum DocumentCategory: string
      * Versioned categories keep prior revisions instead of overwriting, because
      * the superseded document may still be referenced by an agreement.
      */
+    /**
+     * Whether a record may hold many of these at once.
+     *
+     * Photographs are a gallery: a listing has a front, a rear and an interior
+     * shot, and uploading the second must not remove the first. Every other
+     * category is a single slot or a version chain, where a new file genuinely
+     * does supersede its predecessor.
+     *
+     * Without this distinction media fell into the single-slot branch, so each
+     * upload deleted the one before it and a listing could never show more than
+     * one picture.
+     */
+    public function isCollection(): bool
+    {
+        return in_array($this, [
+            self::VehicleMedia,
+            self::PropertyMedia,
+            self::BlogMedia,
+            self::ReviewMedia,
+        ], true);
+    }
+
     public function isVersioned(): bool
     {
         return in_array($this, [

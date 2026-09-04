@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\Sales\SaveVehicleListing;
 use App\Actions\Sales\TransitionVehicleListing;
+use App\Enums\DocumentCategory;
 use App\Enums\ListingStatus;
 use App\Enums\SalesEnquiryStatus;
 use App\Enums\VehicleCatalogueStatus;
+use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SaveVehicleListingRequest;
 use App\Models\Vehicle;
@@ -19,6 +21,8 @@ use Illuminate\View\View;
 
 class VehicleListingController extends Controller
 {
+    use HandlesImageUploads;
+
     public function index(Request $request): View
     {
         $this->authorize('viewAny', VehicleListing::class);
@@ -74,9 +78,18 @@ class VehicleListingController extends Controller
 
         $listing = $action->create($request->user(), $request->validated(), $vehicle);
 
-        return redirect()
-            ->route('admin.showroom.show', $listing)
-            ->with('success', 'Draft listing saved. Publish it to the showroom when the photographs are up.');
+        // Photographs are attached after the listing exists, because a document
+        // needs something to belong to.
+        $rejected = $this->storeUploadedImages($request, $listing, DocumentCategory::VehicleMedia);
+
+        $message = $listing->media()->exists()
+            ? 'Draft listing saved with photographs. Publish it when you are ready.'
+            : 'Draft listing saved. Add photographs before publishing it.';
+
+        return $this->withRejectedImages(
+            redirect()->route('admin.showroom.show', $listing)->with('success', $message),
+            $rejected,
+        );
     }
 
     public function show(VehicleListing $listing): View
@@ -109,9 +122,12 @@ class VehicleListingController extends Controller
     ): RedirectResponse {
         $action->update($request->user(), $listing, $request->validated());
 
-        return redirect()
-            ->route('admin.showroom.show', $listing)
-            ->with('success', 'The listing was updated.');
+        $rejected = $this->storeUploadedImages($request, $listing, DocumentCategory::VehicleMedia);
+
+        return $this->withRejectedImages(
+            redirect()->route('admin.showroom.show', $listing)->with('success', 'The listing was updated.'),
+            $rejected,
+        );
     }
 
     public function publish(Request $request, VehicleListing $listing, TransitionVehicleListing $action): RedirectResponse

@@ -16,6 +16,24 @@ use Illuminate\Support\Facades\Gate;
  */
 class DocumentPolicy
 {
+    /**
+     * The image library, which has no single owning record to inherit from.
+     *
+     * Staff only. A document usually takes its authority from the thing it
+     * belongs to — see the class note — but browsing and uploading catalogue
+     * media is console work with no such parent, so the rule is stated here
+     * rather than borrowed.
+     */
+    public function viewAny(User $user): bool
+    {
+        return $user->canAccessAdministration();
+    }
+
+    public function create(User $user): bool
+    {
+        return $user->canAccessAdministration();
+    }
+
     public function view(User $user, Document $document): bool
     {
         if (! $user->isActive()) {

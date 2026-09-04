@@ -16,6 +16,7 @@ use App\Services\Operations\HealthStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Monolog\Level;
@@ -325,6 +326,30 @@ class HealthAndBackupTest extends TestCase
         foreach (['exec', 'shell_exec', 'proc_open', 'passthru', 'popen', 'system'] as $call) {
             $this->assertStringNotContainsString($call.'(', $code);
         }
+    }
+
+    public function test_the_dump_covers_only_this_database(): void
+    {
+        // On MySQL, getTables() returns every table the *connection* can see,
+        // not every table in the current database. On a shared server that is
+        // every schema the user has rights to — a real run returned 369 tables
+        // of which 277 belonged to other applications.
+        //
+        // Unfiltered, that breaks the dump on the first unreadable foreign
+        // table (so there are no backups at all) and, where the user can read
+        // them, fills the backup with another business's data.
+        $scoped = in_array(DB::connection()->getDriverName(), ['mysql', 'mariadb'], true);
+
+        $expected = collect(Schema::getTables())
+            ->filter(fn (array $t): bool => ! $scoped
+                || ($t['schema'] ?? null) === DB::connection()->getDatabaseName())
+            ->pluck('name')
+            ->reject(fn (string $n): bool => $n === 'sqlite_sequence')
+            ->sort()
+            ->values()
+            ->all();
+
+        $this->assertSame($expected, app(DatabaseDump::class)->tables());
     }
 
     public function test_a_backup_writes_a_dump_to_the_configured_disk(): void

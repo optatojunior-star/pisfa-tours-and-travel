@@ -9,7 +9,10 @@
     silent fallback to SQLite impossible: if the environment is not configured,
     the suite fails to connect rather than passing against the wrong engine.
 
-    Usage: php artisan test --configuration=phpunit.mysql.xml
+    Usage: php artisan test with the configuration flag pointing at this file.
+    (Written out rather than shown literally: a double hyphen is illegal
+    inside an XML comment, and having one here meant this file failed to
+    parse at all - so the production-engine suite never once ran.)
 -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"

@@ -73,6 +73,44 @@ the first two are covered in `tests/Browser`, the third by review. Two of its
 tests check the checker itself, because a checker that passes everything is
 worse than none.
 
+## Running the suite against MariaDB locally
+
+The SQLite run is fast and catches most things, but it hides a whole class of
+bug — see the warning below. Before trusting a change that touches queries,
+migrations or schema, run it against the real engine.
+
+XAMPP ships MariaDB, which is enough:
+
+```bash
+# 1. Start the server (leave it running).
+/c/xampp/mysql/bin/mysqld.exe --console
+
+# 2. Create the test database once.
+/c/xampp/mysql/bin/mysql.exe -u root   -e "CREATE DATABASE pisfa_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# 3. Run the suite against it.
+DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3306 DB_DATABASE=pisfa_test DB_USERNAME=root DB_PASSWORD= php artisan test --configuration=phpunit.mysql.xml
+```
+
+**What SQLite hides.** Three real bugs reached production because the local
+suite was green:
+
+1. **Identifier length.** MySQL caps names at 64 characters; SQLite has no
+   limit. A 70-character foreign key name failed the first deployment.
+2. **Unknown columns.** SQLite quotes identifiers with double quotes, and when
+   a column does not exist it falls back to treating `"customer_id"` as a
+   *string literal* rather than erroring. The query returns zero rows and looks
+   healthy. MySQL correctly refuses. This is what made the customer portal
+   return 500 for every customer.
+3. **This file itself.** `phpunit.mysql.xml` contained a double hyphen inside
+   an XML comment, which is illegal. The file never parsed, so the
+   production-engine suite never ran once — in CI or anywhere else — while
+   appearing to be configured and enforced.
+
+The third is the one worth remembering: a gate that has never been observed to
+pass is not a gate. If you add a CI job, watch it go green at least once before
+believing it protects anything.
+
 ## Two test configurations, and why
 
 `phpunit.xml` pins `DB_CONNECTION=sqlite` with an in-memory database. That is the

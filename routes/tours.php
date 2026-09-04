@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CataloguePhotographController;
 use App\Http\Controllers\Admin\TourBookingController as AdminTourBookingController;
 use App\Http\Controllers\Admin\TourCategoryController;
 use App\Http\Controllers\Admin\TourDepartureController;
@@ -50,6 +51,9 @@ Route::prefix('admin')
         Route::patch('/tours/{tourPackage}/publish', [TourPackageController::class, 'publish'])->name('tours.publish');
         Route::patch('/tours/{tourPackage}/archive', [TourPackageController::class, 'archive'])->name('tours.archive');
         Route::patch('/tours/{tourPackage}/restore', [TourPackageController::class, 'restore'])->name('tours.restore');
+        Route::delete('/tours/{tourPackage}/photographs/{medium}', [CataloguePhotographController::class, 'destroyTourPhotograph'])
+            ->scopeBindings()
+            ->name('tours.media.destroy');
 
         Route::post('/tours/{tourPackage}/departures', [TourDepartureController::class, 'store'])->name('tour-departures.store');
         Route::patch('/tours/{tourPackage}/departures/{tourDeparture}', [TourDepartureController::class, 'update'])->name('tour-departures.update');

@@ -31,11 +31,25 @@ return [
     */
     'company' => [
         'name' => env('PISFA_COMPANY_NAME', 'PISFA Tours and Travels'),
+
+        /*
+         * The registered name, which is not the trading name.
+         *
+         * The certificate of incorporation says PISFA TOUR AND TRAVEL
+         * LIMITED; customers know the business as PISFA Tours and Travels.
+         * Both are correct in their place, and the difference matters: a
+         * limited company's invoices, contracts and terms have to carry the
+         * registered name and number, while its marketing does not.
+         */
+        'legal_name' => env('PISFA_COMPANY_LEGAL_NAME', 'PISFA Tour and Travel Limited'),
         'tagline' => env('PISFA_COMPANY_TAGLINE', 'Uganda travel, transport and fleet services'),
         'email' => env('PISFA_CONTACT_EMAIL', 'info@example.com'),
         'phone' => env('PISFA_CONTACT_PHONE', '+256700000000'),
         'address' => env('PISFA_COMPANY_ADDRESS', 'Kitebi Starlink Building, Kitebi, Bunamwaya, Rubaga Division, Kampala, Uganda'),
-        'registration_number' => env('PISFA_COMPANY_REGISTRATION', ''),
+        // Public information, printed on every invoice and contract — this
+        // is an identifier from a public register, not a credential.
+        'registration_number' => env('PISFA_COMPANY_REGISTRATION', '80034149987265'),
+        'incorporated_on' => env('PISFA_COMPANY_INCORPORATED_ON', '2026-04-10'),
         'tax_identification_number' => env('PISFA_COMPANY_TIN', ''),
 
         /*

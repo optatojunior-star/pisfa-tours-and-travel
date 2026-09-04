@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Marketing;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Models\ServiceImage;
+use App\Models\TeamMember;
 use App\Support\ServiceCatalogue;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -23,6 +25,9 @@ class PublicPageController extends Controller
     {
         return view('marketing.home', [
             'services' => self::SERVICES,
+            // Uploaded pictures replace the line icons where one exists.
+            // A service with none keeps its icon rather than showing a gap.
+            'serviceImages' => ServiceImage::urlsByServiceKey(),
             // Featured, published, and dated in the past — the same public
             // scope the journal itself uses, so the home page cannot surface
             // a post the blog would hide.
@@ -38,12 +43,30 @@ class PublicPageController extends Controller
 
     public function about(): View
     {
-        return view('marketing.about');
+        return view('marketing.about', [
+            // Only published profiles, in the order somebody chose by hand.
+            // An empty list is a normal state, and the page omits the whole
+            // section rather than showing an empty heading.
+            'team' => TeamMember::query()->published()->with('photographs')->get(),
+        ]);
+    }
+
+    public function bookingTerms(): View
+    {
+        return view('marketing.booking-terms');
+    }
+
+    public function cancellationPolicy(): View
+    {
+        return view('marketing.cancellation-policy');
     }
 
     public function contact(): View
     {
-        return view('marketing.contact', ['services' => self::SERVICES]);
+        return view('marketing.contact', [
+            'services' => self::SERVICES,
+            'serviceImages' => ServiceImage::urlsByServiceKey(),
+        ]);
     }
 
     public function requestQuotation(Request $request): View

@@ -4,12 +4,15 @@ namespace App\Http\Requests\Admin;
 
 use App\Enums\VehicleCatalogueStatus;
 use App\Enums\VehicleOperationalStatus;
+use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Models\Vehicle;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class SaveVehicleRequest extends FormRequest
 {
+    use HandlesImageUploads;
+
     public function authorize(): bool
     {
         $vehicle = $this->route('vehicle');
@@ -44,13 +47,23 @@ class SaveVehicleRequest extends FormRequest
             'catalogue_status' => ['required', Rule::enum(VehicleCatalogueStatus::class)],
             'operational_status' => ['required', Rule::enum(VehicleOperationalStatus::class)],
             'is_featured' => ['sometimes', 'boolean'],
-            'media' => ['present', 'array', 'max:20'],
+            // Photographs now arrive as uploaded files. The media rules stay
+            // for the API and the importer, but the key is no longer required:
+            // SaveVehicle replaces the whole collection when it is present, so
+            // a form that stopped sending it would wipe every picture.
+            'media' => ['sometimes', 'array', 'max:20'],
             'media.*.url' => ['nullable', 'string', 'max:2048'],
             'media.*.alt_text' => ['nullable', 'string', 'max:255'],
             'media.*.caption' => ['nullable', 'string', 'max:500'],
             'media.*.is_cover' => ['sometimes', 'boolean'],
             'media.*.sort_order' => ['nullable', 'integer', 'min:0', 'max:65535'],
-        ];
+        ] + $this->imageRules();
+    }
+
+    /** @return array<string, string> */
+    public function messages(): array
+    {
+        return $this->imageMessages();
     }
 
     protected function prepareForValidation(): void
@@ -66,9 +79,12 @@ class SaveVehicleRequest extends FormRequest
             })
             ->all();
 
-        $this->merge([
-            'is_featured' => $this->boolean('is_featured'),
-            'media' => $media,
-        ]);
+        $this->merge(['is_featured' => $this->boolean('is_featured')]);
+
+        // Only when the request actually carried media. Merging an empty array
+        // would look identical to "delete every photograph" to SaveVehicle.
+        if ($this->has('media')) {
+            $this->merge(['media' => $media]);
+        }
     }
 }

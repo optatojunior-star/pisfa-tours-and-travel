@@ -13,6 +13,10 @@
 
         @include('billing.invoices.partials.body')
 
+        <div class="flex justify-center">
+            <a href="{{ route('invoices.track.print', $invoice->tracking_token) }}" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"><x-icon name="printer" class="h-4 w-4" />Print or save as PDF</a>
+        </div>
+
         <p class="text-center text-xs text-slate-500">
             Keep this link private. Anyone who has it can see this invoice.
         </p>

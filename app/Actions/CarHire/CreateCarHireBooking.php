@@ -16,6 +16,7 @@ use App\Models\Vehicle;
 use App\Models\VehicleHireRate;
 use App\Notifications\CarHire\CarHireBookingReceivedNotification;
 use App\Services\AuditLogger;
+use App\Support\LegalDocuments;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Builder;
@@ -322,14 +323,32 @@ class CreateCarHireBooking
         ]);
     }
 
+    /**
+     * The clauses stamped onto this contract.
+     *
+     * Read from LegalDocuments, which is also what the public car-hire terms
+     * page renders, so a customer signs the terms the website showed them.
+     *
+     * This method used to hold its own short summary ending "insurance scope,
+     * damage responsibility, cancellation charges ... require the approved
+     * PISFA policy supplied before handover; this agreement does not invent or
+     * override that policy" — an honest admission that the contract deferred to
+     * a document nobody had written. It exists now, so the contract can say
+     * what it means.
+     *
+     * The text is snapshotted onto the contract row and hashed, so changing the
+     * policy later never rewrites an agreement somebody has already accepted.
+     */
     private function contractTerms(): string
     {
         return implode("\n\n", [
-            'This booking-specific rental agreement records the vehicle, hire interval, mode, locations and exact price snapshot shown above.',
-            'The customer must provide accurate booking information, use the vehicle lawfully and follow written handover and return instructions supplied by PISFA.',
-            'Vehicle handover remains subject to operational confirmation, acceptance of this agreement and any applicable self-drive verification or driver assignment.',
-            'The security deposit is recorded separately from the rental subtotal. This F04 request does not collect payment, promise a refund or determine a financial adjustment.',
-            'Insurance scope, damage responsibility, cancellation charges, document retention and any additional legal terms require the approved PISFA policy supplied before handover; this agreement does not invent or override that policy.',
+            'This agreement records the vehicle, hire interval, mode, locations and exact price shown above, and incorporates the PISFA car hire terms set out below.',
+            // Said outright, because a document with a total on it reads
+            // like a receipt. Booking takes no money: the rental charge and
+            // the deposit are collected separately, and a customer must not
+            // arrive at handover believing they have already paid.
+            'Accepting this agreement does not collect payment. The rental charge and the security deposit are collected separately, and nothing in this document confirms that any money has been received.',
+            ...LegalDocuments::rentalAgreementClauses(),
             'Contact PISFA before accepting if any booking, price, vehicle, date, location or term is incorrect.',
         ]);
     }

@@ -5,6 +5,7 @@
                 <p class="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700">Invoice</p>
                 <h1 class="mt-1 font-mono text-2xl font-bold text-slate-950">{{ $invoice->number }}</h1>
             </div>
+            <a href="{{ route('portal.invoices.print', $invoice) }}" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"><x-icon name="printer" class="h-4 w-4" />Print or save as PDF</a>
             <a href="{{ route('portal.invoices.index') }}" class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-4 py-2.5 text-sm font-bold text-slate-700">Back to my invoices</a>
         </div>
     </x-slot>

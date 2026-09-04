@@ -1,8 +1,21 @@
 <?php
 
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Reviews\PublicReviewController;
 use App\Http\Controllers\Reviews\ReviewController;
 use Illuminate\Support\Facades\Route;
+
+// Open to anyone reading the page, because most PISFA customers arrange
+// their trip over WhatsApp and never make an account — a review system only
+// registered customers can reach is one nobody writes in.
+//
+// Nothing is relaxed about publication: this lands Pending like every other
+// review, and a moderator remains the only route to the public page. The
+// throttle and the one-per-email rule are what replace booking eligibility.
+Route::post('/tours/{tourPackage}/reviews', [PublicReviewController::class, 'store'])
+    ->where('tourPackage', '[a-z0-9]+(?:-[a-z0-9]+)*')
+    ->middleware('throttle:5,60')
+    ->name('tours.reviews.store');
 
 Route::middleware(['auth', 'verified', 'role:customer'])->group(function (): void {
     Route::get('/portal/reviews', [ReviewController::class, 'index'])

@@ -141,7 +141,6 @@ final class ConsoleNavigation
                     ['label' => 'Transfers', 'route' => 'admin.airport-transfer-bookings.index', 'active' => 'admin.airport-transfer-bookings.*'],
                     ['label' => 'Stays', 'route' => 'admin.accommodation.bookings.index', 'active' => 'admin.accommodation.bookings.*'],
                     ['label' => 'Flights', 'route' => 'admin.flight-inquiries.index', 'active' => 'admin.flight-inquiries.*'],
-                    ['label' => 'Imports', 'route' => 'admin.vehicle-imports.index', 'active' => 'admin.vehicle-imports.*'],
                     ['label' => 'Groups', 'route' => 'admin.corporate.groups.index', 'active' => 'admin.corporate.groups.*'],
                 ],
             ],
@@ -151,11 +150,27 @@ final class ConsoleNavigation
                 'items' => [
                     ['label' => 'Tours', 'route' => 'admin.tours.index', 'active' => 'admin.tours.*'],
                     ['label' => 'Tour categories', 'route' => 'admin.tour-categories.index', 'active' => 'admin.tour-categories.*'],
-                    ['label' => 'Vehicles', 'route' => 'admin.vehicles.index', 'active' => 'admin.vehicles.*'],
-                    ['label' => 'Properties', 'route' => 'admin.accommodation.properties.index', 'active' => 'admin.accommodation.properties.*'],
-                    ['label' => 'Showroom', 'route' => 'admin.showroom.index', 'active' => 'admin.showroom.index'],
-                    ['label' => 'Sales enquiries', 'route' => 'admin.showroom.enquiries.index', 'active' => 'admin.showroom.enquiries.*'],
+                    ['label' => 'Properties and stays', 'route' => 'admin.accommodation.properties.index', 'active' => 'admin.accommodation.properties.*'],
                     ['label' => 'Transfer settings', 'route' => 'admin.airport-transfer-settings.index', 'active' => 'admin.airport-transfer-settings.*'],
+                ],
+            ],
+            /*
+             * Vehicles, together.
+             *
+             * Hire, sale and import are three different records with three
+             * different lives, and they were scattered across two headings with
+             * nothing saying they were related — a car bought to resell was
+             * filed under "Showroom", which you had to already know.
+             */
+            [
+                'label' => 'Vehicles',
+                'icon' => 'car',
+                'items' => [
+                    ['label' => 'Add a vehicle', 'route' => 'admin.vehicles.choose', 'active' => 'admin.vehicles.choose'],
+                    ['label' => 'For hire', 'route' => 'admin.vehicles.index', 'active' => 'admin.vehicles.index'],
+                    ['label' => 'For sale', 'route' => 'admin.showroom.index', 'active' => 'admin.showroom.index'],
+                    ['label' => 'Sales enquiries', 'route' => 'admin.showroom.enquiries.index', 'active' => 'admin.showroom.enquiries.*'],
+                    ['label' => 'Imports', 'route' => 'admin.vehicle-imports.index', 'active' => 'admin.vehicle-imports.*'],
                 ],
             ],
             [
@@ -184,6 +199,8 @@ final class ConsoleNavigation
                 'icon' => 'document',
                 'items' => [
                     ['label' => 'Journal', 'route' => 'admin.posts.index', 'active' => 'admin.posts.*'],
+                    ['label' => 'Our team', 'route' => 'admin.team.index', 'active' => 'admin.team.*'],
+                    ['label' => 'Service pictures', 'route' => 'admin.service-images.index', 'active' => 'admin.service-images.*'],
                     ['label' => 'Image library', 'route' => 'admin.media.index', 'active' => 'admin.media.*'],
                     ['label' => 'Reviews', 'route' => 'admin.reviews.index', 'active' => 'admin.reviews.*'],
                 ],

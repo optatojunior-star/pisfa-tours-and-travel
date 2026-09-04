@@ -114,6 +114,10 @@ class SettingsRepository
     {
         return [
             'name' => $this->string('company.name', 'PISFA Tours and Travels'),
+            // The registered name, for the documents that must carry it.
+            // Falls back to the trading name so a footer is never blank.
+            'legal_name' => $this->string('company.legal_name')
+                ?: $this->string('company.name', 'PISFA Tours and Travels'),
             'tagline' => $this->string('company.tagline'),
             'email' => $this->string('company.email'),
             'phone' => $this->string('company.phone'),

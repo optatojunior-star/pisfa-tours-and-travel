@@ -149,7 +149,7 @@
                 label="Upload from your computer"
                 help="Landscape photographs work best. You can add more later."
                 :existing="$package?->media"
-                :delete-route="null" />
+                :delete-route="$package ? fn ($image) => route('admin.tours.media.destroy', [$package, $image]) : null" />
         </div>
     </section>
 

@@ -13,7 +13,7 @@
 
     <div class="py-8">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <form method="POST" action="{{ route('admin.accommodation.update', $property) }}" class="space-y-6">
+            <form method="POST" action="{{ route('admin.accommodation.update', $property) }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PATCH')
                 @include('admin.accommodation.partials.form')

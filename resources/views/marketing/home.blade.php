@@ -59,9 +59,15 @@
                 @foreach ($services as $slug => $service)
                     <article class="flex flex-col rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-lg">
                         <div class="flex items-start justify-between gap-4">
-                            <span class="grid h-12 w-12 shrink-0 place-items-center rounded-control bg-brand-50 text-brand-700">
-                                <x-icon :name="$service['icon']" class="h-6 w-6" />
-                            </span>
+                            @if ($image = ($serviceImages[$slug] ?? null))
+                                <span class="h-12 w-12 shrink-0 overflow-hidden rounded-control bg-brand-50">
+                                    <img src="{{ $image }}" alt="" loading="lazy" class="h-full w-full object-cover">
+                                </span>
+                            @else
+                                <span class="grid h-12 w-12 shrink-0 place-items-center rounded-control bg-brand-50 text-brand-700">
+                                    <x-icon :name="$service['icon']" class="h-6 w-6" />
+                                </span>
+                            @endif
                             {{--
                                 The badge follows the presence of a route in
                                 ServiceCatalogue, so a shipped module cannot sit

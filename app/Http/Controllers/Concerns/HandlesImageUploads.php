@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Concerns;
 
 use App\Actions\Documents\StoreDocument;
+use App\Contracts\HasPhotographs;
 use App\Enums\DocumentCategory;
 use App\Models\Document;
 use App\Models\User;
@@ -73,6 +74,54 @@ trait HandlesImageUploads
                 $rejected[] = $file->getClientOriginalName().' — '
                     .(collect($exception->errors())->flatten()->first() ?? 'could not be accepted.');
             }
+        }
+
+        return $rejected;
+    }
+
+    /**
+     * Uploads photographs and mirrors them into the record's own media table.
+     *
+     * Tours, vehicles and properties all keep a small public media row beside
+     * the stored Document — the URL, the caption, and which picture is the
+     * cover. Writing that bridge once rather than in each controller is not
+     * only shorter: the three copies had already drifted, and a rule fixed in
+     * one was still wrong in the others.
+     *
+     * @return list<string> messages for any file that was refused
+     */
+    protected function copyUploadsToMedia(
+        Request $request,
+        HasPhotographs&Model $owner,
+        DocumentCategory $category,
+        string $altText,
+        string $field = 'images',
+    ): array {
+        if (! $request->hasFile($field)) {
+            return [];
+        }
+
+        // An id boundary rather than an offset. skip() without limit() emits
+        // OFFSET with no LIMIT, which SQLite rejects outright — and reading the
+        // id before the upload is what tells the new rows from the old.
+        $lastId = (int) $owner->photographs()->max('id');
+
+        $rejected = $this->storeUploadedImages($request, $owner, $category, $field);
+
+        $sort = (int) $owner->media()->max('sort_order');
+        $hasCover = $owner->media()->where('is_cover', true)->exists();
+
+        foreach ($owner->photographs()->where('id', '>', $lastId)->get() as $document) {
+            $owner->media()->create([
+                'url' => $document->url(),
+                'alt_text' => $altText,
+                // The first picture on a record with no cover becomes the
+                // cover, so a catalogue card is never blank by default.
+                'is_cover' => ! $hasCover,
+                'sort_order' => ++$sort,
+            ]);
+
+            $hasCover = true;
         }
 
         return $rejected;

@@ -69,6 +69,15 @@ class SaveVehicle
 
             $slug = trim((string) ($validated['slug'] ?? ''));
 
+            if ($slug === '' && $lockedVehicle->exists && filled($lockedVehicle->slug)) {
+                // Blank means "leave it alone", not "rewrite my address".
+                // Deriving it again from make, model and year would change
+                // the public URL of a vehicle that is already listed —
+                // every link to it, everywhere, silently broken by an edit
+                // that had nothing to do with the slug.
+                $slug = (string) $lockedVehicle->slug;
+            }
+
             if ($slug === '') {
                 $slug = Str::slug($validated['make'].'-'.$validated['model'].'-'.$validated['year']);
             }
@@ -112,7 +121,12 @@ class SaveVehicle
                 'seating_capacity' => (int) $validated['seating_capacity'],
                 'luggage_capacity' => (int) ($validated['luggage_capacity'] ?? 0),
                 'summary' => trim($validated['summary']),
-                'description' => $this->nullableString($validated['description'] ?? null),
+                // Present-or-absent, not filled-or-empty. The admin form no
+                // longer carries a description field, and reading a missing
+                // key as null would erase the text on the next save.
+                'description' => array_key_exists('description', $validated)
+                    ? $this->nullableString($validated['description'])
+                    : $lockedVehicle->description,
                 'catalogue_status' => $catalogueStatus,
                 'operational_status' => $operationalStatus,
                 'published_at' => $catalogueStatus === VehicleCatalogueStatus::Published

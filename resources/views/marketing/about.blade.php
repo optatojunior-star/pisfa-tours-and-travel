@@ -52,6 +52,58 @@
         </div>
     </section>
 
+    @if ($team->isNotEmpty())
+        <section class="bg-white px-4 py-16 sm:px-6 lg:px-8" aria-labelledby="our-team">
+            <div class="mx-auto max-w-6xl">
+                <p class="text-sm font-black uppercase tracking-[0.2em] text-amber-700">Our team</p>
+                <h2 id="our-team" class="mt-3 text-3xl font-black text-emerald-950">The people you will be dealing with</h2>
+                <p class="mt-4 max-w-2xl leading-7 text-slate-600">
+                    Planning a safari or handing over a vehicle is a matter of trust, and trust is
+                    easier when you know who is on the other end of the phone.
+                </p>
+
+                <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($team as $member)
+                        <li class="flex flex-col overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-slate-200">
+                            @if ($photo = $member->photoUrl())
+                                <div class="aspect-[4/3] overflow-hidden bg-slate-100">
+                                    <img src="{{ $photo }}" alt="{{ $member->name }}" loading="lazy"
+                                         class="h-full w-full object-cover">
+                                </div>
+                            @endif
+
+                            <div class="flex flex-1 flex-col p-6">
+                                <h3 class="text-lg font-bold text-emerald-950">{{ $member->name }}</h3>
+                                <p class="mt-0.5 text-sm font-semibold text-emerald-700">{{ $member->role_title }}</p>
+
+                                @if ($member->summary)
+                                    <p class="mt-3 flex-1 text-sm leading-6 text-slate-600">{{ $member->summary }}</p>
+                                @endif
+
+                                @if ($member->email || $member->phone)
+                                    <div class="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                                        @if ($member->email)
+                                            <a href="mailto:{{ $member->email }}"
+                                               class="font-semibold text-emerald-800 underline decoration-amber-400 decoration-2 underline-offset-4">
+                                                {{ $member->email }}
+                                            </a>
+                                        @endif
+                                        @if ($member->phone)
+                                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $member->phone) }}"
+                                               class="font-semibold text-emerald-800 underline decoration-amber-400 decoration-2 underline-offset-4">
+                                                {{ $member->phone }}
+                                            </a>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        </section>
+    @endif
+
     <section class="bg-amber-50 px-4 py-16 sm:px-6 lg:px-8">
         <div class="mx-auto flex max-w-5xl flex-col items-start justify-between gap-7 sm:flex-row sm:items-center">
             <div>

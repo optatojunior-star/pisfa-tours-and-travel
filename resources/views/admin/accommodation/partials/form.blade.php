@@ -68,10 +68,20 @@
             <p class="mt-1 text-xs text-slate-500">The line guests read first, on the catalogue card.</p>
         </div>
 
+        {{--
+            Photographs, not a second essay.
+
+            A guest choosing a lodge looks at pictures and reads two lines. The
+            eight-row description box was compulsory, which is why properties
+            were being left half-entered rather than finished.
+        --}}
         <div>
-            <label for="description" class="block text-sm font-semibold">Description</label>
-            <textarea id="description" name="description" rows="8" required minlength="50" maxlength="8000"
-                      class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">{{ $value('description') }}</textarea>
+            <x-image-upload
+                name="images"
+                label="Photographs"
+                help="The first photograph becomes the catalogue cover. Show the rooms, the grounds and the view."
+                :existing="$property?->media"
+                :delete-route="$property ? fn ($image) => route('admin.media.destroy', $image) : null" />
         </div>
 
         <div>

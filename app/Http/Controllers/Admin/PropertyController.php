@@ -6,8 +6,10 @@ use App\Actions\Accommodation\SaveProperty;
 use App\Actions\Accommodation\SaveRoomRate;
 use App\Actions\Accommodation\SaveRoomType;
 use App\Actions\Accommodation\TransitionProperty;
+use App\Enums\DocumentCategory;
 use App\Enums\PropertyBookingStatus;
 use App\Enums\PropertyStatus;
+use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SavePropertyRequest;
 use App\Models\Property;
@@ -20,6 +22,8 @@ use Illuminate\View\View;
 
 class PropertyController extends Controller
 {
+    use HandlesImageUploads;
+
     public function index(Request $request): View
     {
         $this->authorize('viewAny', Property::class);
@@ -63,10 +67,14 @@ class PropertyController extends Controller
     public function store(SavePropertyRequest $request, SaveProperty $action): RedirectResponse
     {
         $property = $action->create($request->user(), $request->validated());
+        $rejected = $this->storeUploadedImages($request, $property, DocumentCategory::PropertyMedia);
 
-        return redirect()
-            ->route('admin.accommodation.show', $property)
-            ->with('success', 'Draft saved. Add rooms and prices, then publish it.');
+        return $this->withRejectedImages(
+            redirect()
+                ->route('admin.accommodation.show', $property)
+                ->with('success', 'Draft saved. Add rooms and prices, then publish it.'),
+            $rejected,
+        );
     }
 
     public function show(Property $property): View
@@ -103,10 +111,14 @@ class PropertyController extends Controller
         SaveProperty $action,
     ): RedirectResponse {
         $action->update($request->user(), $property, $request->validated());
+        $rejected = $this->storeUploadedImages($request, $property, DocumentCategory::PropertyMedia);
 
-        return redirect()
-            ->route('admin.accommodation.show', $property)
-            ->with('success', 'The property was updated.');
+        return $this->withRejectedImages(
+            redirect()
+                ->route('admin.accommodation.show', $property)
+                ->with('success', 'The property was updated.'),
+            $rejected,
+        );
     }
 
     public function publish(Request $request, Property $property, TransitionProperty $action): RedirectResponse

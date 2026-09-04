@@ -27,6 +27,7 @@ use App\Models\Quotation;
 use App\Models\QuotationRequest;
 use App\Models\Review;
 use App\Models\Setting;
+use App\Models\TeamMember;
 use App\Models\TourBooking;
 use App\Models\TourCategory;
 use App\Models\TourDeparture;
@@ -64,6 +65,7 @@ use App\Policies\QuotationPolicy;
 use App\Policies\QuotationRequestPolicy;
 use App\Policies\ReviewPolicy;
 use App\Policies\SettingPolicy;
+use App\Policies\TeamMemberPolicy;
 use App\Policies\TourBookingPolicy;
 use App\Policies\TourCategoryPolicy;
 use App\Policies\TourDeparturePolicy;
@@ -98,6 +100,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(User::class, StaffUserPolicy::class);
+        Gate::policy(TeamMember::class, TeamMemberPolicy::class);
         Gate::policy(TourCategory::class, TourCategoryPolicy::class);
         Gate::policy(TourPackage::class, TourPackagePolicy::class);
         Gate::policy(TourDeparture::class, TourDeparturePolicy::class);

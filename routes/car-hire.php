@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CarHireBookingController as AdminCarHireBookingController;
+use App\Http\Controllers\Admin\CataloguePhotographController;
 use App\Http\Controllers\Admin\VehicleController;
 use App\Http\Controllers\CarHire\CarHireBookingController;
 use App\Http\Controllers\CarHire\CarHireCatalogueController;
@@ -64,6 +65,8 @@ Route::prefix('admin')
     ->middleware(['auth', 'verified', 'role:staff,manager,super_admin', '2fa.required'])
     ->group(function (): void {
         Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
+        // Before /vehicles/{vehicle}, or the slug binding swallows it.
+        Route::get('/vehicles/new', [VehicleController::class, 'choose'])->name('vehicles.choose');
         Route::get('/vehicles/create', [VehicleController::class, 'create'])->name('vehicles.create');
         Route::post('/vehicles', [VehicleController::class, 'store'])->name('vehicles.store');
         Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show'])->name('vehicles.show');
@@ -71,6 +74,11 @@ Route::prefix('admin')
         Route::patch('/vehicles/{vehicle}', [VehicleController::class, 'update'])->name('vehicles.update');
         Route::patch('/vehicles/{vehicle}/status', [VehicleController::class, 'status'])->name('vehicles.status');
         Route::post('/vehicles/{vehicle}/rates', [VehicleController::class, 'storeRate'])->name('vehicles.rates.store');
+        // Scoped, so a photograph belonging to another vehicle is a 404
+        // rather than a deletion on the wrong record.
+        Route::delete('/vehicles/{vehicle}/photographs/{medium}', [CataloguePhotographController::class, 'destroyVehiclePhotograph'])
+            ->scopeBindings()
+            ->name('vehicles.media.destroy');
 
         Route::get('/car-hire-bookings', [AdminCarHireBookingController::class, 'index'])->name('car-hire-bookings.index');
         Route::get('/car-hire-bookings/{carHireBooking}', [AdminCarHireBookingController::class, 'show'])->name('car-hire-bookings.show');

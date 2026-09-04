@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\InvoiceController as AdminInvoiceController;
 use App\Http\Controllers\Admin\QuotationController as AdminQuotationController;
 use App\Http\Controllers\Admin\QuotationRequestController as AdminQuotationRequestController;
 use App\Http\Controllers\Billing\InvoiceController;
+use App\Http\Controllers\Billing\PrintableDocumentController;
 use App\Http\Controllers\Billing\QuotationController;
 use App\Http\Controllers\Billing\QuotationRequestController;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,11 @@ Route::get('/track/quotation/{token}', [QuotationController::class, 'track'])
     ->middleware('throttle:30,1')
     ->name('quotations.track');
 
+Route::get('/track/quotation/{token}/print', [PrintableDocumentController::class, 'trackedQuotation'])
+    ->where('token', '[0-9a-f]{64}')
+    ->middleware('throttle:30,1')
+    ->name('quotations.track.print');
+
 Route::post('/track/quotation/{token}/respond', [QuotationController::class, 'respondAsGuest'])
     ->where('token', '[0-9a-f]{64}')
     ->middleware('throttle:10,1')
@@ -38,6 +44,15 @@ Route::get('/track/invoice/{token}', [InvoiceController::class, 'track'])
     ->where('token', '[0-9a-f]{64}')
     ->middleware('throttle:30,1')
     ->name('invoices.track');
+
+// A printable copy for a recipient with no account. The token is the same
+// one that already shows the document, so this reveals nothing new — and
+// unlike a signed document link it does not expire, which matters when the
+// customer comes back to print the invoice a week later.
+Route::get('/track/invoice/{token}/print', [PrintableDocumentController::class, 'trackedInvoice'])
+    ->where('token', '[0-9a-f]{64}')
+    ->middleware('throttle:30,1')
+    ->name('invoices.track.print');
 
 Route::middleware(['auth', 'verified', 'role:customer'])->group(function (): void {
     Route::get('/portal/quotation-requests', [QuotationRequestController::class, 'index'])
@@ -49,6 +64,8 @@ Route::middleware(['auth', 'verified', 'role:customer'])->group(function (): voi
         ->name('portal.quotations.index');
     Route::get('/portal/quotations/{customerQuotation}', [QuotationController::class, 'show'])
         ->name('portal.quotations.show');
+    Route::get('/portal/quotations/{quotation}/print', [PrintableDocumentController::class, 'quotation'])
+        ->name('portal.quotations.print');
     Route::post('/portal/quotations/{customerQuotation}/respond', [QuotationController::class, 'respond'])
         ->middleware('throttle:10,1')
         ->name('portal.quotations.respond');
@@ -57,6 +74,8 @@ Route::middleware(['auth', 'verified', 'role:customer'])->group(function (): voi
         ->name('portal.invoices.index');
     Route::get('/portal/invoices/{customerInvoice}', [InvoiceController::class, 'show'])
         ->name('portal.invoices.show');
+    Route::get('/portal/invoices/{invoice}/print', [PrintableDocumentController::class, 'invoice'])
+        ->name('portal.invoices.print');
 });
 
 Route::prefix('admin')
@@ -80,6 +99,8 @@ Route::prefix('admin')
         Route::post('/quotations', [AdminQuotationController::class, 'store'])
             ->middleware('throttle:30,1')
             ->name('quotations.store');
+        Route::get('/quotations/{quotation}/print', [PrintableDocumentController::class, 'quotation'])
+            ->name('quotations.print');
         Route::get('/quotations/{quotation}', [AdminQuotationController::class, 'show'])
             ->name('quotations.show');
         Route::get('/quotations/{quotation}/edit', [AdminQuotationController::class, 'edit'])
@@ -102,6 +123,8 @@ Route::prefix('admin')
 
         Route::get('/invoices', [AdminInvoiceController::class, 'index'])
             ->name('invoices.index');
+        Route::get('/invoices/{invoice}/print', [PrintableDocumentController::class, 'invoice'])
+            ->name('invoices.print');
         Route::get('/invoices/{invoice}', [AdminInvoiceController::class, 'show'])
             ->name('invoices.show');
         Route::post('/invoices/{invoice}/issue', [AdminInvoiceController::class, 'issue'])

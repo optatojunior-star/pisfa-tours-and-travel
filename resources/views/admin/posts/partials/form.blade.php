@@ -4,7 +4,7 @@
     $slugLocked = $isEdit && $post->published_at !== null;
 @endphp
 
-<form method="POST" action="{{ $isEdit ? route('admin.posts.update', $post) : route('admin.posts.store') }}" class="space-y-6">
+<form method="POST" action="{{ $isEdit ? route('admin.posts.update', $post) : route('admin.posts.store') }}" enctype="multipart/form-data" class="space-y-6">
     @csrf
     @if ($isEdit) @method('PATCH') @endif
 
@@ -50,6 +50,20 @@
                 <x-input-error :messages="$errors->get('excerpt')" class="mt-1" />
             </div>
 
+            {{--
+                The cover image. blog/index and blog/show have always rendered
+                one — Post::coverUrl() reads the first BlogMedia document — and
+                there was simply no field anywhere that could put a file there,
+                so every article on the site showed the plain fallback header.
+            --}}
+            <div>
+                <x-image-upload
+                    name="images"
+                    label="Cover image"
+                    help="The picture at the top of the article and on its listing card. The first one uploaded is the one used."
+                    :existing="$post?->media"
+                    :delete-route="$post ? fn ($image) => route('admin.media.destroy', $image) : null" />
+            </div>
             <div>
                 <label for="body" class="block text-sm font-semibold text-slate-800">Body</label>
                 <textarea id="body" name="body" rows="18" required minlength="50"

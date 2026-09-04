@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\Content\SavePost;
 use App\Actions\Content\TransitionPost;
+use App\Enums\DocumentCategory;
 use App\Enums\PostStatus;
+use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SavePostRequest;
 use App\Models\Post;
@@ -15,6 +17,8 @@ use Illuminate\View\View;
 
 class PostController extends Controller
 {
+    use HandlesImageUploads;
+
     public function index(Request $request): View
     {
         $this->authorize('viewAny', Post::class);
@@ -60,10 +64,14 @@ class PostController extends Controller
     public function store(SavePostRequest $request, SavePost $action): RedirectResponse
     {
         $post = $action->create($request->user(), $request->validated());
+        $rejected = $this->storeUploadedImages($request, $post, DocumentCategory::BlogMedia);
 
-        return redirect()
-            ->route('admin.posts.edit', $post)
-            ->with('success', 'Draft saved. Publish it when you are ready.');
+        return $this->withRejectedImages(
+            redirect()
+                ->route('admin.posts.edit', $post)
+                ->with('success', 'Draft saved. Publish it when you are ready.'),
+            $rejected,
+        );
     }
 
     public function edit(Post $post): View
@@ -71,7 +79,7 @@ class PostController extends Controller
         $this->authorize('update', $post);
 
         return view('admin.posts.edit', [
-            'post' => $post->load(['tags', 'category']),
+            'post' => $post->load(['tags', 'category', 'media']),
             'categories' => PostCategory::query()->active()->ordered()->get(),
         ]);
     }
@@ -79,10 +87,14 @@ class PostController extends Controller
     public function update(SavePostRequest $request, Post $post, SavePost $action): RedirectResponse
     {
         $action->update($request->user(), $post, $request->validated());
+        $rejected = $this->storeUploadedImages($request, $post, DocumentCategory::BlogMedia);
 
-        return redirect()
-            ->route('admin.posts.edit', $post)
-            ->with('success', 'The post was updated.');
+        return $this->withRejectedImages(
+            redirect()
+                ->route('admin.posts.edit', $post)
+                ->with('success', 'The post was updated.'),
+            $rejected,
+        );
     }
 
     public function publish(Request $request, Post $post, TransitionPost $action): RedirectResponse

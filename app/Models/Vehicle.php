@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\HasPhotographs;
 use App\Enums\DocumentCategory;
 use App\Enums\MaintenanceStatus;
 use App\Enums\VehicleCatalogueStatus;
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
  * @property int $current_odometer_km
  * @property string $registration_plate
  */
-class Vehicle extends Model
+class Vehicle extends Model implements HasPhotographs
 {
     use HasFactory;
 
@@ -74,6 +75,15 @@ class Vehicle extends Model
         return 'slug';
     }
 
+    /** @return MorphMany<Document, $this> */
+    public function photographs(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable')
+            ->where('category', DocumentCategory::VehicleMedia->value)
+            ->orderBy('id');
+    }
+
+    /** @return HasMany<VehicleMedia, $this> */
     public function media(): HasMany
     {
         return $this->hasMany(VehicleMedia::class)

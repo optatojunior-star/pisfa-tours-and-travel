@@ -2,11 +2,14 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Models\Post;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SavePostRequest extends FormRequest
 {
+    use HandlesImageUploads;
+
     public function authorize(): bool
     {
         $post = $this->route('post');
@@ -31,7 +34,7 @@ class SavePostRequest extends FormRequest
             'is_featured' => ['nullable', 'boolean'],
             'tags' => ['nullable', 'array', 'max:12'],
             'tags.*' => ['nullable', 'string', 'max:60'],
-        ];
+        ] + $this->imageRules('images', 4);
     }
 
     /** @return array<string, string> */
@@ -40,7 +43,7 @@ class SavePostRequest extends FormRequest
         return [
             'slug.regex' => 'A slug may contain only lower-case letters, numbers, and hyphens.',
             'excerpt.min' => 'Write a summary readers can judge the article from.',
-        ];
+        ] + $this->imageMessages();
     }
 
     /** Tags arrive as one comma-separated field and are split here. */

@@ -187,7 +187,9 @@
                     <a href="{{ route('about') }}" class="hover:text-amber-300">About PISFA</a>
                     <a href="{{ route('contact') }}" class="hover:text-amber-300">Contact us</a>
                     <a href="{{ route('privacy') }}" class="hover:text-amber-300">Privacy</a>
-                    <a href="{{ route('terms') }}" class="hover:text-amber-300">Terms</a>
+                    <a href="{{ route('terms') }}" class="hover:text-amber-300">Website terms</a>
+                    <a href="{{ route('booking-terms') }}" class="hover:text-amber-300">Booking terms</a>
+                    <a href="{{ route('cancellation-policy') }}" class="hover:text-amber-300">Cancellations</a>
                 </div>
             </section>
 

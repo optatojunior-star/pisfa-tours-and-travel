@@ -119,7 +119,7 @@ class SaveProperty
             'district' => ['nullable', 'string', 'max:120'],
             'address' => ['nullable', 'string', 'max:500'],
             'summary' => ['required', 'string', 'min:20', 'max:400'],
-            'description' => ['required', 'string', 'min:50', 'max:8000'],
+            'description' => ['nullable', 'string', 'max:8000'],
             'directions' => ['nullable', 'string', 'max:2000'],
             'internal_notes' => ['nullable', 'string', 'max:5000'],
             'check_in_from' => ['required', 'date_format:H:i'],
@@ -135,7 +135,12 @@ class SaveProperty
             'district' => $this->nullable($validated['district'] ?? null),
             'address' => $this->nullable($validated['address'] ?? null),
             'summary' => trim((string) $validated['summary']),
-            'description' => trim((string) $validated['description']),
+            // Only when it was sent. The admin form no longer carries a
+            // description field, and treating a missing key as an empty one
+            // would delete the text already written on every save.
+            ...(array_key_exists('description', $attributes)
+                ? ['description' => $this->nullable($validated['description'] ?? null)]
+                : []),
             'directions' => $this->nullable($validated['directions'] ?? null),
             'internal_notes' => $this->nullable($validated['internal_notes'] ?? null),
             'check_in_from' => $validated['check_in_from'].':00',

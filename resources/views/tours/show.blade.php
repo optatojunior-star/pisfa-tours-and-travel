@@ -168,6 +168,8 @@
                         </div>
                     </section>
                 @endif
+
+                @include('tours.partials.review-form', ['package' => $package])
             </div>
 
             <aside class="lg:sticky lg:top-24" aria-labelledby="departures-heading">

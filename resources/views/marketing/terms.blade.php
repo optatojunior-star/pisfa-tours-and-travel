@@ -33,6 +33,11 @@
             <p class="mt-3">We aim to keep public information clear and useful, but destinations, routes, operating conditions, supplier availability, schedules, and prices can change. Important details must be confirmed before travel or payment.</p>
         </section>
         <section>
+            <h2 class="text-2xl font-black text-emerald-950">Booking a service</h2>
+            <p class="mt-3">These terms cover the use of this website. The terms on which we actually provide tours, car hire, transfers, stays, imports, sales and leasing are set out in the <a href="{{ route('booking-terms') }}" class="font-bold text-emerald-800 underline">booking terms and conditions</a>, and what a cancellation costs is set out in the <a href="{{ route('cancellation-policy') }}" class="font-bold text-emerald-800 underline">cancellation policy</a>.</p>
+        </section>
+
+        <section>
             <h2 class="text-2xl font-black text-emerald-950">Privacy</h2>
             <p class="mt-3">Information submitted through the website is handled as described in the <a href="{{ route('privacy') }}" class="font-bold text-emerald-800 underline">privacy policy</a>.</p>
         </section>

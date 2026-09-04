@@ -3,12 +3,15 @@
 namespace App\Http\Requests\Admin;
 
 use App\Enums\PropertyType;
+use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Models\Property;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class SavePropertyRequest extends FormRequest
 {
+    use HandlesImageUploads;
+
     public function authorize(): bool
     {
         $property = $this->route('property');
@@ -30,14 +33,17 @@ class SavePropertyRequest extends FormRequest
             'district' => ['nullable', 'string', 'max:120'],
             'address' => ['nullable', 'string', 'max:500'],
             'summary' => ['required', 'string', 'min:20', 'max:400'],
-            'description' => ['required', 'string', 'min:50', 'max:8000'],
+            // Optional. The summary and the photographs are what the public
+            // listing reads; a long description is welcome but never a
+            // reason a property cannot be saved.
+            'description' => ['nullable', 'string', 'max:8000'],
             'directions' => ['nullable', 'string', 'max:2000'],
             'internal_notes' => ['nullable', 'string', 'max:5000'],
             'check_in_from' => ['required', 'date_format:H:i'],
             'check_out_by' => ['required', 'date_format:H:i'],
             'cancellation_cutoff_hours' => ['required', 'integer', 'min:0', 'max:2160'],
             'is_featured' => ['nullable', 'boolean'],
-        ];
+        ] + $this->imageRules();
     }
 
     /** @return array<string, string> */
@@ -55,7 +61,6 @@ class SavePropertyRequest extends FormRequest
     {
         return [
             'summary.min' => 'The summary is the line guests read first — give it a sentence.',
-            'description.min' => 'Describe the property properly; guests decide on this text.',
-        ];
+        ] + $this->imageMessages();
     }
 }

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\CarHire\SaveVehicle;
 use App\Actions\CarHire\SaveVehicleRate;
+use App\Enums\DocumentCategory;
 use App\Enums\VehicleCatalogueStatus;
 use App\Enums\VehicleOperationalStatus;
+use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ChangeVehicleStatusRequest;
 use App\Http\Requests\Admin\IndexVehiclesRequest;
@@ -17,6 +19,8 @@ use Illuminate\View\View;
 
 class VehicleController extends Controller
 {
+    use HandlesImageUploads;
+
     public function index(IndexVehiclesRequest $request): View
     {
         $filters = $request->validated();
@@ -37,6 +41,22 @@ class VehicleController extends Controller
         $vehicleTypes = Vehicle::query()->distinct()->orderBy('vehicle_type')->pluck('vehicle_type');
 
         return view('admin.vehicles.index', compact('vehicles', 'vehicleTypes', 'filters'));
+    }
+
+    /**
+     * Which of the three kinds of vehicle is this?
+     *
+     * Hire, sale and import are genuinely different records — different prices,
+     * different customers, different paperwork — and they lived in three parts
+     * of the menu with nothing connecting them. Somebody adding a car they have
+     * just bought to resell had no reason to guess it belonged under
+     * "Showroom" rather than "Vehicles".
+     */
+    public function choose(): View
+    {
+        $this->authorize('viewAny', Vehicle::class);
+
+        return view('admin.vehicles.choose');
     }
 
     public function create(): View
@@ -62,9 +82,13 @@ class VehicleController extends Controller
         $attributes = $request->validated();
         $attributes['catalogue_status'] = VehicleCatalogueStatus::Draft->value;
         $vehicle = $action->execute($request->user(), $attributes);
+        $rejected = $this->copyUploadsToMedia($request, $vehicle, DocumentCategory::VehicleMedia, $vehicle->make.' '.$vehicle->model);
 
-        return redirect()->route('admin.vehicles.show', $vehicle)
-            ->with('success', 'Vehicle saved as a draft. Add an effective rate before publishing it.');
+        return $this->withRejectedImages(
+            redirect()->route('admin.vehicles.show', $vehicle)
+                ->with('success', 'Vehicle saved as a draft. Add an effective rate before publishing it.'),
+            $rejected,
+        );
     }
 
     public function show(Vehicle $vehicle): View
@@ -86,8 +110,12 @@ class VehicleController extends Controller
     public function update(SaveVehicleRequest $request, Vehicle $vehicle, SaveVehicle $action): RedirectResponse
     {
         $vehicle = $action->execute($request->user(), $request->validated(), $vehicle);
+        $rejected = $this->copyUploadsToMedia($request, $vehicle, DocumentCategory::VehicleMedia, $vehicle->make.' '.$vehicle->model);
 
-        return redirect()->route('admin.vehicles.show', $vehicle)->with('success', 'Vehicle details were updated.');
+        return $this->withRejectedImages(
+            redirect()->route('admin.vehicles.show', $vehicle)->with('success', 'Vehicle details were updated.'),
+            $rejected,
+        );
     }
 
     public function status(ChangeVehicleStatusRequest $request, Vehicle $vehicle, SaveVehicle $action): RedirectResponse

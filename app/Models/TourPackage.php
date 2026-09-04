@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Contracts\HasPhotographs;
 use App\Enums\DocumentCategory;
 use App\Enums\TourPackageItemType;
 use App\Enums\TourPackageStatus;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-class TourPackage extends Model
+class TourPackage extends Model implements HasPhotographs
 {
     use HasFactory;
     use HasReviews;
@@ -79,6 +80,18 @@ class TourPackage extends Model
         return $this->morphMany(Document::class, 'documentable')
             ->where('category', DocumentCategory::TourMedia->value)
             ->orderBy('id');
+    }
+
+    /**
+     * The same rows as documents(), under the name the photograph bridge
+     * uses. A tour keeps only photographs against it, so the two are one
+     * and the same here — on a vehicle they are emphatically not.
+     *
+     * @return MorphMany<Document, $this>
+     */
+    public function photographs(): MorphMany
+    {
+        return $this->documents();
     }
 
     public function media(): HasMany

@@ -14,6 +14,12 @@ Route::controller(PublicPageController::class)->group(function (): void {
     Route::get('/request-quotation', 'requestQuotation')->name('request-quotation');
     Route::get('/privacy', 'privacy')->name('privacy');
     Route::get('/terms', 'terms')->name('terms');
+    // The terms PISFA actually trades on, as against the website terms
+    // above. Separate pages because they answer different questions: one
+    // is about using this site, the other about what happens when a hire
+    // car is damaged or a safari is cancelled.
+    Route::get('/booking-terms', 'bookingTerms')->name('booking-terms');
+    Route::get('/cancellation-policy', 'cancellationPolicy')->name('cancellation-policy');
 });
 
 Route::post('/contact', ContactMessageController::class)

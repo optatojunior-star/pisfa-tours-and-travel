@@ -100,7 +100,7 @@ class TourPackageController extends Controller
             attributes: $attributes,
         );
 
-        $rejected = $this->storeTourPhotographs($request, $package);
+        $rejected = $this->copyUploadsToMedia($request, $package, DocumentCategory::TourMedia, $package->name);
 
         return $this->withRejectedImages(
             redirect()->route('admin.tours.show', $package)
@@ -153,7 +153,7 @@ class TourPackageController extends Controller
             package: $tourPackage,
         );
 
-        $rejected = $this->storeTourPhotographs($request, $package);
+        $rejected = $this->copyUploadsToMedia($request, $package, DocumentCategory::TourMedia, $package->name);
 
         return $this->withRejectedImages(
             redirect()->route('admin.tours.show', $package)->with('success', 'Tour package updated.'),
@@ -303,47 +303,5 @@ class TourPackageController extends Controller
         });
 
         return back()->with('success', 'Tour package restored to draft.');
-    }
-
-    /**
-     * Stores uploaded photographs and points the package's media rows at them.
-     *
-     * A tour keeps its images in TourPackageMedia, which holds a URL string
-     * rather than a document. Rather than give tours a second, weaker upload
-     * path, the file goes through StoreDocument — the same inspection every
-     * other upload gets, reading the real content rather than the extension —
-     * and the resulting public URL is written into the row the views already
-     * read. One storage path, one set of checks, and nothing that displays a
-     * tour has to change.
-     *
-     * @return list<string>
-     */
-    private function storeTourPhotographs(Request $request, TourPackage $package): array
-    {
-        if (! $request->hasFile('images')) {
-            return [];
-        }
-
-        // An id boundary rather than an offset: skip() without limit() emits
-        // OFFSET with no LIMIT, which SQLite rejects outright.
-        $lastId = (int) $package->documents()->max('id');
-
-        $rejected = $this->storeUploadedImages($request, $package, DocumentCategory::TourMedia);
-
-        $sort = (int) $package->media()->max('sort_order');
-        $hasCover = $package->media()->where('is_cover', true)->exists();
-
-        foreach ($package->documents()->where('id', '>', $lastId)->get() as $document) {
-            $package->media()->create([
-                'url' => $document->url(),
-                'alt_text' => $package->name,
-                'is_cover' => ! $hasCover && $sort === 0,
-                'sort_order' => ++$sort,
-            ]);
-
-            $hasCover = true;
-        }
-
-        return $rejected;
     }
 }

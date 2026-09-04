@@ -90,6 +90,15 @@
                                 </form>
                             @endcan
 
+                            {{-- Print works whether or not a PDF has been
+                                 filed yet, so a draft can still be shown to
+                                 somebody across a desk. --}}
+                            <a href="{{ route('admin.invoices.print', $invoice) }}" target="_blank" rel="noopener"
+                               class="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-emerald-200 px-4 text-sm font-bold text-emerald-800 hover:bg-emerald-50">
+                                <x-icon name="printer" class="h-4 w-4" />
+                                Print or save as PDF
+                            </a>
+
                             @if ($document)
                                 <a href="{{ route('documents.show', $document) }}" class="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-slate-300 px-4 text-sm font-bold text-slate-700">
                                     Download PDF (v{{ $document->version }})

@@ -1,16 +1,7 @@
 @php
     $editing = $vehicle->exists;
-    $mediaRows = old('media', $editing
-        ? $vehicle->media->map(fn($medium) => [
-            'url' => $medium->url,
-            'alt_text' => $medium->alt_text,
-            'caption' => $medium->caption,
-            'is_cover' => $medium->is_cover,
-            'sort_order' => $medium->sort_order,
-        ])->values()->all()
-        : [['url'=>'','alt_text'=>'','caption'=>'','is_cover'=>true,'sort_order'=>0]]);
 @endphp
-<form method="POST" action="{{ $editing ? route('admin.vehicles.update',$vehicle) : route('admin.vehicles.store') }}" class="space-y-6" x-data="{media: {{ Illuminate\Support\Js::from($mediaRows) }}}">
+<form method="POST" action="{{ $editing ? route('admin.vehicles.update',$vehicle) : route('admin.vehicles.store') }}" enctype="multipart/form-data" class="space-y-6">
     @csrf @if($editing) @method('PATCH') @endif
     @if($errors->any())<div class="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800" role="alert" tabindex="-1"><p class="font-bold">The vehicle was not saved.</p><ul class="mt-2 list-disc pl-5">@foreach($errors->all() as $error)<li>{{$error}}</li>@endforeach</ul></div>@endif
     <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-labelledby="vehicle-identity-heading"><h2 id="vehicle-identity-heading" class="text-xl font-black text-emerald-950">Identity and specification</h2><div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -30,7 +21,33 @@
         <div><label for="operational-status" class="block text-sm font-semibold">Operational status</label><select id="operational-status" name="operational_status" required class="mt-1 block w-full rounded-xl border-slate-300">@foreach(\App\Enums\VehicleOperationalStatus::cases() as $case)<option value="{{$case->value}}" @selected(old('operational_status',$vehicle->operational_status?->value ?? 'available')===$case->value)>{{$case->label()}}</option>@endforeach</select></div>
         <label class="flex items-center gap-3 self-end rounded-xl bg-slate-50 p-3 text-sm font-semibold"><input type="hidden" name="is_featured" value="0"><input type="checkbox" name="is_featured" value="1" @checked(old('is_featured',$vehicle->is_featured)) class="rounded border-slate-300 text-emerald-700">Feature in catalogue</label>
     </div></section>
-    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-labelledby="vehicle-copy-heading"><h2 id="vehicle-copy-heading" class="text-xl font-black text-emerald-950">Public description</h2><div class="mt-6 space-y-5"><div><label for="vehicle-summary" class="block text-sm font-semibold">Summary</label><textarea id="vehicle-summary" name="summary" required maxlength="500" rows="3" class="mt-1 block w-full rounded-xl border-slate-300">{{old('summary',$vehicle->summary)}}</textarea></div><div><label for="vehicle-description" class="block text-sm font-semibold">Full description</label><textarea id="vehicle-description" name="description" maxlength="50000" rows="8" class="mt-1 block w-full rounded-xl border-slate-300">{{old('description',$vehicle->description)}}</textarea></div></div></section>
-    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-labelledby="vehicle-media-heading"><div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><h2 id="vehicle-media-heading" class="text-xl font-black text-emerald-950">Public media</h2><p class="mt-1 text-sm text-slate-600">Use HTTPS URLs or single-slash application paths. A published vehicle needs exactly one cover.</p></div><button type="button" @click="if(media.length<20){media.push({url:'',alt_text:'',caption:'',is_cover:false,sort_order:media.length});$nextTick(()=>document.getElementById('vehicle-media-'+(media.length-1)+'-url')?.focus())}" class="min-h-11 rounded-xl border border-emerald-300 px-4 text-sm font-bold text-emerald-800">Add image</button></div><div class="mt-6 space-y-4"><template x-for="(medium,index) in media" :key="index"><fieldset class="rounded-2xl border border-slate-200 p-4"><legend class="px-2 text-sm font-bold" x-text="'Image '+(index+1)"></legend><div class="grid gap-4 sm:grid-cols-2"><div class="sm:col-span-2"><label :for="'vehicle-media-'+index+'-url'" class="block text-sm font-semibold">Image URL or path</label><input :id="'vehicle-media-'+index+'-url'" :name="'media['+index+'][url]'" x-model="medium.url" maxlength="2048" class="mt-1 block w-full rounded-xl border-slate-300" placeholder="https://… or /storage/…"></div><div><label :for="'vehicle-media-'+index+'-alt'" class="block text-sm font-semibold">Alternative text</label><input :id="'vehicle-media-'+index+'-alt'" :name="'media['+index+'][alt_text]'" x-model="medium.alt_text" maxlength="255" class="mt-1 block w-full rounded-xl border-slate-300"></div><div><label :for="'vehicle-media-'+index+'-caption'" class="block text-sm font-semibold">Caption</label><input :id="'vehicle-media-'+index+'-caption'" :name="'media['+index+'][caption]'" x-model="medium.caption" maxlength="500" class="mt-1 block w-full rounded-xl border-slate-300"></div><input type="hidden" :name="'media['+index+'][sort_order]'" :value="index"><label class="flex items-center gap-2 text-sm font-semibold"><input type="checkbox" :name="'media['+index+'][is_cover]'" value="1" x-model="medium.is_cover" @change="if(medium.is_cover){media.forEach((item,i)=>{if(i!==index)item.is_cover=false})}" class="rounded border-slate-300 text-emerald-700">Use as cover</label><button type="button" @click="media.splice(index,1)" class="justify-self-start text-sm font-bold text-rose-700 underline">Remove image</button></div></fieldset></template><p x-show="media.length===0" class="rounded-xl bg-slate-50 p-4 text-sm text-slate-600">No images added. Drafts can be saved, but publication requires a cover image.</p></div></section>
+    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-labelledby="vehicle-copy-heading">
+        <h2 id="vehicle-copy-heading" class="text-xl font-black text-emerald-950">Public description</h2>
+        <div class="mt-6">
+            <label for="vehicle-summary" class="block text-sm font-semibold">Summary</label>
+            <textarea id="vehicle-summary" name="summary" required maxlength="500" rows="3"
+                      class="mt-1 block w-full rounded-xl border-slate-300">{{ old("summary", $vehicle->summary) }}</textarea>
+            <p class="mt-1 text-xs text-slate-500">The couple of lines a customer reads on the catalogue card. This is the only description the site shows.</p>
+        </div>
+    </section>
+    {{--
+        Photographs are uploaded, not linked.
+
+        This used to be a repeater of URL boxes, which only worked if the picture
+        was already hosted somewhere else — and left the catalogue depending on
+        somebody else's server staying up. A photograph taken on a phone had
+        nowhere to go at all.
+    --}}
+    <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" aria-labelledby="vehicle-media-heading">
+        <h2 id="vehicle-media-heading" class="text-xl font-black text-emerald-950">Photographs</h2>
+        <div class="mt-6">
+            <x-image-upload
+                name="images"
+                label="Vehicle photographs"
+                help="The first photograph becomes the catalogue cover. Publishing needs at least one."
+                :existing="$editing ? $vehicle->media : null"
+                :delete-route="$editing ? fn ($image) => route('admin.vehicles.media.destroy', [$vehicle, $image]) : null" />
+        </div>
+    </section>
     <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><a href="{{ $editing ? route('admin.vehicles.show',$vehicle) : route('admin.vehicles.index') }}" class="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 px-5 text-sm font-bold text-slate-700">Cancel</a><button type="submit" class="min-h-11 rounded-xl bg-emerald-700 px-6 text-sm font-bold text-white">{{ $editing ? 'Save vehicle' : 'Create draft vehicle' }}</button></div>
 </form>

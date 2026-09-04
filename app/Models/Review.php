@@ -37,6 +37,8 @@ class Review extends Model
     protected $fillable = [
         'reference',
         'customer_id',
+        'guest_name',
+        'guest_email',
         'booking_type',
         'booking_id',
         'reviewable_type',
@@ -58,7 +60,10 @@ class Review extends Model
      * The moderation note explains a rejection to the author and to staff. It
      * is never part of a public payload.
      */
-    protected $hidden = ['moderation_note'];
+    // The moderation note explains a rejection and is not public. Nor is a
+    // guest's email: it exists so a moderator can reply to somebody who
+    // reported a problem, never to be shown beside their review.
+    protected $hidden = ['moderation_note', 'guest_email'];
 
     protected function casts(): array
     {
@@ -157,7 +162,10 @@ class Review extends Model
     /** Author display name, trimmed for public use. */
     public function authorName(): string
     {
-        $name = trim((string) ($this->customer->name ?? 'PISFA customer'));
+        // A guest review has no account to read a name from, so it carries
+        // its own. Falling through to "PISFA customer" for those would put
+        // the same words under every public review the site collects.
+        $name = trim((string) ($this->customer->name ?? $this->guest_name ?? 'PISFA customer'));
         $parts = preg_split('/\s+/', $name) ?: [$name];
 
         // First name plus a surname initial, so a public page does not publish

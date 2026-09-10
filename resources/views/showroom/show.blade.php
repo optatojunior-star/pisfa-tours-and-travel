@@ -109,11 +109,34 @@
                                 <a href="{{ route('showroom.index') }}" class="font-bold underline">what is currently available</a>.
                             </p>
                         @endif
+
+                        {{--
+                            WhatsApp first, above the form.
+
+                            Most buyers here will not fill in a web form and wait
+                            for an email; they will send a message. The link
+                            arrives carrying the reference, the vehicle and the
+                            asking price, so the person answering knows which car
+                            is being asked about without a round trip — and the
+                            buyer does not have to describe it or copy anything.
+                        --}}
+                        <x-whatsapp-enquiry
+                            class="mt-4 w-full"
+                            :label="$canEnquire ? 'Ask about this vehicle' : 'Ask about similar vehicles'"
+                            :lines="[
+                                'Hello PISFA, I am interested in this vehicle:',
+                                $listing->title,
+                                'Reference: '.$listing->reference,
+                                $canEnquire
+                                    ? 'Listed at '.$listing->formattedAskingPrice()
+                                    : 'I can see it is '.strtolower($listing->status->label()).' — do you have anything similar?',
+                                route('showroom.show', $listing->slug),
+                            ]" />
                     </div>
 
                     @if ($canEnquire)
                         <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                            <h2 class="text-lg font-black text-emerald-950">Enquire about this vehicle</h2>
+                            <h2 class="text-lg font-black text-emerald-950">Or enquire by email</h2>
                             <p class="mt-1 text-sm text-slate-600">
                                 We reply by email, usually the same working day.
                             </p>

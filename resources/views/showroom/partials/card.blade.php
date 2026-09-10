@@ -38,9 +38,28 @@
             @endif
         </p>
 
-        <a href="{{ route('showroom.show', $listing->slug) }}"
-           class="mt-5 inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-800 px-5 text-sm font-bold text-white hover:bg-emerald-900">
-            {{ $listing->acceptsEnquiries() ? 'View and enquire' : 'View details' }}
-        </a>
+        {{-- Two ways out of the card. Somebody scanning a grid of eight cars
+             should not have to open each one to ask a single question about the
+             one they liked. --}}
+        <div class="mt-5 flex flex-col gap-2">
+            <a href="{{ route('showroom.show', $listing->slug) }}"
+               class="inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-800 px-5 text-sm font-bold text-white hover:bg-emerald-900">
+                {{ $listing->acceptsEnquiries() ? 'View and enquire' : 'View details' }}
+            </a>
+
+            @if ($listing->acceptsEnquiries())
+                <x-whatsapp-enquiry
+                    compact
+                    class="w-full"
+                    label="Ask on WhatsApp"
+                    :lines="[
+                        'Hello PISFA, I am interested in this vehicle:',
+                        $listing->title,
+                        'Reference: '.$listing->reference,
+                        'Listed at '.$listing->formattedAskingPrice(),
+                        route('showroom.show', $listing->slug),
+                    ]" />
+            @endif
+        </div>
     </div>
 </article>

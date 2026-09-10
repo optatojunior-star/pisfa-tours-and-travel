@@ -5,9 +5,12 @@ namespace App\Http\Controllers\CarHire;
 use App\Enums\HireMode;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CarHire\CarHireCatalogueRequest;
+use App\Http\Requests\CarHire\CompareVehiclesRequest;
 use App\Models\Vehicle;
 use App\Models\VehicleHireRate;
 use App\Support\Money;
+use App\Support\VehicleComparison;
+use App\Support\VehicleSpecification;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -59,7 +62,7 @@ class CarHireCatalogueController extends Controller
             $query->search((string) $filters['q']);
         }
 
-        foreach (['vehicle_type', 'transmission'] as $field) {
+        foreach (['vehicle_type', 'transmission', 'drive_type'] as $field) {
             if (filled($filters[$field] ?? null)) {
                 $query->where($field, $filters[$field]);
             }
@@ -110,10 +113,17 @@ class CarHireCatalogueController extends Controller
         };
 
         $vehicles = $query->paginate((int) ($filters['per_page'] ?? 12))->withQueryString();
-        $vehicleTypes = Vehicle::query()->acceptingHire()->distinct()->orderBy('vehicle_type')->pluck('vehicle_type');
-        $transmissions = Vehicle::query()->acceptingHire()->distinct()->orderBy('transmission')->pluck('transmission');
 
-        return view('car-hire.index', compact('vehicles', 'vehicleTypes', 'transmissions', 'filters', 'pickupAt', 'returnAt', 'mode'));
+        // Only what the fleet actually holds, labelled from the shared
+        // vocabulary so the dropdowns read "Safari van (pop-up roof)" rather
+        // than "safari_van".
+        $vehicleTypes = $this->filterOptions('vehicle_type', VehicleSpecification::bodyTypes());
+        $transmissions = $this->filterOptions('transmission', VehicleSpecification::transmissions());
+        $driveTypes = $this->filterOptions('drive_type', VehicleSpecification::driveTypes());
+
+        return view('car-hire.index', compact(
+            'vehicles', 'vehicleTypes', 'transmissions', 'driveTypes', 'filters', 'pickupAt', 'returnAt', 'mode',
+        ));
     }
 
     public function show(string $vehicle): View
@@ -139,6 +149,78 @@ class CarHireCatalogueController extends Controller
             ->firstOrFail();
 
         return view('car-hire.show', compact('vehicle'));
+    }
+
+    /**
+     * Two to four vehicles, side by side.
+     *
+     * A catalogue card can only answer "what is this one". Choosing between a
+     * Prado and a Hiace is a question about the differences — seats against
+     * price, 4WD against economy — and answering it meant opening two tabs and
+     * scrolling between them.
+     *
+     * The selection lives in the URL rather than in the browser, so the page can
+     * be sent to whoever is actually paying for the trip. That is most of the
+     * point: the person choosing the vehicle and the person approving the cost
+     * are usually not the same person.
+     */
+    public function compare(CompareVehiclesRequest $request): View
+    {
+        $filters = $request->validated();
+        $slugs = array_values(array_unique((array) $filters['vehicles']));
+
+        $vehicles = Vehicle::query()
+            ->acceptingHire()
+            ->whereIn('slug', $slugs)
+            ->has('bookableHireRates')
+            ->with(['coverMedia', 'bookableHireRates'])
+            ->get()
+            // The customer's own tick order, not the database's. They compared
+            // these in a particular order and the table should agree.
+            ->sortBy(fn (Vehicle $vehicle): int => array_search($vehicle->slug, $slugs, true))
+            ->values();
+
+        abort_if($vehicles->count() < 2, 404);
+
+        // Only what "Book this one" needs; the rest of the catalogue filters
+        // describe a search, not a booking.
+        $carried = array_filter([
+            'pickup_at' => $filters['pickup_at'] ?? null,
+            'return_at' => $filters['return_at'] ?? null,
+            'hire_mode' => $filters['hire_mode'] ?? null,
+            'currency' => $filters['currency'] ?? null,
+        ], static fn (mixed $value): bool => filled($value));
+
+        return view('car-hire.compare', [
+            'vehicles' => $vehicles,
+            'rows' => VehicleComparison::rows($vehicles),
+            'carried' => $carried,
+        ]);
+    }
+
+    /**
+     * The distinct values a column actually holds in the bookable fleet, keyed
+     * by storage value and labelled for a human.
+     *
+     * Offering every case of an enum would advertise filters that return
+     * nothing, which reads as a broken catalogue rather than an empty one.
+     *
+     * @param  array<array-key, string>  $labels
+     * @return array<string, string>
+     */
+    private function filterOptions(string $column, array $labels): array
+    {
+        return Vehicle::query()
+            ->acceptingHire()
+            ->whereNotNull($column)
+            ->where($column, '<>', '')
+            ->distinct()
+            ->orderBy($column)
+            ->pluck($column)
+            ->mapWithKeys(fn (string $value): array => [
+                $value => VehicleSpecification::label($labels, $value),
+            ])
+            ->all();
     }
 
     /** @param array<string, mixed> $filters

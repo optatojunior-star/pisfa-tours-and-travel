@@ -96,6 +96,66 @@
                     </div>
                 @endif
             </section>
+
+            {{--
+                The driver's own headshot.
+
+                Kept at the bottom because it is a set-once thing, not daily
+                work. It matters at the other end: the customer standing in
+                arrivals at Entebbe who currently has a name and nothing else to
+                go on, and has to let a stranger start the conversation before
+                they can tell whether he is the right stranger.
+            --}}
+            @if ($profile !== null)
+                <section aria-labelledby="driver-photo-heading" class="rounded-3xl border border-ink-200 bg-white p-6">
+                    <h2 id="driver-photo-heading" class="text-lg font-black text-slate-950">Your photograph</h2>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                        Customers see this on their confirmation so they can recognise you at the airport.
+                        Face the camera in good light, no sunglasses, no hat.
+                    </p>
+
+                    @php($photograph = $profile->photographUrl())
+
+                    <div class="mt-5 flex flex-col gap-5 sm:flex-row sm:items-start">
+                        <div class="shrink-0">
+                            @if ($photograph)
+                                <img src="{{ $photograph }}" alt="Your current photograph"
+                                     class="size-28 rounded-2xl border border-ink-200 object-cover">
+                            @else
+                                <div class="grid size-28 place-items-center rounded-2xl border-2 border-dashed border-ink-300 bg-ink-50 text-xs font-semibold text-ink-500">
+                                    No photograph
+                                </div>
+                            @endif
+                        </div>
+
+                        <div class="min-w-0 flex-1 space-y-4">
+                            <form method="POST" action="{{ route('drivers.photograph.store') }}" enctype="multipart/form-data">
+                                @csrf
+                                <x-image-upload
+                                    name="images"
+                                    input-id="driver-photograph"
+                                    :multiple="false"
+                                    :max-edge="800"
+                                    :label="$photograph ? 'Replace your photograph' : 'Add your photograph'"
+                                    help="Just your head and shoulders. It is never shown publicly — only to a customer whose transfer you have been assigned to." />
+
+                                <button type="submit" class="mt-3 min-h-11 rounded-control bg-brand-700 px-5 text-sm font-bold text-white hover:bg-brand-800">
+                                    Save photograph
+                                </button>
+                            </form>
+
+                            @if ($photograph)
+                                <form method="POST" action="{{ route('drivers.photograph.destroy') }}"
+                                      onsubmit="return confirm('Remove your photograph? Customers will see your name only.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-sm font-bold text-rose-700 underline">Remove my photograph</button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                </section>
+            @endif
         </div>
     </div>
 </x-app-layout>

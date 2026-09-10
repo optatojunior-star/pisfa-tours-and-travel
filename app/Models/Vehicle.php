@@ -101,9 +101,37 @@ class Vehicle extends Model implements HasPhotographs
             ->oldestOfMany('sort_order');
     }
 
+    /** @return HasMany<VehicleHireRate, $this> */
     public function hireRates(): HasMany
     {
         return $this->hasMany(VehicleHireRate::class)
+            ->orderByDesc('effective_from')
+            ->orderByDesc('id');
+    }
+
+    /**
+     * The prices a customer could actually be charged right now: switched on,
+     * inside their effective window, and priced for at least one hire mode.
+     *
+     * Expressed as a relation rather than as a closure passed to whereHas() and
+     * with() separately. Two call sites constraining the same thing by hand is
+     * how they drift, and a named relation says what the constraint means.
+     *
+     * @return HasMany<VehicleHireRate, $this>
+     */
+    public function bookableHireRates(): HasMany
+    {
+        $now = now();
+
+        return $this->hasMany(VehicleHireRate::class)
+            ->where('is_active', true)
+            ->where('effective_from', '<=', $now)
+            ->where(fn (Builder $validity) => $validity
+                ->whereNull('effective_until')
+                ->orWhere('effective_until', '>', $now))
+            ->where(fn (Builder $priced) => $priced
+                ->where('self_drive_daily_minor', '>', 0)
+                ->orWhere('with_driver_daily_minor', '>', 0))
             ->orderByDesc('effective_from')
             ->orderByDesc('id');
     }

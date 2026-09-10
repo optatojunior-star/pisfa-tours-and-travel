@@ -1,11 +1,21 @@
 <?php
 
+use App\Http\Controllers\Drivers\DriverPhotographController;
 use App\Http\Controllers\Drivers\DriverPortalController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'verified', 'role:driver'])->group(function (): void {
     Route::get('/driver', [DriverPortalController::class, 'index'])->name('drivers.index');
     Route::get('/driver/history', [DriverPortalController::class, 'history'])->name('drivers.history');
+
+    // The driver's own headshot. No route parameter: the profile comes from the
+    // session, so there is no other driver's photograph to reach.
+    Route::post('/driver/photograph', [DriverPhotographController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('drivers.photograph.store');
+    Route::delete('/driver/photograph', [DriverPhotographController::class, 'destroy'])
+        ->middleware('throttle:10,1')
+        ->name('drivers.photograph.destroy');
 
     /*
      * The source segment is matched against the AssignmentSource allowlist in

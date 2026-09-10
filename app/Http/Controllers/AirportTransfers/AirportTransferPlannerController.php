@@ -154,7 +154,12 @@ class AirportTransferPlannerController extends Controller
         // account to authorize against, so ownership is the signature itself.
         abort_unless($airportTransferBooking->isGuest(), 404);
 
-        $booking = $airportTransferBooking->load(['airport', 'location', 'rate']);
+        $booking = $airportTransferBooking->load([
+            'airport', 'location', 'rate',
+            'assignedVehicle:id,slug,make,model,year,vehicle_type,seating_capacity,registration_plate',
+            'assignedDriver:id,name,phone',
+            'assignedDriver.driverProfile.photographs',
+        ]);
 
         return view('airport-transfers.guest', compact('booking'));
     }

@@ -46,6 +46,35 @@ variants together. Condition is deliberately not force-mapped: "good" does not
 say whether a vehicle was imported or bought locally, and that is the
 distinction the new list draws.
 
+## Side-by-side comparison
+
+`car-hire.compare` takes two to four slugs and renders `VehicleComparison::rows()`
+as a table. A catalogue card can only answer "what is this one"; choosing
+between a Prado and a Hiace is a question about the differences, and answering
+it meant opening two tabs and scrolling between them.
+
+Three decisions worth keeping:
+
+- **The selection lives in the query string, not in the browser.** The person
+  choosing the vehicle and the person approving the cost are usually not the
+  same person, so the comparison has to be something you can send.
+- **Rows that differ are marked and sorted first.** A table where eleven of
+  thirteen rows read identically has buried the two that matter.
+- **It obeys the catalogue's own visibility rule.** The address is public and
+  hand-editable, so `compare()` filters through `acceptingHire()` and
+  `has('bookableHireRates')`, and a selection that leaves fewer than two visible
+  vehicles is a 404 rather than a single-column table. Otherwise it would be a
+  way to read draft stock by guessing a slug.
+
+The catalogue also filters on `drive_type` now. "Is it 4WD" is the first
+question a customer heading for Kidepo or Bwindi asks, and until the column
+existed the catalogue could not answer it at all. Filter dropdowns list only the
+values the bookable fleet actually holds, so a filter never returns nothing.
+
+`Vehicle::bookableHireRates()` is the relation behind both: switched on, inside
+its effective window, and priced for at least one mode. It replaced the same
+constraint written twice as closures passed to `whereHas()` and `with()`.
+
 ## Publication readiness
 
 `App\Support\Publishing\VehicleReadiness` answers "can this go live yet?" as a

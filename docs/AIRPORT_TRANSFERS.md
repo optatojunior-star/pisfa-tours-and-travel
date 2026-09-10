@@ -148,6 +148,30 @@ Routes live in `routes/airport-transfers.php`, required from `routes/web.php`.
 | Operations detail, status, assignment, reschedule | `admin.airport-transfer-bookings.{show,transition,assignment,reschedule}` | `Admin\AirportTransferBookingController` | `admin/airport-transfer-bookings/show.blade.php` |
 | Airports, locations, and rate versions | `admin.airport-transfer-settings.*` | `Admin\AirportTransferSettingController` | `admin/airport-transfer-settings/index.blade.php` |
 
+### Who is meeting you
+
+`airport-transfers/partials/driver-card.blade.php` is shared by the customer
+portal and the guest acknowledgement. It shows the driver's photograph, their
+name, the vehicle, its **number plate**, and a `tel:` link plus a WhatsApp link
+to the driver's own number.
+
+"Where is my driver" is the call this business takes most often. The
+confirmation used to answer it with a name and, where the office had recorded
+one, a phone number as plain text — which helps only after a stranger has
+already started the conversation. The guest page did not show the driver at all:
+it said the team would confirm a vehicle and driver, and then never did.
+
+The photograph comes from `DriverProfile::photographUrl()`, a short-lived signed
+link — see [docs/UPLOADS_AND_DOCUMENTS.md](UPLOADS_AND_DOCUMENTS.md) for why it
+is private rather than public media like a team photo. A driver with no
+photograph falls back to their initial rather than a stock silhouette, which is
+honest about there being no photograph.
+
+Both controllers must keep `registration_plate` in the `assignedVehicle` column
+list. It is excluded from serialisation by `Vehicle::$hidden` but the plate is
+exactly what a customer checks in a car park, so the confirmation reads it
+directly.
+
 ### The published price list
 
 `AirportTransferPlannerController::priceList()` reads every rate currently in

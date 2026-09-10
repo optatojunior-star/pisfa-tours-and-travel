@@ -60,6 +60,19 @@
             </div>
         </dl>
 
+        {{--
+            Guests get the driver details too.
+
+            This page said "our team replies with the confirmed vehicle and
+            driver" and then never showed them — so a guest who kept the link
+            had no way to check, and the email was the only record. The link is
+            already signed and specific to this booking, so there is nothing to
+            withhold.
+        --}}
+        <div class="mt-8">
+            @include('airport-transfers.partials.driver-card', ['booking' => $booking])
+        </div>
+
         <div class="mt-8 rounded-2xl bg-stone-100 p-5 text-sm text-slate-700">
             <p class="font-bold text-slate-900">Need to change or cancel this request?</p>
             <p class="mt-1">Reply to the confirmation email or <a href="{{ route('contact') }}" class="font-bold text-emerald-800 underline decoration-amber-400 decoration-2 underline-offset-4">contact our team</a> quoting {{ $booking->reference }}. Create an account with the same email to manage future transfers in your portal.</p>

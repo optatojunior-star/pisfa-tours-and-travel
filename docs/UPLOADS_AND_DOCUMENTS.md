@@ -36,6 +36,29 @@ Every one of these rules has an adversarial test in
 `tests/Feature/Documents/FileInspectorTest.php`, including a PHP script renamed
 `.jpg` and a JPEG-magic-bytes polyglot with `<?php system('id'); ?>` in its body.
 
+## A note on `DriverPhoto`
+
+It is the one image category that looks like public media and is not.
+
+`TeamPhoto` is marketing: the person chose to appear on the About page, and the
+file sits on the public disk with a direct URL. A driver's headshot exists for a
+single moment — a customer in arrivals at Entebbe deciding whether the man
+walking towards them is the one PISFA sent. That is a good reason to show it to
+that customer and no reason to leave a staff member's face at a public URL that
+outlives the trip.
+
+So it is private, and reaches the confirmation page as a short-lived signed link
+minted per render for a viewer already authorized against the booking
+(`DriverProfile::photographUrl()`). The authorized route refuses it to anyone
+but administration, because `DriverProfile` has no policy and `DocumentPolicy`
+falls back to `canAccessAdministration()` — which is what stops a customer
+reaching another customer's driver by incrementing a document id.
+
+It is also not a collection: a driver has one face, and a gallery would leave
+years of superseded headshots on a shared host. Drivers manage it themselves at
+`drivers.photograph.store`; there is no admin screen for driver profiles to put
+it on, and it is their face.
+
 ## Visibility is decided by category, not by the caller
 
 `DocumentCategory::visibility()` is authoritative. A caller cannot ask for an

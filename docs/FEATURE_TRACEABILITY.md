@@ -158,6 +158,11 @@ can pay through `payments.checkout` and settlement records a durable
 
 **Gaps:** MySQL race evidence, browser/accessibility journeys.
 
+`car-hire.compare` puts two to four vehicles side by side, and the catalogue
+filters on `drive_type` — see [docs/CAR_HIRE.md](CAR_HIRE.md) for why the
+selection lives in the URL and why the comparison re-applies the catalogue's own
+visibility rule. Covered by `tests/Feature/CarHire/VehicleComparisonTest` (11).
+
 The vehicle specification vocabulary (`App\Support\VehicleSpecification`) and the
 publication checklist (`App\Support\Publishing\VehicleReadiness`, rendered on
 `admin/vehicles/show`) are shared with F08. Migrations
@@ -186,13 +191,19 @@ Branded PDF contracts are now delivered via F27
 | Services/actions | `CreateAirportTransferBooking`, `QuoteAirportTransfer`, `TransitionAirportTransferBooking`, `CancelAirportTransferBooking`, `AssignAirportTransferResources`, `RescheduleAirportTransferBooking`, `SaveAirport`, `SaveAirportTransferLocation`, `SaveAirportTransferRate`, `ChangeAirportTransferRateStatus` |
 | Routes | `routes/airport-transfers.php` — `airport-transfers.index`, `airport-transfer-bookings.store`, `airport-transfer-bookings.guest.show` (signed), `portal.airport-transfer-bookings.*`, `admin.airport-transfer-bookings.*`, `admin.airport-transfer-settings.*` (20 routes) |
 | Controllers | `AirportTransfers\AirportTransferPlannerController`, `AirportTransfers\AirportTransferPortalController`, `Admin\AirportTransferBookingController`, `Admin\AirportTransferSettingController` |
-| Screens | `views/airport-transfers/` (index, guest), `views/airport-transfer-bookings/` (index, show), `views/admin/airport-transfer-bookings/` (index, show), `views/admin/airport-transfer-settings/` (index) |
+| Screens | `views/airport-transfers/` (index, guest, `partials/driver-card`), `views/airport-transfer-bookings/` (index, show), `views/admin/airport-transfer-bookings/` (index, show), `views/admin/airport-transfer-settings/` (index) |
 | Notifications/jobs | `Notifications\AirportTransfers\*` (6); `ExpireAirportTransferRequests`, `SendAirportTransferPickupReminders` commands |
 | Integrations | SMTP |
-| Tests | `tests/Feature/AirportTransfers/` — `AirportTransferPlannerHttpTest` (10), `AirportTransferRouteAuthorizationTest` (9), `AirportTransferAdministrationHttpTest` (10), `AirportTransferPortalAndLifecycleTest` (7) = 36 tests |
+| Tests | `tests/Feature/AirportTransfers/` — `AirportTransferPlannerHttpTest` (10), `AirportTransferRouteAuthorizationTest` (9), `AirportTransferAdministrationHttpTest` (10), `AirportTransferPortalAndLifecycleTest` (7), `TransferConfirmationDetailsTest` (5) = 41 tests |
 | **Status** | **In progress** |
 
 **Gaps:** MySQL race evidence, browser/accessibility journeys, staging SMTP/queue/scheduler observation, approved live route and rate data. Checkout is live via F14 (`AirportTransferBooking` implements `Payable`). Detail in `docs/AIRPORT_TRANSFERS.md`.
+
+The public rate table and the "who is meeting you" card (driver photograph,
+number plate, `tel:` and WhatsApp links, shared by the portal and the guest
+acknowledgement) are described in `docs/AIRPORT_TRANSFERS.md`. The photograph
+itself is F22/F27: `DocumentCategory::DriverPhoto`, private, uploaded by the
+driver at `drivers.photograph.store`.
 
 ---
 
@@ -266,7 +277,7 @@ can pay without staff intervention, MySQL race evidence, browser journeys.
 | Services/actions | `SaveVehicleListing` (fleet interlocks, unique slug, money parsing), `TransitionVehicleListing` (list/reserve/release/restore/withdraw/sell), `SubmitSalesEnquiry` (guest-capable, idempotent), `TransitionSalesEnquiry` (pipeline, assignment, internal notes) |
 | Routes | `routes/sales.php` — public `showroom.{index,show,enquire}`; admin `admin.showroom.{index,create,store,show,edit,update,publish,reserve,release,restore,withdraw,sell}` and `admin.showroom.enquiries.{index,show,advance,assign,note}` |
 | Controllers | `Sales\ShowroomController`, `Admin\VehicleListingController`, `Admin\SalesEnquiryController`; `StoreSalesEnquiryRequest`, `SaveVehicleListingRequest` |
-| Screens | `views/showroom/{index,show}` + `partials/card`, `views/admin/showroom/{index,create,edit,show}` + `partials/form`, `views/admin/showroom/enquiries/{index,show}`; "Cars for sale" in the public nav, mobile menu, and footer; "Showroom" in the staff console nav; "Sell this vehicle" on the fleet vehicle page |
+| Screens | `views/showroom/{index,show}` + `partials/card`, `views/admin/showroom/{index,create,edit,show}` + `partials/form`, `views/admin/showroom/enquiries/{index,show}`; "Cars for sale" in the public nav, mobile menu, and footer; "Showroom" in the staff console nav; "Sell this vehicle" on the fleet vehicle page. Both the card and the detail page carry `x-whatsapp-enquiry`, which opens WhatsApp with the reference, the vehicle and the asking price already written |
 | Notifications/jobs | `SalesEnquiryReceivedNotification` (queued, rate-limited via `sales-notification-mail`; mail only for a guest, mail + database for a customer) |
 | Integrations | F04/F21 fleet vehicles and hire bookings, F27 documents for photographs (`DocumentCategory::VehicleMedia`), F26 audit log |
 | Tests | `tests/Feature/Sales/ShowroomTest` (49 tests) |
@@ -317,8 +328,7 @@ slug, and soft-deleted slugs are counted so a withdrawn URL is never reused;
 internal notes and idempotency material are hidden from serialisation, and the
 audit trail records that a note was added and how long it was, never its text.
 
-**Gaps:** no photograph upload from the showroom console — media is attached
-through F27 and the create form has no uploader yet; no test drive or viewing
+**Gaps:** no test drive or viewing
 scheduler; no part-exchange valuation; no finance or hire-purchase quotation; no
 deposit taken through F14 payments, so a reservation is recorded but the money is
 handled outside the system; no sold-stock reporting slice in F25; and no
@@ -392,8 +402,7 @@ guest may cancel only inside the property's own free-cancellation window, and th
 reason is shown rather than the button silently vanishing; and internal notes,
 the idempotency key, and the request fingerprint are never serialised.
 
-**Gaps:** no photograph upload from the accommodation console — media attaches
-through F27 and the property form has no uploader; no amenity list or facility
+**Gaps:** no amenity list or facility
 filters; no map or coordinates; no per-room photographs; no deposit or partial
 payment schedule, so a stay is paid in full or not at all; no rate import from a
 property's own system; no allocation of a specific room number at check-in; no
@@ -1062,12 +1071,12 @@ policy ability existing; MySQL race evidence, browser journeys.
 | Enums | `DriverTripStatus` (guarded graph), `InspectionPhase`; `Support\Drivers\AssignmentSource` (domain allowlist), `Support\Fleet\InspectionChecklist` (fixed item set with critical flags) |
 | Policies/permissions | `Actions\Drivers\DriverAccess` — active driver role, ownership re-proved against the locked assignment, withdrawn assignments refused |
 | Services/actions | `StartDriverTrip` (+`prepare`), `CompleteDriverTrip` (complete/abandon), `RecordVehicleInspection`, `Services\Drivers\DriverAssignmentQuery` |
-| Routes | `routes/drivers.php` — `drivers.index`, `drivers.history`, `drivers.jobs.show`, `drivers.jobs.start`, `drivers.jobs.inspection`, `drivers.trips.complete`, `drivers.trips.abandon` |
-| Controllers | `Drivers\DriverPortalController`; requests `StartDriverTripRequest`, `CloseDriverTripRequest`, `RecordInspectionRequest` |
-| Screens | `views/drivers/index` (today, upcoming, licence warnings, on-the-road banner), `views/drivers/show` (job detail, both checks, start/close/abandon), `views/drivers/history`; `/dashboard` now redirects drivers here |
+| Routes | `routes/drivers.php` — `drivers.index`, `drivers.history`, `drivers.jobs.show`, `drivers.jobs.start`, `drivers.jobs.inspection`, `drivers.trips.complete`, `drivers.trips.abandon`, `drivers.photograph.store`, `drivers.photograph.destroy` |
+| Controllers | `Drivers\DriverPortalController`, `Drivers\DriverPhotographController`; requests `StartDriverTripRequest`, `CloseDriverTripRequest`, `RecordInspectionRequest` |
+| Screens | `views/drivers/index` (today, upcoming, licence warnings, on-the-road banner, own photograph), `views/drivers/show` (job detail, both checks, start/close/abandon), `views/drivers/history`; `/dashboard` now redirects drivers here |
 | Notifications/jobs | Driver licences join `FleetAlertNotification` and the `fleet:send-alerts` sweep |
 | Integrations | F03/F04/F05 assignments supply the work; F21 receives the odometer and the defect-raised repairs; F27 unaffected |
-| Tests | `tests/Feature/Drivers/DriverOperationsTest` (29 tests) plus licence coverage in `FleetReportingTest` |
+| Tests | `tests/Feature/Drivers/DriverOperationsTest` (29 tests), `DriverPhotographTest` (12 tests), plus licence coverage in `FleetReportingTest` |
 | **Status** | **In progress** |
 
 **The vehicle check gates the trip, and that ordering is the whole point.** A trip

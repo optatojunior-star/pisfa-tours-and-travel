@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\DocumentCategory;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 /**
  * A driver's licence, availability, and emergency contact.
@@ -59,6 +61,44 @@ class DriverProfile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * The driver's headshot, so a customer waiting at Entebbe can recognise who
+     * is coming for them.
+     *
+     * A single slot rather than a gallery: DocumentCategory::DriverPhoto is not
+     * a collection, so uploading a new photograph supersedes the previous one
+     * and the old file is removed. Nobody wants five years of staff headshots
+     * accumulating on a shared host.
+     *
+     * @return MorphMany<Document, $this>
+     */
+    public function photographs(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable')
+            ->where('category', DocumentCategory::DriverPhoto->value)
+            ->where('is_current', true)
+            ->latest('id');
+    }
+
+    public function photograph(): ?Document
+    {
+        return $this->relationLoaded('photographs')
+            ? $this->photographs->first()
+            : $this->photographs()->first();
+    }
+
+    /**
+     * A short-lived link to the headshot, or null when there is none.
+     *
+     * Signed rather than public: the photograph lives on the private disk, and
+     * the link is minted per page render for a viewer who has already been
+     * authorized against the booking it appears on.
+     */
+    public function photographUrl(): ?string
+    {
+        return $this->photograph()?->temporarySignedUrl();
     }
 
     public function scopeAvailable(Builder $query): Builder

@@ -26,10 +26,27 @@
             <span class="whitespace-nowrap rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">Available</span>
         </div>
         <p class="mt-3 flex-1 text-sm leading-6 text-slate-600">{{ $vehicle->summary }}</p>
+
+        {{--
+            Five facts, not three.
+
+            Engine and drive were missing, and drive is the one a customer going
+            upcountry decides on — a 2WD saloon and a 4WD station wagon are not
+            alternatives for the same trip, and the card gave no way to tell
+            them apart without opening both.
+        --}}
+        @php($spec = \App\Support\VehicleSpecification::class)
         <dl class="mt-4 grid grid-cols-3 gap-2 text-center text-xs">
             <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Seats</dt><dd class="mt-1 font-bold text-slate-900">{{ $vehicle->seating_capacity }}</dd></div>
-            <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Gearbox</dt><dd class="mt-1 font-bold text-slate-900">{{ str($vehicle->transmission)->replace('_', ' ')->title() }}</dd></div>
-            <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Fuel</dt><dd class="mt-1 font-bold text-slate-900">{{ str($vehicle->fuel_type)->replace('_', ' ')->title() }}</dd></div>
+            <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Gearbox</dt><dd class="mt-1 font-bold text-slate-900">{{ $spec::label($spec::transmissions(), $vehicle->transmission) }}</dd></div>
+            <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Fuel</dt><dd class="mt-1 font-bold text-slate-900">{{ $spec::label($spec::fuelTypes(), $vehicle->fuel_type) }}</dd></div>
+            @if ($vehicle->drive_type)
+                <div class="rounded-xl bg-emerald-50 p-2"><dt class="text-emerald-700">Drive</dt><dd class="mt-1 font-bold text-emerald-900">{{ $spec::label($spec::driveTypes(), $vehicle->drive_type) }}</dd></div>
+            @endif
+            @if ($vehicle->engine_cc)
+                <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Engine</dt><dd class="mt-1 font-bold text-slate-900">{{ number_format($vehicle->engine_cc) }} cc</dd></div>
+            @endif
+            <div class="rounded-xl bg-slate-50 p-2"><dt class="text-slate-500">Luggage</dt><dd class="mt-1 font-bold text-slate-900">{{ $vehicle->luggage_capacity }} bags</dd></div>
         </dl>
         <div class="mt-5 border-t border-slate-100 pt-4">
             @if ($selectedMinor !== null)
@@ -42,6 +59,16 @@
                 </div>
             @endif
             <a href="{{ route('car-hire.show', ['vehicle' => $vehicle] + $detailQuery) }}" class="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-emerald-800 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">View vehicle</a>
+
+            {{-- The tick belongs to the compare form wrapping the whole grid.
+                 It is a real checkbox with a real label, so the form submits and
+                 the comparison works with JavaScript switched off. --}}
+            <label class="mt-3 flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50 has-[:checked]:text-emerald-900">
+                <input type="checkbox" name="vehicles[]" value="{{ $vehicle->slug }}"
+                       x-model="picked"
+                       class="size-5 rounded border-slate-300 text-emerald-700 focus:ring-emerald-600">
+                Compare this one
+            </label>
         </div>
     </div>
 </article>

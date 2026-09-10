@@ -82,29 +82,7 @@
 
             <x-pay-now :payable="$booking" />
 
-            <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm" aria-labelledby="transfer-team">
-                <h2 id="transfer-team" class="text-lg font-black text-slate-950">Assigned team</h2>
-                @if ($booking->assignedDriver === null && $booking->assignedVehicle === null)
-                    <p class="mt-3 text-sm text-slate-600">A vehicle and driver are assigned once our team confirms the transfer. You will be emailed the details.</p>
-                @else
-                    <dl class="mt-4 grid gap-5 sm:grid-cols-2">
-                        <div>
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Vehicle</dt>
-                            <dd class="mt-1 font-bold text-slate-900">{{ $booking->assignedVehicle === null ? 'Pending' : trim($booking->assignedVehicle->year.' '.$booking->assignedVehicle->make.' '.$booking->assignedVehicle->model) }}</dd>
-                        </div>
-                        <div>
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Driver</dt>
-                            <dd class="mt-1 font-bold text-slate-900">{{ $booking->assignedDriver?->name ?? 'Pending' }}</dd>
-                        </div>
-                        @if ($booking->assignedDriver?->phone !== null)
-                            <div>
-                                <dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Driver phone</dt>
-                                <dd class="mt-1 font-bold text-slate-900">{{ $booking->assignedDriver->phone }}</dd>
-                            </div>
-                        @endif
-                    </dl>
-                @endif
-            </section>
+            @include('airport-transfers.partials.driver-card', ['booking' => $booking])
 
             <section class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm" aria-labelledby="transfer-cancel">
                 <h2 id="transfer-cancel" class="text-lg font-black text-slate-950">Cancel this transfer</h2>

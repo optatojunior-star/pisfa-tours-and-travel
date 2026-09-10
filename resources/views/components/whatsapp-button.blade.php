@@ -1,15 +1,14 @@
 @props(['message' => null])
 
 @php
-    // wa.me wants digits only with the country code and no plus, whatever shape
-    // the number was configured in.
-    $number = preg_replace('/[^0-9]/', '', (string) config('pisfa.company.whatsapp', ''));
+    use App\Support\WhatsApp;
 
-    $text = $message ?? 'Hello PISFA, I would like to ask about ';
-    $href = 'https://wa.me/'.$number.'?text='.rawurlencode($text);
+    // Number handling lives in App\Support\WhatsApp now that x-whatsapp-enquiry
+    // needs the same rules.
+    $href = WhatsApp::link([$message ?? 'Hello PISFA, I would like to ask about ']);
 @endphp
 
-@if ($number !== '')
+@if ($href !== null)
     {{--
         Sits above the chat widget rather than beside it.
 

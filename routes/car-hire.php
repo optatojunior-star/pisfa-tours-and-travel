@@ -12,6 +12,12 @@ use App\Http\Controllers\CarHire\SelfDriveApplicationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/car-hire', [CarHireCatalogueController::class, 'index'])->name('car-hire.index');
+
+// Declared before the {vehicle} route, which would otherwise match "compare"
+// as a slug and 404 on a vehicle nobody was looking for.
+Route::get('/car-hire/compare', [CarHireCatalogueController::class, 'compare'])
+    ->name('car-hire.compare');
+
 Route::get('/car-hire/{vehicle}', [CarHireCatalogueController::class, 'show'])
     ->where('vehicle', '[a-z0-9]+(?:-[a-z0-9]+)*')
     ->name('car-hire.show');

@@ -4,6 +4,7 @@ namespace App\Http\Requests\CarHire;
 
 use App\Enums\HireMode;
 use App\Support\Money;
+use App\Support\VehicleSpecification;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -35,6 +36,10 @@ class CarHireCatalogueRequest extends FormRequest
             ],
             'vehicle_type' => ['nullable', 'string', 'max:40', 'regex:/\A[a-z0-9]+(?:_[a-z0-9]+)*\z/'],
             'transmission' => ['nullable', 'string', 'max:40', 'regex:/\A[a-z0-9]+(?:_[a-z0-9]+)*\z/'],
+            // "Is it 4WD" is the question a customer heading for Kidepo or
+            // Bwindi asks first, and until now the catalogue could not answer
+            // it at all — the column did not exist.
+            'drive_type' => ['nullable', Rule::in(array_keys(VehicleSpecification::driveTypes()))],
             'min_seats' => ['nullable', 'integer', 'min:1', 'max:100'],
             'min_price' => ['bail', 'nullable', 'string', 'max:24', 'regex:/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/'],
             'max_price' => ['bail', 'nullable', 'string', 'max:24', 'regex:/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/'],

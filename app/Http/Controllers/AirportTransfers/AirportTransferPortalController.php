@@ -68,8 +68,11 @@ class AirportTransferPortalController extends Controller
 
         $booking = $customerAirportTransferBooking->load([
             'airport', 'location', 'rate',
-            'assignedVehicle:id,slug,make,model,year,vehicle_type,seating_capacity',
+            // The plate is what a customer checks in a car park, so it has to
+            // be in the column list or the confirmation cannot show it.
+            'assignedVehicle:id,slug,make,model,year,vehicle_type,seating_capacity,registration_plate',
             'assignedDriver:id,name,phone',
+            'assignedDriver.driverProfile.photographs',
         ]);
         $canCancel = $booking->canBeCancelledAt();
 

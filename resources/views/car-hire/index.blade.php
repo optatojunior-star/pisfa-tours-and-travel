@@ -14,8 +14,19 @@
             <div><label for="pickup-at" class="block text-sm font-semibold text-slate-800">Pickup (Uganda time)</label><input id="pickup-at" name="pickup_at" type="datetime-local" value="{{ $filters['pickup_at'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600"></div>
             <div><label for="return-at" class="block text-sm font-semibold text-slate-800">Return (Uganda time)</label><input id="return-at" name="return_at" type="datetime-local" value="{{ $filters['return_at'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600"></div>
             <div><label for="hire-mode" class="block text-sm font-semibold text-slate-800">Hire mode</label><select id="hire-mode" name="hire_mode" class="mt-1 block w-full rounded-xl border-slate-300"><option value="">Either mode</option>@foreach (\App\Enums\HireMode::cases() as $case)<option value="{{ $case->value }}" @selected(($filters['hire_mode'] ?? '') === $case->value)>{{ $case->label() }}</option>@endforeach</select></div>
-            <div><label for="vehicle-type" class="block text-sm font-semibold text-slate-800">Vehicle type</label><select id="vehicle-type" name="vehicle_type" class="mt-1 block w-full rounded-xl border-slate-300"><option value="">All types</option>@foreach ($vehicleTypes as $type)<option value="{{ $type }}" @selected(($filters['vehicle_type'] ?? '') === $type)>{{ str($type)->replace('_', ' ')->title() }}</option>@endforeach</select></div>
-            <div><label for="transmission" class="block text-sm font-semibold text-slate-800">Transmission</label><select id="transmission" name="transmission" class="mt-1 block w-full rounded-xl border-slate-300"><option value="">Any transmission</option>@foreach ($transmissions as $transmission)<option value="{{ $transmission }}" @selected(($filters['transmission'] ?? '') === $transmission)>{{ str($transmission)->replace('_', ' ')->title() }}</option>@endforeach</select></div>
+            <div><label for="vehicle-type" class="block text-sm font-semibold text-slate-800">Vehicle type</label><select id="vehicle-type" name="vehicle_type" class="mt-1 block w-full rounded-xl border-slate-300"><option value="">All types</option>@foreach ($vehicleTypes as $value => $label)<option value="{{ $value }}" @selected(($filters['vehicle_type'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
+            <div><label for="transmission" class="block text-sm font-semibold text-slate-800">Transmission</label><select id="transmission" name="transmission" class="mt-1 block w-full rounded-xl border-slate-300"><option value="">Any transmission</option>@foreach ($transmissions as $value => $label)<option value="{{ $value }}" @selected(($filters['transmission'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
+            {{-- The filter a customer heading upcountry reaches for first. --}}
+            <div>
+                <label for="drive-type" class="block text-sm font-semibold text-slate-800">Drive</label>
+                <select id="drive-type" name="drive_type" class="mt-1 block w-full rounded-xl border-slate-300" aria-describedby="drive-type-help">
+                    <option value="">Any drive</option>
+                    @foreach ($driveTypes as $value => $label)
+                        <option value="{{ $value }}" @selected(($filters['drive_type'] ?? '') === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+                <p id="drive-type-help" class="mt-1 text-xs text-slate-500">Choose 4WD for the parks and murram roads.</p>
+            </div>
             <div><label for="min-seats" class="block text-sm font-semibold text-slate-800">Minimum seats</label><input id="min-seats" name="min_seats" type="number" min="1" max="100" value="{{ $filters['min_seats'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300"></div>
             <div><label for="hire-currency" class="block text-sm font-semibold text-slate-800">Price currency</label><select id="hire-currency" name="currency" aria-describedby="hire-price-help" class="mt-1 block w-full rounded-xl border-slate-300"><option value="">All currencies</option>@foreach (config('car_hire.currencies', ['UGX','USD']) as $code)<option value="{{ $code }}" @selected(($filters['currency'] ?? '') === $code)>{{ $code }}</option>@endforeach</select></div>
             <div class="grid grid-cols-2 gap-2"><div><label for="min-price" class="block text-sm font-semibold text-slate-800">Min/day</label><input id="min-price" name="min_price" inputmode="decimal" value="{{ $filters['min_price'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300"></div><div><label for="max-price" class="block text-sm font-semibold text-slate-800">Max/day</label><input id="max-price" name="max_price" inputmode="decimal" value="{{ $filters['max_price'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300"></div></div>
@@ -30,7 +41,57 @@
         @if ($vehicles->isEmpty())
             <div class="mt-6 rounded-3xl border border-dashed border-slate-300 bg-white p-10 text-center"><h3 class="text-lg font-bold text-slate-900">No vehicles match this search</h3><p class="mt-2 text-sm text-slate-600">Try a different interval, mode, or vehicle type.</p><a href="{{ route('car-hire.index') }}" class="mt-5 inline-flex rounded-xl bg-emerald-800 px-5 py-3 text-sm font-bold text-white">Clear filters</a></div>
         @else
-            <div class="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">@foreach ($vehicles as $vehicle)@include('car-hire.partials.vehicle-card', ['vehicle' => $vehicle, 'mode' => $mode])@endforeach</div>
+            {{--
+                The grid is a form.
+
+                Choosing between a Prado and a Hiace is a question about the
+                differences, and the catalogue could only answer "what is this
+                one" — you had to open two tabs and scroll between them. Ticking
+                two to four cards and submitting produces a side-by-side table
+                whose address carries the selection, so it can be sent to
+                whoever is actually paying for the trip.
+
+                A plain GET form with real checkboxes: it works with JavaScript
+                off, and the Alpine below only adds the running count and
+                disables a submit that would fail validation anyway.
+            --}}
+            <form method="GET" action="{{ route('car-hire.compare') }}"
+                  x-data="{ picked: [], max: {{ \App\Http\Requests\CarHire\CompareVehiclesRequest::maximum() }} }">
+                @foreach (['pickup_at', 'return_at', 'hire_mode', 'currency'] as $carry)
+                    @if (filled($filters[$carry] ?? null))
+                        <input type="hidden" name="{{ $carry }}" value="{{ $filters[$carry] }}">
+                    @endif
+                @endforeach
+
+                <div class="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    @foreach ($vehicles as $vehicle)
+                        @include('car-hire.partials.vehicle-card', ['vehicle' => $vehicle, 'mode' => $mode])
+                    @endforeach
+                </div>
+
+                @if ($vehicles->count() > 1)
+                    <div x-show="picked.length > 0" x-cloak
+                         class="sticky bottom-4 z-30 mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-700 bg-emerald-950 p-4 text-white shadow-xl">
+                        <p class="text-sm font-semibold">
+                            <span x-text="picked.length">0</span> selected
+                            <span class="text-emerald-200" x-show="picked.length < 2">— tick one more to compare</span>
+                            <span class="text-amber-300" x-show="picked.length > max">— that is more than <span x-text="max"></span></span>
+                        </p>
+                        <div class="flex items-center gap-2">
+                            <button type="button" @click="picked = []; $el.closest('form').querySelectorAll('input[name=&quot;vehicles[]&quot;]').forEach(box => box.checked = false)"
+                                    class="min-h-11 rounded-xl border border-white/30 px-4 text-sm font-bold text-white hover:bg-white/10">
+                                Clear
+                            </button>
+                            <button type="submit"
+                                    :disabled="picked.length < 2 || picked.length > max"
+                                    class="min-h-11 rounded-xl bg-amber-400 px-5 text-sm font-black text-emerald-950 transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-50">
+                                Compare side by side
+                            </button>
+                        </div>
+                    </div>
+                @endif
+            </form>
+
             <div class="mt-8">{{ $vehicles->links() }}</div>
         @endif
     </section>

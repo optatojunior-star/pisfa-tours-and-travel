@@ -20,7 +20,7 @@
     <div class="flex flex-1 flex-col p-5">
         <div class="flex items-start justify-between gap-4">
             <div>
-                <p class="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">{{ str($vehicle->vehicle_type)->replace('_', ' ')->title() }}</p>
+                <p class="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">{{ \App\Support\VehicleSpecification::label(\App\Support\VehicleSpecification::bodyTypes(), $vehicle->vehicle_type) }}</p>
                 <h2 id="vehicle-{{ $vehicle->id }}-title" class="mt-1 text-xl font-black text-emerald-950"><a href="{{ route('car-hire.show', ['vehicle' => $vehicle] + $detailQuery) }}" class="rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600">{{ $vehicle->year }} {{ $vehicle->make }} {{ $vehicle->model }}</a></h2>
             </div>
             <span class="whitespace-nowrap rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800">Available</span>

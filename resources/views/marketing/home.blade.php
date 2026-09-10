@@ -1,49 +1,17 @@
 @extends('layouts.public')
 
 @section('content')
-    <section class="relative overflow-hidden bg-emerald-950 text-white">
-        <div class="absolute inset-0 opacity-20" aria-hidden="true">
-            <div class="absolute -right-32 -top-32 size-96 rounded-full bg-amber-300 blur-3xl"></div>
-            <div class="absolute -bottom-36 -left-20 size-96 rounded-full bg-emerald-400 blur-3xl"></div>
-        </div>
-        <div class="relative mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 sm:py-20 lg:grid-cols-2 lg:px-8 lg:py-20">
-            <div>
-                <p class="text-sm font-black uppercase tracking-[0.22em] text-amber-300">Discover Uganda with confidence</p>
-                <h1 class="mt-5 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">Journeys planned around people, not packages.</h1>
-                <p class="mt-6 max-w-2xl text-lg leading-8 text-emerald-100">
-                    PISFA brings tours, transport, vehicles, stays, and group travel planning together with responsive local support.
-                </p>
-                <div class="mt-9 flex flex-col gap-4 sm:flex-row">
-                    <a href="#services" class="rounded-xl bg-amber-400 px-6 py-4 text-center font-bold text-emerald-950 transition hover:bg-amber-300 focus:outline-none focus:ring-2 focus:ring-white">Explore services</a>
-                    <a href="{{ route('request-quotation') }}" class="rounded-xl border border-white/40 px-6 py-4 text-center font-bold text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-amber-400">Tell us what you need</a>
-                </div>
-            </div>
-            <div class="grid gap-4 sm:grid-cols-2" aria-label="PISFA service highlights">
-                <div class="rounded-3xl bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15">
-                    <x-icon name="globe" class="h-9 w-9 text-accent-400" />
-                    <h2 class="mt-6 text-xl font-bold">Local insight</h2>
-                    <p class="mt-2 text-sm leading-6 text-emerald-100">Plans shaped with practical knowledge of Uganda and its routes.</p>
-                </div>
-                {{-- Icon and text are ink on the orange ground: an accent-coloured
-                     icon here was orange on orange and effectively invisible. --}}
-                <div class="rounded-3xl bg-accent-500 p-6 text-ink-950 sm:translate-y-8">
-                    <x-icon name="compass" class="h-9 w-9 text-ink-950" />
-                    <h2 class="mt-6 text-xl font-bold">One helpful team</h2>
-                    <p class="mt-2 text-sm leading-6">A clear starting point for several connected travel services.</p>
-                </div>
-                <div class="rounded-3xl bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15">
-                    <x-icon name="chat" class="h-9 w-9 text-accent-400" />
-                    <h2 class="mt-6 text-xl font-bold">Real follow-up</h2>
-                    <p class="mt-2 text-sm leading-6 text-emerald-100">Website inquiries are saved for review instead of showing a fake success.</p>
-                </div>
-                <div class="rounded-3xl bg-white/10 p-6 backdrop-blur-sm ring-1 ring-white/15 sm:translate-y-8">
-                    <x-icon name="shield" class="h-9 w-9 text-accent-400" />
-                    <h2 class="mt-6 text-xl font-bold">Responsible service</h2>
-                    <p class="mt-2 text-sm leading-6 text-emerald-100">Prices and availability are checked again before anything is confirmed.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    {{--
+        The header is a slideshow of the services themselves.
+
+        It was a fixed headline beside four cards of general reassurance —
+        "local insight", "responsible service" — none of which said that this
+        company hires cars, sells them, imports them, runs safaris, books lodges
+        and meets flights. A visitor had to scroll to find that out. The
+        slideshow reads from ServiceCatalogue, the same list the menu and the
+        cards below use, so it can never fall out of step with what is shipped.
+    --}}
+    <x-hero-slider :services="$services" :images="$serviceImages" />
 
     <section id="services" class="scroll-mt-8 px-4 py-20 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-7xl">

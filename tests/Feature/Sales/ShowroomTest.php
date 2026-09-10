@@ -94,13 +94,19 @@ class ShowroomTest extends TestCase
             'make' => 'Toyota',
             'model' => 'Land Cruiser Prado',
             'year' => 2016,
-            'body_type' => 'SUV',
-            'fuel_type' => 'Diesel',
-            'transmission' => 'Automatic',
+            // Storage keys from the shared vehicle vocabulary, not prose. The
+            // showroom used to accept "SUV"/"Diesel"/"Automatic" while the hire
+            // fleet stored "suv"/"diesel"/"automatic", so the two halves of the
+            // same business disagreed about what a car was.
+            'body_type' => 'suv',
+            'fuel_type' => 'diesel',
+            'transmission' => 'automatic',
+            'drive_type' => '4wd',
+            'engine_cc' => 3000,
             'colour' => 'Pearl white',
             'mileage_km' => 96000,
             'seating_capacity' => 7,
-            'condition' => 'Used — good',
+            'condition' => 'foreign_used',
             'description' => str_repeat('Serviced at the Toyota Uganda main dealer every 5,000 km. ', 6),
             'asking_price' => '145000000',
             'currency' => 'UGX',

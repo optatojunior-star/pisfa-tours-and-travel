@@ -74,7 +74,8 @@ class MediaLibraryController extends Controller
             'album' => $album,
             'search' => $request->query('q'),
             'categories' => self::UPLOADABLE,
-            'maxKilobytes' => (int) config('documents.images.maximum_kilobytes', 5120),
+            // The size limit is no longer passed down: x-image-upload reads it
+            // from config itself, so there is one place it can be wrong.
         ]);
     }
 

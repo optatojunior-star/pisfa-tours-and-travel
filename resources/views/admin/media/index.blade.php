@@ -34,47 +34,23 @@
             <section class="rounded-card border border-ink-200 bg-white p-6" aria-labelledby="upload-heading">
                 <h2 id="upload-heading" class="text-sm font-bold uppercase tracking-wide text-ink-600">Upload images</h2>
 
-                <form method="POST" action="{{ route('admin.media.store') }}" enctype="multipart/form-data" class="mt-4"
-                      x-data="mediaUpload()">
+                {{--
+                    The shared upload component, not a second copy of it.
+
+                    This screen had its own drop zone and its own Alpine object
+                    doing the same job slightly differently — which is how it
+                    came to be the one uploader in the system that never learned
+                    to shrink a photograph before sending it. At twenty files a
+                    time that made it the likeliest place in the console to hit
+                    a gateway timeout.
+                --}}
+                <form method="POST" action="{{ route('admin.media.store') }}" enctype="multipart/form-data" class="mt-4">
                     @csrf
 
-                    {{--
-                        A label wrapping the file input is the whole drop zone.
-                        Clicking it opens the picker without any JavaScript, so
-                        upload still works if Alpine fails to load; the drag
-                        handlers are an enhancement on top.
-                    --}}
-                    <label for="images"
-                           @dragover.prevent="dragging = true"
-                           @dragleave.prevent="dragging = false"
-                           @drop.prevent="drop($event)"
-                           :class="dragging ? 'border-brand-600 bg-brand-50' : 'border-ink-300 bg-ink-50'"
-                           class="flex cursor-pointer flex-col items-center justify-center rounded-card border-2 border-dashed px-6 py-10 text-center transition hover:border-brand-500">
-                        <x-icon name="image" class="h-8 w-8 text-brand-700" />
-                        <span class="mt-3 text-sm font-bold text-ink-800">Drag images here, or click to choose</span>
-                        <span class="mt-1 text-xs text-ink-500">
-                            JPG, PNG or WebP &middot; up to {{ round($maxKilobytes / 1024, 1) }} MB each &middot; 20 at a time
-                        </span>
-                    </label>
-
-                    <input id="images" name="images[]" type="file" x-ref="input" multiple
-                           accept="image/jpeg,image/png,image/webp" class="sr-only" @change="take($event.target.files)">
-
-                    <template x-if="files.length">
-                        <div class="mt-4 rounded-control border border-ink-200 bg-ink-50 p-3">
-                            <p class="text-xs font-bold uppercase tracking-wide text-ink-600">
-                                <span x-text="files.length"></span> file(s) ready
-                            </p>
-                            <ul class="mt-2 space-y-1 text-sm text-ink-700">
-                                <template x-for="file in files" :key="file.name">
-                                    <li class="flex justify-between gap-4">
-                                        <span class="truncate" x-text="file.name"></span>
-                                        <span class="shrink-0 text-ink-500" x-text="file.size"></span>
-                                    </li>
-                                </template>
-                            </ul>
-                        </div>
-                    </template>
+                    <x-image-upload
+                        name="images"
+                        label="Images to upload"
+                        help="Up to 20 at a time. Large photographs are resized for the web before they are sent." />
 
                     <div class="mt-4 flex flex-wrap items-end gap-3">
                         <div>
@@ -173,24 +149,6 @@
 
     @push('scripts')
         <script>
-            function mediaUpload() {
-                return {
-                    files: [],
-                    dragging: false,
-                    take(list) {
-                        this.files = Array.from(list).map((f) => ({
-                            name: f.name,
-                            size: (f.size / 1048576).toFixed(1) + ' MB',
-                        }));
-                    },
-                    drop(event) {
-                        this.dragging = false;
-                        this.$refs.input.files = event.dataTransfer.files;
-                        this.take(event.dataTransfer.files);
-                    },
-                };
-            }
-
             function copyLink(url) {
                 return {
                     copied: false,

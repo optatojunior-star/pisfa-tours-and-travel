@@ -23,6 +23,45 @@ interfaces.
   vehicle is never globally marked "booked".
 - Ordered public media belongs to a vehicle. Publication requires exactly one
   cover image and at least one currently effective supported hire rate.
+- Body type, fuel, transmission, drive and condition are chosen from
+  `App\Enums\Vehicle*`, surfaced through `App\Support\VehicleSpecification`, and
+  shared with the showroom. Engine capacity is an integer `engine_cc` picked
+  from the displacements actually sold in this market.
+
+### Why the specification is a closed list
+
+These were free-text boxes hinting "lowercase key, for example suv". That asked
+whoever was publishing to invent a vocabulary, and the inventions disagreed —
+the showroom filled with `Diesel`/`Automatic` while the fleet filled with
+`diesel`/`automatic`, so no filter could match both and a car retiring from hire
+into the showroom changed its own specification on the way.
+
+Adopting a closed list on a table that already held open text has one rule that
+makes it safe: `VehicleSpecification::optionsPreserving()` keeps a record's
+current value in its own dropdown, and `allowedValues()` keeps the same value
+valid. A vehicle recorded before the lists existed stays editable and is never
+silently rewritten by a screen nobody touched.
+`2026_09_10_000200_normalise_vehicle_specification_values` folds the unambiguous
+variants together. Condition is deliberately not force-mapped: "good" does not
+say whether a vehicle was imported or bought locally, and that is the
+distinction the new list draws.
+
+## Publication readiness
+
+`App\Support\Publishing\VehicleReadiness` answers "can this go live yet?" as a
+list of checks, each carrying what is wrong, what to do about it, and where on
+the screen to do it. `SaveVehicle` raises every outstanding failure at once,
+against the field that fixes it, and `admin/vehicles/show` renders the same
+checks as a visible checklist with the Publish button disabled until they pass.
+
+This replaced a single message — *"A published vehicle needs a currently
+effective supported rate for at least one hire mode."* — raised against
+`catalogue_status`, a dropdown at the top of a form that describes neither
+photographs nor prices. It covered five different failures without naming any of
+them: no price at all, both amounts blank, a currency the catalogue does not
+sell in, a price switched off, a price whose window has not started, and a price
+that has expired. Each is now reported separately, and both media and price
+problems arrive together rather than one round trip at a time.
 - Hire rates are immutable effective-dated versions by vehicle and currency.
   A new version closes the preceding interval without disabling a still-current
   rate merely because its successor starts in the future.

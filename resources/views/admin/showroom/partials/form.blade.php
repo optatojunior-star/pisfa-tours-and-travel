@@ -48,44 +48,82 @@
             </div>
         </div>
 
+        {{--
+            The specification, as dropdowns.
+
+            These were six free-text boxes, and buyers search on every one of
+            them. Typed by hand they filled up with "Automatic", "automatic",
+            "AT" and "Auto" — four spellings of one gearbox, none of which a
+            filter could reconcile with the hire fleet's own spelling.
+        --}}
         <div class="grid gap-4 sm:grid-cols-3">
-            <div>
-                <label for="body_type" class="block text-sm font-semibold">Body</label>
-                <input id="body_type" name="body_type" type="text" maxlength="32" value="{{ $value('body_type') }}"
-                       class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
-            </div>
-            <div>
-                <label for="transmission" class="block text-sm font-semibold">Transmission</label>
-                <input id="transmission" name="transmission" type="text" maxlength="24" value="{{ $value('transmission') }}"
-                       class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
-            </div>
-            <div>
-                <label for="fuel_type" class="block text-sm font-semibold">Fuel</label>
-                <input id="fuel_type" name="fuel_type" type="text" maxlength="24" value="{{ $value('fuel_type') }}"
-                       class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
-            </div>
+            <x-spec-select
+                id="body_type" name="body_type" label="Body type"
+                :options="\App\Support\VehicleSpecification::bodyTypes()"
+                :current="$value('body_type')"
+                placeholder="Not stated" />
+
+            <x-spec-select
+                id="transmission" name="transmission" label="Transmission"
+                :options="\App\Support\VehicleSpecification::transmissions()"
+                :current="$value('transmission')"
+                placeholder="Not stated" />
+
+            <x-spec-select
+                id="fuel_type" name="fuel_type" label="Fuel"
+                :options="\App\Support\VehicleSpecification::fuelTypes()"
+                :current="$value('fuel_type')"
+                placeholder="Not stated" />
+
+            <x-spec-select
+                id="engine_cc" name="engine_cc" label="Engine size"
+                :options="\App\Support\VehicleSpecification::engineCapacities()"
+                :current="$value('engine_cc')"
+                placeholder="Not stated" />
+
+            <x-spec-select
+                id="drive_type" name="drive_type" label="Drive"
+                :options="\App\Support\VehicleSpecification::driveTypes()"
+                :current="$value('drive_type')"
+                placeholder="Not stated" />
+
+            <x-spec-select
+                id="condition" name="condition" label="Condition"
+                :options="\App\Support\VehicleSpecification::conditions()"
+                :current="$value('condition')"
+                placeholder="Not stated"
+                help="Foreign used and locally used are the first thing a buyer asks." />
+
             <div>
                 <label for="colour" class="block text-sm font-semibold">Colour</label>
-                <input id="colour" name="colour" type="text" maxlength="40" value="{{ $value('colour') }}"
+                <input id="colour" name="colour" type="text" maxlength="40" value="{{ $value('colour') }}" list="listing-colours"
                        class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                <datalist id="listing-colours">
+                    @foreach (['White', 'Silver', 'Grey', 'Black', 'Blue', 'Red', 'Green', 'Beige', 'Gold', 'Maroon', 'Brown', 'Pearl white'] as $colour)
+                        <option value="{{ $colour }}"></option>
+                    @endforeach
+                </datalist>
+                <x-input-error :messages="$errors->get('colour')" class="mt-1" />
             </div>
+
             <div>
                 <label for="mileage_km" class="block text-sm font-semibold">Mileage (km)</label>
                 <input id="mileage_km" name="mileage_km" type="number" min="0" max="2000000" value="{{ $value('mileage_km') }}"
                        class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                <x-input-error :messages="$errors->get('mileage_km')" class="mt-1" />
             </div>
+
             <div>
                 <label for="seating_capacity" class="block text-sm font-semibold">Seats</label>
-                <input id="seating_capacity" name="seating_capacity" type="number" min="1" max="100" value="{{ $value('seating_capacity') }}"
-                       class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                <select id="seating_capacity" name="seating_capacity"
+                        class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                    <option value="">Not stated</option>
+                    @foreach ([2, 4, 5, 7, 8, 9, 11, 14, 15, 18, 22, 26, 29, 33, 45, 51, 62] as $seats)
+                        <option value="{{ $seats }}" @selected((int) $value('seating_capacity') === $seats)>{{ $seats }} seats</option>
+                    @endforeach
+                </select>
+                <x-input-error :messages="$errors->get('seating_capacity')" class="mt-1" />
             </div>
-        </div>
-
-        <div>
-            <label for="condition" class="block text-sm font-semibold">Condition</label>
-            <input id="condition" name="condition" type="text" maxlength="24" value="{{ $value('condition') }}"
-                   placeholder="Used — good"
-                   class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
         </div>
 
         <div>

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use App\Models\VehicleListing;
+use App\Support\VehicleSpecification;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -31,19 +32,36 @@ class SaveVehicleListingRequest extends FormRequest
     public function rules(): array
     {
         $currentYear = (int) now()->format('Y');
+        $route = $this->route('listing');
+        $listing = $route instanceof VehicleListing ? $route : null;
 
         return [
             'title' => ['required', 'string', 'min:4', 'max:200'],
             'make' => ['required', 'string', 'min:2', 'max:60'],
             'model' => ['required', 'string', 'min:1', 'max:80'],
             'year' => ['required', 'integer', 'min:1950', 'max:'.($currentYear + 1)],
-            'body_type' => ['nullable', 'string', 'max:32'],
-            'fuel_type' => ['nullable', 'string', 'max:24'],
-            'transmission' => ['nullable', 'string', 'max:24'],
+            // Chosen from the shared vehicle vocabulary, not typed. The
+            // listing's own current value stays acceptable so stock entered
+            // before the lists existed is still editable.
+            'body_type' => ['nullable', 'string', 'max:32', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::bodyTypes(), $listing?->body_type),
+            )],
+            'fuel_type' => ['nullable', 'string', 'max:24', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::fuelTypes(), $listing?->fuel_type),
+            )],
+            'transmission' => ['nullable', 'string', 'max:24', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::transmissions(), $listing?->transmission),
+            )],
+            'drive_type' => ['nullable', 'string', 'max:16', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::driveTypes(), $listing?->drive_type),
+            )],
+            'engine_cc' => ['nullable', 'integer', 'min:50', 'max:20000'],
             'colour' => ['nullable', 'string', 'max:40'],
             'mileage_km' => ['nullable', 'integer', 'min:0', 'max:2000000'],
             'seating_capacity' => ['nullable', 'integer', 'min:1', 'max:100'],
-            'condition' => ['nullable', 'string', 'max:24'],
+            'condition' => ['nullable', 'string', 'max:24', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::conditions(), $listing?->condition),
+            )],
             'description' => ['required', 'string', 'min:30', 'max:5000'],
             'internal_notes' => ['nullable', 'string', 'max:5000'],
             'asking_price' => ['required', 'string', 'max:24'],

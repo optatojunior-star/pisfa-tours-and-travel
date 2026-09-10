@@ -62,6 +62,8 @@ class AirportTransferPlannerController extends Controller
         $earliestStart = CarbonImmutable::now(config('pisfa.business_timezone', 'Africa/Kampala'))
             ->addHours((int) config('airport_transfers.minimum_notice_hours', 2));
 
+        $priceList = $this->priceList((string) ($filters['currency'] ?? ''));
+
         return view('airport-transfers.index', compact(
             'airports',
             'locations',
@@ -71,7 +73,48 @@ class AirportTransferPlannerController extends Controller
             'transferType',
             'idempotencyKey',
             'earliestStart',
+            'priceList',
         ));
+    }
+
+    /**
+     * Every price currently in force, so a visitor can see what a transfer
+     * costs without filling in a form first.
+     *
+     * The planner already priced a transfer accurately — but only after eight
+     * fields including a flight time, which somebody comparing operators does
+     * not have to hand and should not need. A published table answers "what
+     * does Entebbe to Kampala cost in a minibus" in one glance, and the planner
+     * remains the thing that turns an answer into a booking.
+     *
+     * Rates are read once and grouped in PHP: a handful of rows, and one query
+     * beats a query per route.
+     *
+     * @return Collection<string, mixed>
+     */
+    private function priceList(string $currency): Collection
+    {
+        $currencies = (array) config('airport_transfers.currencies', ['UGX', 'USD']);
+        $currency = strtoupper(trim($currency));
+
+        if (! in_array($currency, $currencies, true)) {
+            $currency = (string) ($currencies[0] ?? 'UGX');
+        }
+
+        return AirportTransferRate::query()
+            ->with(['airport:id,code,name,city', 'location:id,name,region'])
+            ->active()
+            ->forCurrency($currency)
+            ->effectiveAt(now())
+            ->whereHas('airport', fn ($airport) => $airport->where('is_active', true))
+            ->whereHas('location', fn ($location) => $location->where('is_active', true))
+            ->orderBy('airport_id')
+            ->orderBy('airport_transfer_location_id')
+            ->orderBy('amount_minor')
+            ->get()
+            // One block per airport-and-place pair, because that is the unit a
+            // customer thinks in: "Entebbe to Kampala", then the vehicles.
+            ->groupBy(fn (AirportTransferRate $rate): string => $rate->airport_id.':'.$rate->airport_transfer_location_id);
     }
 
     public function store(

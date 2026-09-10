@@ -48,6 +48,28 @@ return [
         'minimum_height' => 200,
         'maximum_width' => 10000,
         'maximum_height' => 10000,
+
+        /*
+        |----------------------------------------------------------------------
+        | Shrinking in the browser
+        |----------------------------------------------------------------------
+        |
+        | A phone photograph is 3-6 MB at around 4000x3000. Twelve of them is
+        | sixty megabytes of request body, which on a domestic Ugandan upstream
+        | takes minutes — long enough for the proxy in front of PHP to give up
+        | and return a 504 Gateway Timeout with nothing saved.
+        |
+        | The upload component redraws anything larger than the threshold onto a
+        | canvas no bigger than the longest edge before sending it. 1920px is
+        | wider than any place the site displays a photograph, so nothing
+        | visible is lost, and the same twelve pictures come to about 4 MB.
+        |
+        | Raising the longest edge raises upload time roughly with its square.
+        | Setting it to 0 is not supported; disable per form with :shrink="false".
+        |
+        */
+        'browser_longest_edge' => max(600, min(4000, (int) env('PISFA_IMAGE_BROWSER_EDGE', 1920))),
+        'browser_shrink_over_kilobytes' => max(100, (int) env('PISFA_IMAGE_BROWSER_SHRINK_OVER_KB', 900)),
     ],
 
     'files' => [

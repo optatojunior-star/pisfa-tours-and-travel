@@ -14,6 +14,7 @@ use App\Http\Requests\Admin\IndexVehiclesRequest;
 use App\Http\Requests\Admin\SaveVehicleRateRequest;
 use App\Http\Requests\Admin\SaveVehicleRequest;
 use App\Models\Vehicle;
+use App\Support\VehicleSpecification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -38,7 +39,16 @@ class VehicleController extends Controller
         }
 
         $vehicles = $query->latest('updated_at')->latest('id')->paginate(20)->withQueryString();
-        $vehicleTypes = Vehicle::query()->distinct()->orderBy('vehicle_type')->pluck('vehicle_type');
+
+        // Only the body types actually in the fleet, but labelled from the
+        // shared vocabulary so the filter reads "Safari van (pop-up roof)"
+        // rather than "safari_van".
+        $inUse = Vehicle::query()->distinct()->orderBy('vehicle_type')->pluck('vehicle_type');
+        $vehicleTypes = $inUse
+            ->filter(fn (?string $type): bool => filled($type))
+            ->mapWithKeys(fn (string $type): array => [
+                $type => VehicleSpecification::label(VehicleSpecification::bodyTypes(), $type),
+            ]);
 
         return view('admin.vehicles.index', compact('vehicles', 'vehicleTypes', 'filters'));
     }
@@ -62,13 +72,13 @@ class VehicleController extends Controller
     public function create(): View
     {
         $this->authorize('create', Vehicle::class);
+        // Blank, not guessed. The old defaults pre-selected "suv / petrol /
+        // automatic / good", which is a saloon-shaped lie on a form somebody
+        // can submit without reading — and "good" is not even a condition the
+        // list offers any more.
         $vehicle = new Vehicle([
             'year' => now()->year,
-            'condition' => 'good',
-            'vehicle_type' => 'suv',
-            'fuel_type' => 'petrol',
-            'transmission' => 'automatic',
-            'seating_capacity' => 5,
+            'seating_capacity' => null,
             'luggage_capacity' => 2,
             'catalogue_status' => VehicleCatalogueStatus::Draft,
             'operational_status' => VehicleOperationalStatus::Available,

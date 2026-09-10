@@ -33,7 +33,110 @@
         </div>
     @endif
 
-    <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="transfer-quote-heading">
+    {{--
+        The published price list.
+
+        Pricing was accurate and completely invisible: you had to choose a
+        direction, an airport, a place, a currency, a flight time, a party size
+        and a luggage count before the site would tell you a single figure. That
+        is a form for somebody who has already decided to book with PISFA, not
+        for somebody deciding whether to. The table below answers "what does
+        Entebbe to Kampala cost, and in what vehicle" straight away, and each
+        row starts the booking with that route already chosen.
+    --}}
+    @if ($priceList->isNotEmpty())
+        <section class="mb-10 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="transfer-prices-heading">
+            <div class="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <p class="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Our prices</p>
+                    <h2 id="transfer-prices-heading" class="mt-1 text-xl font-black text-emerald-950">Airport pickup and drop-off, per transfer</h2>
+                    <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+                        One price per vehicle for the whole transfer, not per person. Pickups include the driver waiting
+                        with a name board, and flight delays are watched rather than charged for.
+                    </p>
+                </div>
+                <form method="GET" action="{{ route('airport-transfers.index') }}" class="flex items-end gap-2">
+                    <div>
+                        <label for="price-currency" class="block text-xs font-bold uppercase tracking-wide text-slate-500">Currency</label>
+                        <select id="price-currency" name="currency" onchange="this.form.submit()"
+                                class="mt-1 rounded-xl border-slate-300 text-sm focus:border-emerald-600 focus:ring-emerald-600">
+                            @foreach ($currencies as $currency)
+                                <option value="{{ $currency }}" @selected($selectedCurrency === $currency)>{{ $currency }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <noscript><button class="min-h-11 rounded-xl bg-emerald-800 px-4 text-sm font-bold text-white">Show</button></noscript>
+                </form>
+            </div>
+
+            <div class="mt-6 grid gap-5 lg:grid-cols-2">
+                @foreach ($priceList as $group)
+                    @php($first = $group->first())
+                    <article class="rounded-2xl border border-slate-200 bg-stone-50/70 p-5">
+                        <h3 class="text-base font-black text-emerald-950">
+                            {{ $first->airport->code }} &harr; {{ $first->location->name }}
+                        </h3>
+                        <p class="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            {{ $first->airport->name }} · {{ $first->location->region }}
+                        </p>
+
+                        <div class="mt-4 overflow-x-auto">
+                            <table class="min-w-full text-left text-sm">
+                                <caption class="sr-only">
+                                    Transfer prices between {{ $first->airport->name }} and {{ $first->location->name }}
+                                </caption>
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-xs uppercase tracking-wide text-slate-500">
+                                        <th scope="col" class="py-2 pr-3">Vehicle</th>
+                                        <th scope="col" class="py-2 pr-3">Takes</th>
+                                        <th scope="col" class="py-2 pr-3">Direction</th>
+                                        <th scope="col" class="py-2 text-right">Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-200">
+                                    @foreach ($group as $rate)
+                                        <tr>
+                                            <td class="py-2.5 pr-3 font-bold text-slate-900">
+                                                {{ str($rate->vehicle_type)->replace('_', ' ')->title() }}
+                                            </td>
+                                            <td class="py-2.5 pr-3 text-slate-600">
+                                                {{ $rate->passenger_capacity }}
+                                                <span class="sr-only">passengers,</span>
+                                                <span aria-hidden="true">pax</span> ·
+                                                {{ $rate->luggage_capacity }}<span class="sr-only"> pieces of luggage</span><span aria-hidden="true"> bags</span>
+                                            </td>
+                                            <td class="py-2.5 pr-3 text-slate-600">{{ $rate->transfer_type->label() }}</td>
+                                            <td class="py-2.5 text-right font-black text-emerald-800">
+                                                {{ Money::format($rate->amount_minor, $rate->currency) }}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <a href="{{ route('airport-transfers.index', [
+                                'transfer_type' => $first->transfer_type->value,
+                                'airport_id' => $first->airport_id,
+                                'airport_transfer_location_id' => $first->airport_transfer_location_id,
+                                'currency' => $selectedCurrency,
+                            ]) }}#transfer-quote-heading"
+                           class="mt-4 inline-flex min-h-11 items-center text-sm font-bold text-emerald-800 underline decoration-amber-400 decoration-2 underline-offset-4">
+                            Book this route
+                        </a>
+                    </article>
+                @endforeach
+            </div>
+
+            <p class="mt-5 text-xs leading-5 text-slate-500">
+                Prices in {{ $selectedCurrency }}, currently in force, and confirmed again against the flight time when you
+                submit a request. A route that is not listed is still possible —
+                <a href="{{ route('request-quotation', ['service' => 'airport-transfers']) }}" class="font-bold text-emerald-800 underline">ask for a quotation</a>.
+            </p>
+        </section>
+    @endif
+
+    <section class="scroll-mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="transfer-quote-heading">
         <div class="flex flex-wrap items-end justify-between gap-4">
             <div>
                 <p class="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Step 1</p>

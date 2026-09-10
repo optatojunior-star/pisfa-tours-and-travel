@@ -7,17 +7,23 @@
     $gallery = $listing->media;
     $canEnquire = $listing->acceptsEnquiries();
     $user = auth()->user();
+    // Labels come from the shared vocabulary, so a stored key reads back as the
+    // phrase the person publishing actually chose. Engine and drive were absent
+    // from this table entirely, which are the two things a buyer here asks first.
+    $spec = App\Support\VehicleSpecification::class;
     $specs = array_filter([
         'Year' => $listing->year,
         'Make' => $listing->make,
         'Model' => $listing->model,
-        'Body' => $listing->body_type,
-        'Transmission' => $listing->transmission,
-        'Fuel' => $listing->fuel_type,
+        'Body' => $listing->body_type ? $spec::label($spec::bodyTypes(), $listing->body_type) : null,
+        'Engine' => $spec::formatEngine($listing->engine_cc),
+        'Transmission' => $listing->transmission ? $spec::label($spec::transmissions(), $listing->transmission) : null,
+        'Fuel' => $listing->fuel_type ? $spec::label($spec::fuelTypes(), $listing->fuel_type) : null,
+        'Drive' => $listing->drive_type ? $spec::label($spec::driveTypes(), $listing->drive_type) : null,
         'Colour' => $listing->colour,
         'Seats' => $listing->seating_capacity,
         'Mileage' => $listing->formattedMileage(),
-        'Condition' => $listing->condition,
+        'Condition' => $listing->condition ? $spec::label($spec::conditions(), $listing->condition) : null,
     ], static fn ($value) => filled($value));
 @endphp
 
@@ -37,22 +43,22 @@
     <article class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div class="grid gap-10 lg:grid-cols-3">
             <div class="lg:col-span-2">
-                <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
-                    @if ($cover)
-                        <img src="{{ $cover }}" alt="{{ $listing->title }}" class="aspect-[16/10] w-full object-cover">
-                    @else
+                {{--
+                    The whole set, browsable.
+
+                    This used to show the cover large and the rest as square
+                    crops beneath it that did nothing when clicked — on the page
+                    where a buyer is deciding whether to spend tens of millions
+                    of shillings, and where the photographs are the entire
+                    argument.
+                --}}
+                @if ($gallery->isNotEmpty())
+                    <x-image-gallery :images="$gallery" :alt="$listing->title" heading="Photographs of this vehicle" />
+                @else
+                    <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
                         <div class="flex aspect-[16/10] w-full items-center justify-center text-sm font-semibold text-slate-400">
                             Photographs coming soon
                         </div>
-                    @endif
-                </div>
-
-                @if ($gallery->count() > 1)
-                    <div class="mt-4 grid grid-cols-4 gap-3">
-                        @foreach ($gallery->slice(1)->take(8) as $shot)
-                            <img src="{{ $shot->url() }}" alt="{{ $listing->title }}" loading="lazy"
-                                 class="aspect-square w-full rounded-2xl border border-slate-200 object-cover">
-                        @endforeach
                     </div>
                 @endif
 

@@ -5,11 +5,20 @@
     'existing' => null,
     'deleteRoute' => null,
     'multiple' => true,
+    'shrink' => true,
+    'maxEdge' => null,
+    'inputId' => null,
 ])
 
 @php
     $maxKb = (int) config('documents.images.maximum_kilobytes', 5120);
     $field = $multiple ? $name.'[]' : $name;
+    // A page may carry several of these — the service-pictures screen has one
+    // card per service — so the element id can be set independently of the
+    // field name, which they all share.
+    $inputId ??= $name;
+    $shrinkTo = (int) ($maxEdge ?? config('documents.images.browser_longest_edge', 1920));
+    $shrinkOver = (int) config('documents.images.browser_shrink_over_kilobytes', 900);
 
     /*
      * Existing images arrive as one of two shapes. A Document exposes url() as
@@ -43,10 +52,10 @@
     previews are enhancements layered on top: if Alpine fails to load, uploading
     still works.
 --}}
-<div x-data="imageUpload()" class="space-y-3">
-    <label for="{{ $name }}" class="block text-sm font-semibold text-ink-800">{{ $label }}</label>
+<div x-data="imageUpload({{ $shrink ? 'true' : 'false' }}, {{ $shrinkTo }}, {{ $shrinkOver }})" class="space-y-3">
+    <label for="{{ $inputId }}" class="block text-sm font-semibold text-ink-800">{{ $label }}</label>
 
-    <label for="{{ $name }}"
+    <label for="{{ $inputId }}"
            @dragover.prevent="dragging = true"
            @dragleave.prevent="dragging = false"
            @drop.prevent="drop($event)"
@@ -62,7 +71,7 @@
         </span>
     </label>
 
-    <input id="{{ $name }}" name="{{ $field }}" type="file" x-ref="input"
+    <input id="{{ $inputId }}" name="{{ $field }}" type="file" x-ref="input"
            @if ($multiple) multiple @endif
            accept="image/jpeg,image/png,image/webp"
            class="sr-only" @change="take($event.target.files)">
@@ -70,6 +79,29 @@
     @if ($help)
         <p class="text-xs text-ink-500">{{ $help }}</p>
     @endif
+
+    {{--
+        What the browser did to the pictures before sending them.
+
+        Worth saying out loud: somebody who has just chosen a 6 MB photograph
+        from their phone and sees "ready to upload" should be able to tell that
+        it is not about to spend four minutes uploading it.
+    --}}
+    <template x-if="working">
+        <p class="flex items-center gap-2 text-xs font-semibold text-brand-800" role="status">
+            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"/>
+                <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+            Preparing your photographs…
+        </p>
+    </template>
+
+    <template x-if="! working && saved > 0">
+        <p class="text-xs font-semibold text-brand-800" role="status">
+            Resized for the web — uploading <span x-text="savedLabel"></span> instead of the full-size originals.
+        </p>
+    </template>
 
     @error($name)
         <p class="text-sm font-medium text-rose-700" role="alert">{{ $message }}</p>
@@ -146,16 +178,42 @@
 @once
     @push('scripts')
         <script>
-            function imageUpload() {
+            /*
+             * Photographs are shrunk in the browser before they are uploaded.
+             *
+             * This is the fix for the 504 Gateway Timeout on saving a tour. A
+             * photograph off a modern phone is 3-6 MB at around 4000x3000, and
+             * a tour takes twelve of them: sixty megabytes of request body over
+             * a domestic Ugandan upstream, which is several minutes. The proxy
+             * in front of PHP gives up long before that and returns a 504 —
+             * having already spent the customer's data, and with nothing saved.
+             *
+             * At 1920px on the longest edge, which is larger than any place the
+             * site displays a photograph, the same twelve pictures come to about
+             * four megabytes. The upload finishes in seconds and the picture is
+             * indistinguishable on screen.
+             *
+             * Everything here degrades safely. If canvas, toBlob or DataTransfer
+             * is unavailable, or a file fails to decode, the original file is
+             * uploaded exactly as before and the server's own limits still apply.
+             */
+            function imageUpload(shrink, longestEdge, shrinkOverKb) {
                 return {
                     previews: [],
                     dragging: false,
-                    take(list) {
-                        this.previews = Array.from(list).map((file) => ({
-                            name: file.name,
-                            src: URL.createObjectURL(file),
-                        }));
+                    working: false,
+                    saved: 0,
+                    get savedLabel() {
+                        const mb = this.saved / (1024 * 1024);
+
+                        return mb >= 1 ? `${mb.toFixed(1)} MB` : `${Math.round(this.saved / 1024)} KB`;
                     },
+
+                    take(list) {
+                        this.render(list);
+                        this.prepare(Array.from(list));
+                    },
+
                     drop(event) {
                         this.dragging = false;
                         // Assigning to .files is what makes a dropped file part
@@ -163,6 +221,113 @@
                         // only and nothing uploads.
                         this.$refs.input.files = event.dataTransfer.files;
                         this.take(event.dataTransfer.files);
+                    },
+
+                    render(list) {
+                        this.previews = Array.from(list).map((file) => ({
+                            name: file.name,
+                            src: URL.createObjectURL(file),
+                        }));
+                    },
+
+                    supported() {
+                        return shrink
+                            && typeof window.DataTransfer === 'function'
+                            && typeof document.createElement('canvas').toBlob === 'function'
+                            && typeof window.createImageBitmap === 'function';
+                    },
+
+                    async prepare(files) {
+                        if (! this.supported() || files.length === 0) {
+                            return;
+                        }
+
+                        this.working = true;
+                        this.saved = 0;
+
+                        const before = files.reduce((total, file) => total + file.size, 0);
+                        let processed;
+
+                        try {
+                            processed = await Promise.all(files.map((file) => this.shrinkOne(file)));
+                        } catch (error) {
+                            // Whatever went wrong, the originals are still in the
+                            // input and still upload. Never block the save.
+                            this.working = false;
+
+                            return;
+                        }
+
+                        const after = processed.reduce((total, file) => total + file.size, 0);
+
+                        if (after < before) {
+                            const bag = new DataTransfer();
+                            processed.forEach((file) => bag.items.add(file));
+                            this.$refs.input.files = bag.files;
+                            this.saved = before - after;
+                        }
+
+                        this.working = false;
+                    },
+
+                    async shrinkOne(file) {
+                        const types = {
+                            'image/jpeg': 0.82,
+                            'image/webp': 0.85,
+                            // PNG is re-encoded as PNG rather than JPEG: a logo
+                            // or a screenshot with transparency would otherwise
+                            // come back with a black background. The saving comes
+                            // from the smaller canvas either way.
+                            'image/png': undefined,
+                        };
+
+                        if (! (file.type in types)) {
+                            return file;
+                        }
+
+                        // Already small and modest in size: leave it exactly as
+                        // it is rather than re-encoding it and losing quality
+                        // for no benefit.
+                        if (file.size <= shrinkOverKb * 1024) {
+                            return file;
+                        }
+
+                        let bitmap;
+
+                        try {
+                            bitmap = await createImageBitmap(file);
+                        } catch (error) {
+                            return file;
+                        }
+
+                        const scale = Math.min(1, longestEdge / Math.max(bitmap.width, bitmap.height));
+                        const width = Math.max(1, Math.round(bitmap.width * scale));
+                        const height = Math.max(1, Math.round(bitmap.height * scale));
+
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        canvas.getContext('2d').drawImage(bitmap, 0, 0, width, height);
+                        bitmap.close?.();
+
+                        const blob = await new Promise((resolve) => {
+                            canvas.toBlob(resolve, file.type, types[file.type]);
+                        });
+
+                        // A re-encode that came out bigger is a re-encode worth
+                        // throwing away.
+                        if (! blob || blob.size >= file.size) {
+                            return file;
+                        }
+
+                        // The name is kept, extension and all. The server reads
+                        // the real bytes to decide the type and then checks the
+                        // extension agrees with them, so changing either one
+                        // here would get the file rejected on arrival.
+                        return new File([blob], file.name, {
+                            type: file.type,
+                            lastModified: Date.now(),
+                        });
                     },
                 };
             }

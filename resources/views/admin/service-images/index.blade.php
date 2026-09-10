@@ -65,15 +65,19 @@
                             @csrf
                             <input type="hidden" name="service_key" value="{{ $key }}">
 
-                            {{-- A distinct field name per service, so the label,
-                                 the input and the error all belong to this card
-                                 rather than the last one on the page. --}}
-                            <label for="image-{{ $key }}" class="text-sm font-semibold text-ink-800">
-                                {{ $url ? 'Replace the picture' : 'Upload a picture' }}
-                            </label>
-                            <input id="image-{{ $key }}" name="images[]" type="file"
-                                   accept="image/jpeg,image/png,image/webp"
-                                   class="block w-full text-sm text-ink-700 file:mr-3 file:min-h-10 file:cursor-pointer file:rounded-control file:border-0 file:bg-brand-50 file:px-4 file:text-sm file:font-bold file:text-brand-800 hover:file:bg-brand-100">
+                            {{-- The shared uploader, with a distinct element id
+                                 per card so the label, the input and the error
+                                 belong to this service rather than the last one
+                                 on the page. Menu pictures are shown at about
+                                 48px square, so 640 is already generous — there
+                                 is no reason to send a 6 MB phone photograph for
+                                 an icon. --}}
+                            <x-image-upload
+                                name="images"
+                                :input-id="'image-'.$key"
+                                :label="$url ? 'Replace the picture' : 'Upload a picture'"
+                                :max-edge="640"
+                                help="A square-ish photograph works best — it is shown as a small tile." />
 
                             <div class="mt-auto flex flex-wrap gap-2 pt-2">
                                 <button type="submit"

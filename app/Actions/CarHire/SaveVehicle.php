@@ -10,6 +10,8 @@ use App\Models\Vehicle;
 use App\Models\VehicleHireRate;
 use App\Services\AuditLogger;
 use App\Support\PublicMediaUrl;
+use App\Support\Publishing\VehicleReadiness;
+use App\Support\VehicleSpecification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -118,6 +120,14 @@ class SaveVehicle
                 'vehicle_type' => trim($validated['vehicle_type']),
                 'fuel_type' => trim($validated['fuel_type']),
                 'transmission' => trim($validated['transmission']),
+                // Present-or-absent, so an API caller that omits them does not
+                // wipe a specification it never mentioned.
+                'drive_type' => array_key_exists('drive_type', $validated)
+                    ? $this->nullableString($validated['drive_type'])
+                    : $lockedVehicle->drive_type,
+                'engine_cc' => array_key_exists('engine_cc', $validated)
+                    ? ($validated['engine_cc'] === null ? null : (int) $validated['engine_cc'])
+                    : $lockedVehicle->engine_cc,
                 'seating_capacity' => (int) $validated['seating_capacity'],
                 'luggage_capacity' => (int) ($validated['luggage_capacity'] ?? 0),
                 'summary' => trim($validated['summary']),
@@ -152,7 +162,7 @@ class SaveVehicle
             $currentRateCount = $this->currentSupportedRates($lockedVehicle)->count();
 
             if ($catalogueStatus === VehicleCatalogueStatus::Published) {
-                $this->assertPublishable($lockedVehicle, $currentRateCount);
+                $this->assertPublishable($lockedVehicle);
             }
 
             $this->auditLogger->record(
@@ -196,10 +206,32 @@ class SaveVehicle
             'model' => ['required', 'string', 'max:100'],
             'year' => ['required', 'integer', 'min:1886', 'max:'.($currentYear + 2)],
             'color' => ['required', 'string', 'max:60'],
-            'condition' => ['required', 'string', 'max:40'],
-            'vehicle_type' => ['required', 'string', 'max:40'],
-            'fuel_type' => ['required', 'string', 'max:40'],
-            'transmission' => ['required', 'string', 'max:40'],
+            /*
+             * Closed lists, but the record's own value is always allowed.
+             *
+             * A vehicle saved before these lists existed holds "good" as its
+             * condition. Rejecting that would make an old vehicle unsaveable
+             * until somebody noticed which of a dozen fields the form was
+             * objecting to — so the current value stays valid until it is
+             * deliberately changed. VehicleSpecification::optionsPreserving()
+             * puts the same value in the dropdown, so the two agree.
+             */
+            'condition' => ['required', 'string', 'max:40', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::conditions(), $vehicle?->condition),
+            )],
+            'vehicle_type' => ['required', 'string', 'max:40', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::bodyTypes(), $vehicle?->vehicle_type),
+            )],
+            'fuel_type' => ['required', 'string', 'max:40', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::fuelTypes(), $vehicle?->fuel_type),
+            )],
+            'transmission' => ['required', 'string', 'max:40', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::transmissions(), $vehicle?->transmission),
+            )],
+            'drive_type' => ['nullable', 'string', 'max:16', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::driveTypes(), $vehicle?->drive_type),
+            )],
+            'engine_cc' => ['nullable', 'integer', 'min:50', 'max:20000'],
             'seating_capacity' => ['required', 'integer', 'min:1', 'max:65535'],
             'luggage_capacity' => ['sometimes', 'integer', 'min:0', 'max:65535'],
             'summary' => ['required', 'string', 'max:500'],
@@ -250,17 +282,25 @@ class SaveVehicle
         }
     }
 
-    private function assertPublishable(Vehicle $vehicle, int $currentRateCount): void
+    /**
+     * The publication gate, in words the person publishing can act on.
+     *
+     * It used to raise "A published vehicle needs a currently effective
+     * supported rate for at least one hire mode" against `catalogue_status` —
+     * a field at the top of a form, describing a problem in a rate table on a
+     * different screen, using three pieces of jargon in one sentence.
+     *
+     * VehicleReadiness works out which specific condition failed. Raising every
+     * failure at once, each against its own field, is deliberate: being told
+     * about the photograph, fixing it, and only then being told about the price
+     * is two round trips for one problem.
+     */
+    private function assertPublishable(Vehicle $vehicle): void
     {
-        if ($vehicle->media->where('is_cover', true)->count() !== 1) {
-            $this->invalid('media', 'A published vehicle must have exactly one cover image.');
-        }
+        $readiness = VehicleReadiness::for($vehicle);
 
-        if ($currentRateCount === 0) {
-            $this->invalid(
-                'catalogue_status',
-                'A published vehicle needs a currently effective supported rate for at least one hire mode.',
-            );
+        if (! $readiness->isReady()) {
+            $readiness->raise();
         }
     }
 
@@ -295,6 +335,12 @@ class SaveVehicle
             'make' => $vehicle->make,
             'model' => $vehicle->model,
             'year' => $vehicle->year,
+            'vehicle_type' => $vehicle->vehicle_type,
+            'fuel_type' => $vehicle->fuel_type,
+            'transmission' => $vehicle->transmission,
+            'drive_type' => $vehicle->drive_type,
+            'engine_cc' => $vehicle->engine_cc,
+            'condition' => $vehicle->condition,
             'catalogue_status' => $vehicle->catalogue_status->value,
             'operational_status' => $vehicle->operational_status->value,
             'seating_capacity' => $vehicle->seating_capacity,

@@ -71,13 +71,25 @@ browser journeys, live provider credentials).
 | Services/actions | — (controllers write directly) |
 | Routes | `home`, `about`, `contact`, `request-quotation`, `privacy`, `terms`, `contact.store`, `newsletter.store` |
 | Controllers | `Marketing\PublicPageController`, `Marketing\ContactMessageController`, `Marketing\NewsletterSubscriptionController` |
-| Screens | `resources/views/marketing/` (7 Blade files), `layouts/public.blade.php` |
+| Screens | `resources/views/marketing/` (7 Blade files), `layouts/public.blade.php`, `components/hero-slider.blade.php`, `components/image-gallery.blade.php` |
 | Notifications/jobs | — |
 | Integrations | — (Google Analytics not configured) |
 | Tests | `tests/Feature/MarketingPagesTest.php` |
 | **Status** | **In progress** |
 
 **Gaps:** multi-service search, featured tours/vehicles/properties, testimonials, company statistics, chat entry point, Open Graph metadata, sitemap, robots rules, Google Analytics, web manifest and branded icons, admin management of subscribers/messages. Featured journal posts and editable SEO landed with F12.
+
+The home page header is `x-hero-slider`, which reads `ServiceCatalogue` and the
+uploaded `ServiceImage` for each entry — so a module that ships appears in the
+header without anyone remembering to add it, and a service with no uploaded
+picture falls back to its line icon rather than showing a gap. It auto-advances,
+pauses on hover and focus, offers back/forward/pause plus per-service dots, and
+does not move at all under `prefers-reduced-motion`.
+
+`x-image-gallery` is the shared back-and-forward viewer used by tours, car hire,
+the showroom and accommodation. Before it, every one of those rendered a grid of
+thumbnails that did nothing when clicked, and the accommodation page showed only
+the cover — every other photograph of a lodge was stored and invisible.
 
 ---
 
@@ -133,7 +145,7 @@ can pay through `payments.checkout` and settlement records a durable
 |---|---|
 | Migrations/tables | `2026_08_20_000200_create_car_hire_domain_tables.php` → `vehicles`, `vehicle_media`, `vehicle_hire_rates`, `car_hire_bookings`, `car_hire_self_drive_applications`, `car_hire_documents`, `car_hire_contracts`, `car_hire_driver_assignments`, `car_hire_booking_events` |
 | Models | `Vehicle`, `VehicleMedia`, `VehicleHireRate`, `CarHireBooking`, `CarHireSelfDriveApplication`, `CarHireDocument`, `CarHireContract`, `CarHireDriverAssignment`, `CarHireBookingEvent` |
-| Enums | `HireMode`, `CarHireBookingStatus`, `CarHireBookingEventType`, `CarHireDocumentType`, `SelfDriveApplicationStatus`, `VehicleCatalogueStatus`, `VehicleOperationalStatus` |
+| Enums | `HireMode`, `CarHireBookingStatus`, `CarHireBookingEventType`, `CarHireDocumentType`, `SelfDriveApplicationStatus`, `VehicleCatalogueStatus`, `VehicleOperationalStatus`, `VehicleBodyType`, `VehicleFuelType`, `VehicleTransmission`, `VehicleDriveType`, `VehicleCondition` (the last five shared with F08) |
 | Policies/permissions | `VehiclePolicy`, `CarHireBookingPolicy`, `CarHireDocumentPolicy`, `CarHireContractPolicy` |
 | Services/actions | `CreateCarHireBooking`, `CancelCarHireBooking`, `TransitionCarHireBooking`, `AssignCarHireDriver`, `SaveSelfDriveApplication`, `ReviewSelfDriveApplication`, `VerifySelfDriveOriginals`, `StoreCarHireDocument`, `DeleteCarHireDocument`, `AcceptCarHireContract`, `SaveVehicle`, `SaveVehicleRate` |
 | Routes | `routes/car-hire.php` — `car-hire.*`, `car-hire-bookings.*`, `portal.car-hire-bookings.*` (incl. documents/contracts), `admin.vehicles.*`, `admin.car-hire-bookings.*` |
@@ -145,6 +157,15 @@ can pay through `payments.checkout` and settlement records a durable
 | **Status** | **In progress** |
 
 **Gaps:** MySQL race evidence, browser/accessibility journeys.
+
+The vehicle specification vocabulary (`App\Support\VehicleSpecification`) and the
+publication checklist (`App\Support\Publishing\VehicleReadiness`, rendered on
+`admin/vehicles/show`) are shared with F08. Migrations
+`2026_09_10_000100_add_engine_and_drive_to_vehicle_tables` and
+`2026_09_10_000200_normalise_vehicle_specification_values` add `engine_cc` and
+`drive_type` and fold the historical spellings together. See
+[docs/CAR_HIRE.md](CAR_HIRE.md) for why the lists are closed and how existing
+rows stay editable.
 
 Checkout is live via F14 (`CarHireBooking` implements `Payable`).
 
@@ -240,7 +261,7 @@ can pay without staff intervention, MySQL race evidence, browser journeys.
 |---|---|
 | Migrations/tables | `2026_08_29_000500_create_sales_domain_tables.php` -> `vehicle_listings` (nullable `vehicle_id` to the F04 fleet, snapshotted specification, `asking_price_minor`, `sold_price_minor`, deferred `sold_to_enquiry_id` FK), `vehicle_sales_enquiries` (nullable `customer_id`, unique `(idempotency_owner_hash, idempotency_key)`) |
 | Models | `VehicleListing` (soft deleted), `VehicleSalesEnquiry`; `Vehicle::listings()` |
-| Enums | `ListingStatus` — Draft, Available, Reserved, Sold, Withdrawn; `SalesEnquiryStatus` — New, Contacted, Viewing, Negotiating, Won, Lost. Both with guarded transition graphs |
+| Enums | `ListingStatus` — Draft, Available, Reserved, Sold, Withdrawn; `SalesEnquiryStatus` — New, Contacted, Viewing, Negotiating, Won, Lost. Both with guarded transition graphs. Specification comes from `VehicleBodyType`, `VehicleFuelType`, `VehicleTransmission`, `VehicleDriveType` and `VehicleCondition`, shared with F04 |
 | Policies/permissions | `VehicleListingPolicy` (console access for staff; a sold or withdrawn listing is read-only; `sell` is manager-only), `VehicleSalesEnquiryPolicy` (staff, plus the customer who raised it), `Actions\Sales\SalesAccess` re-checking the locked user row inside every action |
 | Services/actions | `SaveVehicleListing` (fleet interlocks, unique slug, money parsing), `TransitionVehicleListing` (list/reserve/release/restore/withdraw/sell), `SubmitSalesEnquiry` (guest-capable, idempotent), `TransitionSalesEnquiry` (pipeline, assignment, internal notes) |
 | Routes | `routes/sales.php` — public `showroom.{index,show,enquire}`; admin `admin.showroom.{index,create,store,show,edit,update,publish,reserve,release,restore,withdraw,sell}` and `admin.showroom.enquiries.{index,show,advance,assign,note}` |

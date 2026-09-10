@@ -145,12 +145,68 @@ the modest memory limit on shared hosting. Private responses carry
 nosniff`, and the download filename is derived from the category and id — never
 from the uploaded name.
 
+## Photographs are shrunk in the browser before they are uploaded
+
+Saving a tour with a full set of photographs returned **504 Gateway Timeout** in
+production. Nothing on the server was slow: a photograph off a modern phone is
+3–6 MB at around 4000×3000, twelve of them is sixty megabytes of request body,
+and on a domestic Ugandan upstream that takes minutes. The proxy in front of PHP
+gave up first — after the uploader had already spent the data, with nothing
+saved.
+
+`resources/views/components/image-upload.blade.php` now redraws anything over the
+threshold onto a canvas no larger than the configured longest edge before the
+form is submitted. At 1920px — wider than anywhere the site displays a
+photograph — the same twelve pictures come to roughly 4 MB and the upload
+finishes in seconds.
+
+Rules the component follows:
+
+- JPEG and WebP are re-encoded in their own format at 0.82/0.85 quality. PNG is
+  re-encoded as PNG, so a logo with transparency does not come back on a black
+  ground.
+- The file name and extension are preserved, because `FileInspector` reads the
+  real bytes and then checks the extension agrees with them.
+- A file already under `PISFA_IMAGE_BROWSER_SHRINK_OVER_KB` is left untouched
+  rather than re-encoded for no gain.
+- A re-encode that came out larger is discarded.
+- If `createImageBitmap`, `canvas.toBlob` or `DataTransfer` is missing, or a file
+  fails to decode, the original uploads exactly as before. The server's limits
+  are unchanged and remain the real boundary.
+
+Every upload screen uses this one component — tours, vehicles, showroom,
+accommodation, journal, team and service pictures, and the image library. The
+image library and the service-pictures screen each had a hand-rolled copy of the
+drop zone; those were the two places that never got the shrinking, and the image
+library takes twenty files at a time, so it was the likeliest place in the
+console to time out.
+
+Pass `:shrink="false"` to opt a form out, or `:max-edge="640"` to cap it lower —
+service pictures do, because they are rendered as ~48px tiles.
+
+## PHP limits
+
+`public/.user.ini` is committed and applies to the whole document root, since
+`public_html` is a symlink to `public/`. It is kept in git deliberately:
+changing an upload limit should be a deploy, not an SSH session with an editor.
+`public/.htaccess` denies HTTP access to it.
+
+`max_input_time` is the one that matters for a large upload on a slow link and
+is the one most often left at 60 seconds. `max_execution_time` does not cover
+time spent *receiving* the body.
+
+A 504 is returned by the proxy, not by PHP, so it can appear with nothing in
+`storage/logs`. If one is reported, check the request size before looking for an
+application bug.
+
 ## Configuration
 
 ```
 PISFA_PRIVATE_DISK=local
 PISFA_PUBLIC_DISK=public
 PISFA_IMAGE_MAX_KB=5120
+PISFA_IMAGE_BROWSER_EDGE=1920
+PISFA_IMAGE_BROWSER_SHRINK_OVER_KB=900
 PISFA_FILE_MAX_KB=10240
 PISFA_SIGNED_URL_MINUTES=15
 PISFA_PDF_PAPER=a4
@@ -159,6 +215,9 @@ PISFA_COMPANY_ADDRESS="Kampala, Uganda"
 PISFA_COMPANY_REGISTRATION=
 PISFA_COMPANY_TIN=
 ```
+
+`PISFA_IMAGE_BROWSER_EDGE` raises upload time roughly with its square. Raise it
+only if a photograph is genuinely being displayed larger than 1920px somewhere.
 
 ## Tests
 

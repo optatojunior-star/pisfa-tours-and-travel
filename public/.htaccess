@@ -23,3 +23,9 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Never serve the PHP limits file itself. It is configuration, not content, and
+# .user.ini is a plain text file that a web server will happily hand out.
+<Files ".user.ini">
+    Require all denied
+</Files>

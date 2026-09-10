@@ -9,6 +9,8 @@ use App\Enums\UserRole;
 use App\Enums\VehicleCatalogueStatus;
 use App\Enums\VehicleOperationalStatus;
 use App\Models\Vehicle;
+use App\Models\VehicleHireRate;
+use App\Support\Publishing\VehicleReadiness;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
@@ -179,10 +181,85 @@ class VehicleCatalogueAndRateTest extends TestCase
             ]), $vehicle);
             $this->fail('A vehicle without a cover and rate was published.');
         } catch (ValidationException $exception) {
-            $this->assertNotEmpty(array_intersect(['media', 'catalogue_status'], array_keys($exception->errors())));
+            $errors = $exception->errors();
+
+            /*
+             * Both problems, each against the field that fixes it.
+             *
+             * This used to raise one message on `catalogue_status` — a dropdown
+             * at the top of the vehicle form — for a missing photograph and a
+             * missing price, neither of which lives on that form. Fixing the
+             * photograph then bought you a second, equally opaque failure about
+             * the price. Reporting them together, on `images` and `rates`, is
+             * the behaviour under test.
+             */
+            $this->assertArrayHasKey('images', $errors);
+            $this->assertArrayHasKey('rates', $errors);
         }
 
         $this->assertSame(VehicleCatalogueStatus::Draft, $vehicle->fresh()->catalogue_status);
+    }
+
+    /**
+     * The price rule has five separate ways to fail and used to describe all of
+     * them with one sentence: "A published vehicle needs a currently effective
+     * supported rate for at least one hire mode." Each now says which.
+     */
+    public function test_each_way_a_price_can_block_publication_is_reported_distinctly(): void
+    {
+        $actor = $this->operationsUser();
+
+        $cases = [
+            // No price at all.
+            [null, 'no daily price'],
+            // Priced, but the price is switched off.
+            [['is_active' => false], 'switched off'],
+            // Priced and active, but it has not started yet.
+            [['effective_from' => now()->addWeek()], 'does not start until'],
+            // Priced and active, but the window has closed.
+            [['effective_from' => now()->subMonth(), 'effective_until' => now()->subDay()], 'expired on'],
+        ];
+
+        foreach ($cases as $index => [$rate, $expected]) {
+            $vehicle = app(SaveVehicle::class)->execute($actor, $this->vehiclePayload([
+                'slug' => 'price-case-'.$index,
+                'registration_plate' => 'UPC '.str_pad((string) $index, 3, '0', STR_PAD_LEFT).'Z',
+            ]));
+
+            if ($rate !== null) {
+                VehicleHireRate::factory()->create(array_merge([
+                    'vehicle_id' => $vehicle->getKey(),
+                    'currency' => 'UGX',
+                    'self_drive_daily_minor' => 300_000,
+                    'with_driver_daily_minor' => null,
+                    'is_active' => true,
+                    'effective_from' => now()->subDay(),
+                    'effective_until' => null,
+                ], $rate));
+            }
+
+            $readiness = VehicleReadiness::for($vehicle->fresh()->load('media'));
+            $messages = collect($readiness->failures())->map->message()->implode(' ');
+
+            $this->assertStringContainsString($expected, $messages, "Case {$index} did not explain itself.");
+        }
+    }
+
+    public function test_a_ready_vehicle_reports_no_outstanding_publication_work(): void
+    {
+        $actor = $this->operationsUser();
+        $vehicle = app(SaveVehicle::class)->execute($actor, $this->vehiclePayload());
+
+        app(SaveVehicleRate::class)->execute($actor, $vehicle, [
+            'currency' => 'UGX',
+            'self_drive_daily_minor' => 300_000,
+            'effective_from' => now()->subDay()->format('Y-m-d H:i'),
+        ]);
+
+        $readiness = VehicleReadiness::for($vehicle->fresh()->load('media'));
+
+        $this->assertTrue($readiness->isReady());
+        $this->assertSame($readiness->total(), $readiness->passedCount());
     }
 
     public function test_media_urls_and_single_cover_invariant_are_enforced(): void
@@ -268,10 +345,12 @@ class VehicleCatalogueAndRateTest extends TestCase
             'model' => 'Land Cruiser',
             'year' => 2024,
             'color' => 'Pearl white',
-            'condition' => 'excellent',
+            'condition' => 'foreign_used',
             'vehicle_type' => 'suv',
             'fuel_type' => 'diesel',
             'transmission' => 'automatic',
+            'drive_type' => '4wd',
+            'engine_cc' => 3000,
             'seating_capacity' => 7,
             'luggage_capacity' => 5,
             'summary' => 'A comfortable seven-seat vehicle for road trips and safaris.',

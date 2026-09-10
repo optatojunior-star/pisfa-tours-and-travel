@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\HireMode;
+use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +11,23 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * One immutable version of a vehicle's daily price.
+ *
+ * The casts below are the truth about these attributes, but static analysis
+ * cannot read them through `casts()`, so it fell back to the column types and
+ * concluded the dates were strings. Declaring them here is what lets a caller
+ * be told at analysis time that it is calling a Carbon method on a date.
+ *
+ * @property int $vehicle_id
+ * @property string $currency
+ * @property int|null $self_drive_daily_minor
+ * @property int|null $with_driver_daily_minor
+ * @property int $security_deposit_minor
+ * @property CarbonImmutable $effective_from
+ * @property CarbonImmutable|null $effective_until
+ * @property bool $is_active
+ */
 class VehicleHireRate extends Model
 {
     use HasFactory;

@@ -61,14 +61,10 @@
                 @if ($media->count() > 1)
                     <section aria-labelledby="gallery-heading">
                         <h2 id="gallery-heading" class="text-2xl font-black text-emerald-950">Gallery</h2>
-                        <div class="mt-5 grid gap-4 sm:grid-cols-2">
-                            @foreach ($media as $image)
-                                <figure class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                                    <img src="{{ $image->url }}" alt="{{ $image->alt_text ?: $package->name }}" class="aspect-[4/3] w-full object-cover" loading="lazy">
-                                    @if ($image->caption)<figcaption class="px-4 py-3 text-sm text-slate-600">{{ $image->caption }}</figcaption>@endif
-                                </figure>
-                            @endforeach
-                        </div>
+                        {{-- Was a grid of thumbnails with no way to view any of
+                             them properly; now one large picture with back and
+                             forward controls. --}}
+                        <x-image-gallery class="mt-5" :images="$media" :alt="$package->name" heading-id="gallery-heading" />
                     </section>
                 @endif
 

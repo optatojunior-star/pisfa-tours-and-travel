@@ -35,15 +35,23 @@
     @endif
 
     <article class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-        <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
-            @if ($cover)
-                <img src="{{ $cover }}" alt="{{ $property->name }}" class="aspect-[21/9] w-full object-cover">
-            @else
+        {{--
+            Every photograph, not just the cover.
+
+            A lodge could have eight pictures uploaded against it and this page
+            showed one. The rest were stored, paid for in upload time, and
+            invisible to the person deciding whether to stay there.
+        --}}
+        @if ($property->media->isNotEmpty())
+            <x-image-gallery :images="$property->media" :alt="$property->name"
+                             ratio="aspect-[21/9]" heading="Photographs of {{ $property->name }}" />
+        @else
+            <div class="overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
                 <div class="flex aspect-[21/9] w-full items-center justify-center text-sm font-semibold text-slate-400">
                     Photographs coming soon
                 </div>
-            @endif
-        </div>
+            </div>
+        @endif
 
         <div class="mt-8 grid gap-10 lg:grid-cols-3">
             <div class="lg:col-span-2">

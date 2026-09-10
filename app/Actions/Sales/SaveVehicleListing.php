@@ -9,6 +9,7 @@ use App\Models\Vehicle;
 use App\Models\VehicleListing;
 use App\Services\AuditLogger;
 use App\Support\Money;
+use App\Support\VehicleSpecification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -75,7 +76,7 @@ class SaveVehicleListing
     /** @param array<string, mixed> $attributes */
     public function update(User $actor, VehicleListing $listing, array $attributes): VehicleListing
     {
-        $input = $this->validated($attributes);
+        $input = $this->validated($attributes, $listing);
 
         return DB::transaction(function () use ($actor, $listing, $input): VehicleListing {
             $lockedActor = SalesAccess::lockedManager($actor);
@@ -154,7 +155,7 @@ class SaveVehicleListing
      * @param  array<string, mixed>  $attributes
      * @return array<string, mixed>
      */
-    private function validated(array $attributes): array
+    private function validated(array $attributes, ?VehicleListing $listing = null): array
     {
         $currentYear = (int) now()->format('Y');
 
@@ -163,13 +164,34 @@ class SaveVehicleListing
             'make' => ['required', 'string', 'min:2', 'max:60'],
             'model' => ['required', 'string', 'min:1', 'max:80'],
             'year' => ['required', 'integer', 'min:1950', 'max:'.($currentYear + 1)],
-            'body_type' => ['nullable', 'string', 'max:32'],
-            'fuel_type' => ['nullable', 'string', 'max:24'],
-            'transmission' => ['nullable', 'string', 'max:24'],
+            /*
+             * The same closed lists the hire fleet uses.
+             *
+             * These were free text on both sides, and the two sides disagreed:
+             * the showroom stored "Diesel" and "Automatic" while the fleet
+             * stored "diesel" and "automatic", so a vehicle moved from hire to
+             * sale changed its own specification on the way. The listing keeps
+             * whatever it already held, so older stock stays editable.
+             */
+            'body_type' => ['nullable', 'string', 'max:32', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::bodyTypes(), $listing?->body_type),
+            )],
+            'fuel_type' => ['nullable', 'string', 'max:24', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::fuelTypes(), $listing?->fuel_type),
+            )],
+            'transmission' => ['nullable', 'string', 'max:24', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::transmissions(), $listing?->transmission),
+            )],
+            'drive_type' => ['nullable', 'string', 'max:16', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::driveTypes(), $listing?->drive_type),
+            )],
+            'engine_cc' => ['nullable', 'integer', 'min:50', 'max:20000'],
             'colour' => ['nullable', 'string', 'max:40'],
             'mileage_km' => ['nullable', 'integer', 'min:0', 'max:2000000'],
             'seating_capacity' => ['nullable', 'integer', 'min:1', 'max:100'],
-            'condition' => ['nullable', 'string', 'max:24'],
+            'condition' => ['nullable', 'string', 'max:24', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::conditions(), $listing?->condition),
+            )],
             'description' => ['required', 'string', 'min:30', 'max:5000'],
             'internal_notes' => ['nullable', 'string', 'max:5000'],
             'asking_price' => ['required', 'string', 'max:24'],
@@ -201,6 +223,8 @@ class SaveVehicleListing
             'body_type' => $this->nullable($validated['body_type'] ?? null),
             'fuel_type' => $this->nullable($validated['fuel_type'] ?? null),
             'transmission' => $this->nullable($validated['transmission'] ?? null),
+            'drive_type' => $this->nullable($validated['drive_type'] ?? null),
+            'engine_cc' => isset($validated['engine_cc']) ? (int) $validated['engine_cc'] : null,
             'colour' => $this->nullable($validated['colour'] ?? null),
             'mileage_km' => $validated['mileage_km'] ?? null,
             'seating_capacity' => $validated['seating_capacity'] ?? null,
@@ -243,6 +267,13 @@ class SaveVehicleListing
             'make' => $vehicle->make,
             'model' => $vehicle->model,
             'year' => $vehicle->year,
+            // body_type, engine and drive were silently dropped here, so a
+            // retiring fleet vehicle arrived in the showroom with three of its
+            // specifications blank and somebody had to retype them. They carry
+            // across now that both sides use one vocabulary.
+            'body_type' => $vehicle->vehicle_type,
+            'engine_cc' => $vehicle->engine_cc,
+            'drive_type' => $vehicle->drive_type,
             'fuel_type' => $vehicle->fuel_type,
             'transmission' => $vehicle->transmission,
             'colour' => $vehicle->color,

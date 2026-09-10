@@ -32,11 +32,13 @@ class Vehicle extends Model implements HasPhotographs
         'make',
         'model',
         'year',
+        'engine_cc',
         'color',
         'condition',
         'vehicle_type',
         'fuel_type',
         'transmission',
+        'drive_type',
         'seating_capacity',
         'luggage_capacity',
         'current_odometer_km',
@@ -59,6 +61,7 @@ class Vehicle extends Model implements HasPhotographs
     {
         return [
             'year' => 'integer',
+            'engine_cc' => 'integer',
             'seating_capacity' => 'integer',
             'luggage_capacity' => 'integer',
             'current_odometer_km' => 'integer',

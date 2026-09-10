@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\DocumentCategory;
 use App\Enums\ListingStatus;
 use App\Support\Money;
+use App\Support\VehicleSpecification;
 use Carbon\CarbonImmutable;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -50,9 +51,11 @@ class VehicleListing extends Model
         'make',
         'model',
         'year',
+        'engine_cc',
         'body_type',
         'fuel_type',
         'transmission',
+        'drive_type',
         'colour',
         'mileage_km',
         'seating_capacity',
@@ -80,6 +83,7 @@ class VehicleListing extends Model
         return [
             'status' => ListingStatus::class,
             'year' => 'integer',
+            'engine_cc' => 'integer',
             'mileage_km' => 'integer',
             'seating_capacity' => 'integer',
             'asking_price_minor' => 'integer',
@@ -220,12 +224,21 @@ class VehicleListing extends Model
         return $cover?->url();
     }
 
+    /**
+     * The one-line specification under a showroom card.
+     *
+     * Reads through VehicleSpecification so a stored "safari_van" is shown as
+     * "Safari van (pop-up roof)" rather than the storage key, and so engine and
+     * drive — the two facts a buyer here asks about first — finally appear.
+     */
     public function specSummary(): string
     {
         return trim(implode(' · ', array_filter([
             $this->year,
-            $this->transmission,
-            $this->fuel_type,
+            VehicleSpecification::formatEngine($this->engine_cc),
+            $this->transmission === null ? null : VehicleSpecification::label(VehicleSpecification::transmissions(), $this->transmission),
+            $this->fuel_type === null ? null : VehicleSpecification::label(VehicleSpecification::fuelTypes(), $this->fuel_type),
+            $this->drive_type === null ? null : VehicleSpecification::label(VehicleSpecification::driveTypes(), $this->drive_type),
             $this->formattedMileage(),
         ])));
     }

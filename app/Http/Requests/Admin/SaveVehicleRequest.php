@@ -6,6 +6,7 @@ use App\Enums\VehicleCatalogueStatus;
 use App\Enums\VehicleOperationalStatus;
 use App\Http\Controllers\Concerns\HandlesImageUploads;
 use App\Models\Vehicle;
+use App\Support\VehicleSpecification;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,8 +26,9 @@ class SaveVehicleRequest extends FormRequest
     /** @return array<string, mixed> */
     public function rules(): array
     {
-        $vehicle = $this->route('vehicle');
-        $vehicleId = $vehicle instanceof Vehicle ? $vehicle->getKey() : null;
+        $route = $this->route('vehicle');
+        $vehicle = $route instanceof Vehicle ? $route : null;
+        $vehicleId = $vehicle?->getKey();
         $currentYear = (int) now()->format('Y');
 
         return [
@@ -36,10 +38,31 @@ class SaveVehicleRequest extends FormRequest
             'model' => ['required', 'string', 'max:100'],
             'year' => ['required', 'integer', 'min:1886', 'max:'.($currentYear + 2)],
             'color' => ['required', 'string', 'max:60'],
-            'condition' => ['required', 'string', 'max:40'],
-            'vehicle_type' => ['required', 'string', 'max:40', 'regex:/\A[a-z0-9]+(?:_[a-z0-9]+)*\z/'],
-            'fuel_type' => ['required', 'string', 'max:40', 'regex:/\A[a-z0-9]+(?:_[a-z0-9]+)*\z/'],
-            'transmission' => ['required', 'string', 'max:40', 'regex:/\A[a-z0-9]+(?:_[a-z0-9]+)*\z/'],
+            /*
+             * These five are chosen from a list now, not typed.
+             *
+             * The old rules only demanded lowercase_snake_case, which accepted
+             * "diesel", "disel" and "diesel_engine" equally — three spellings of
+             * one fact, none of which a filter could reconcile. Rule::in closes
+             * the set to what the dropdown offered, plus whatever this record
+             * already held so an older vehicle stays saveable.
+             */
+            'condition' => ['required', 'string', 'max:40', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::conditions(), $vehicle?->condition),
+            )],
+            'vehicle_type' => ['required', 'string', 'max:40', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::bodyTypes(), $vehicle?->vehicle_type),
+            )],
+            'fuel_type' => ['required', 'string', 'max:40', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::fuelTypes(), $vehicle?->fuel_type),
+            )],
+            'transmission' => ['required', 'string', 'max:40', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::transmissions(), $vehicle?->transmission),
+            )],
+            'drive_type' => ['nullable', 'string', 'max:16', Rule::in(
+                VehicleSpecification::allowedValues(VehicleSpecification::driveTypes(), $vehicle?->drive_type),
+            )],
+            'engine_cc' => ['nullable', 'integer', 'min:50', 'max:20000'],
             'seating_capacity' => ['required', 'integer', 'min:1', 'max:100'],
             'luggage_capacity' => ['required', 'integer', 'min:0', 'max:100'],
             'summary' => ['required', 'string', 'max:500'],

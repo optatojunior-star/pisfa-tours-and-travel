@@ -148,6 +148,25 @@ Routes live in `routes/airport-transfers.php`, required from `routes/web.php`.
 | Operations detail, status, assignment, reschedule | `admin.airport-transfer-bookings.{show,transition,assignment,reschedule}` | `Admin\AirportTransferBookingController` | `admin/airport-transfer-bookings/show.blade.php` |
 | Airports, locations, and rate versions | `admin.airport-transfer-settings.*` | `Admin\AirportTransferSettingController` | `admin/airport-transfer-settings/index.blade.php` |
 
+### The published price list
+
+`AirportTransferPlannerController::priceList()` reads every rate currently in
+force, for active airports and locations, in one query, and groups it by
+airport-and-place — the unit a customer thinks in ("Entebbe to Kampala"), then
+the vehicles.
+
+It exists because pricing was accurate and completely invisible. The planner
+would not name a figure until it had a direction, an airport, a location, a
+currency, a flight time, a party size and a luggage count: a form for somebody
+who has already chosen PISFA, not for somebody deciding whether to. The table
+answers "what does Entebbe to Kampala cost, and in what vehicle" on arrival,
+each row links into the planner with that route preselected, and the planner
+remains the only thing that produces a bookable quote.
+
+The list is display only. Every price is resolved again server-side against the
+flight time when a request is submitted, so a stale table can never become a
+stale booking.
+
 Server-side pricing for the planner comes from `Actions\AirportTransfers\
 QuoteAirportTransfer`, which resolves the same effective rate version that
 `CreateAirportTransferBooking` selects, so a quoted price and a booked price

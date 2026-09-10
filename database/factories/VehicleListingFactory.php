@@ -3,6 +3,11 @@
 namespace Database\Factories;
 
 use App\Enums\ListingStatus;
+use App\Enums\VehicleBodyType;
+use App\Enums\VehicleCondition;
+use App\Enums\VehicleDriveType;
+use App\Enums\VehicleFuelType;
+use App\Enums\VehicleTransmission;
 use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\VehicleListing;
@@ -28,13 +33,18 @@ class VehicleListingFactory extends Factory
             'make' => $make,
             'model' => $model,
             'year' => $year,
-            'body_type' => 'SUV',
-            'fuel_type' => 'Diesel',
-            'transmission' => 'Automatic',
+            // The same keys the hire fleet stores. These were Title Case prose
+            // and the fleet's were snake_case keys, so a car moving from hire to
+            // sale silently changed its own specification.
+            'body_type' => VehicleBodyType::Suv->value,
+            'fuel_type' => VehicleFuelType::Diesel->value,
+            'transmission' => VehicleTransmission::Automatic->value,
+            'drive_type' => VehicleDriveType::FourWheelDrive->value,
+            'engine_cc' => 3000,
             'colour' => fake()->safeColorName(),
             'mileage_km' => fake()->numberBetween(20_000, 180_000),
             'seating_capacity' => 7,
-            'condition' => 'Used',
+            'condition' => VehicleCondition::ForeignUsed->value,
             'description' => implode("\n\n", fake()->paragraphs(3)),
             'internal_notes' => null,
             // UGX has no minor unit, so the integer is whole shillings.

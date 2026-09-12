@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Marketing;
 
 use App\Http\Controllers\Controller;
+use App\Models\MediaAlbum;
 use App\Models\Post;
 use App\Models\ServiceImage;
 use App\Models\TeamMember;
@@ -38,6 +39,15 @@ class PublicPageController extends Controller
                 ->latest('published_at')
                 ->limit(3)
                 ->get(),
+            // The sliding gallery. Read from the reserved album rather than
+            // created here: homeGallery() would write a row on every home-page
+            // request, and the public site must never create records.
+            'galleryImages' => MediaAlbum::query()
+                ->where('slug', 'home-gallery')
+                ->first()
+                ?->galleryImages()
+                ->limit(24)
+                ->get() ?? collect(),
         ]);
     }
 

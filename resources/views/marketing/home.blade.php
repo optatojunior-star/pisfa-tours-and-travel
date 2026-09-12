@@ -59,6 +59,13 @@
         </div>
     </section>
 
+    {{-- Renders nothing at all until a photograph is uploaded under
+         Content → Home page gallery, so a fresh install shows no gap. --}}
+    <x-gallery-slider
+        :images="$galleryImages"
+        heading="Uganda, as our customers saw it"
+        intro="Photographs from our own trips — the parks, the roads, the vehicles and the people who drive them." />
+
     <section class="bg-amber-50 px-4 py-20 sm:px-6 lg:px-8">
         <div class="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
             <div>

@@ -19,28 +19,29 @@
 
     <section class="px-4 py-16 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-7xl">
-            <form method="GET" action="{{ route('accommodation.index') }}"
-                  class="grid gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-3 sm:items-end">
-                <div class="sm:col-span-2">
-                    <label for="stay-q" class="block text-sm font-semibold">Search</label>
-                    <input id="stay-q" name="q" type="search" maxlength="100" value="{{ $search }}"
-                           placeholder="Name, town, or district"
-                           class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
-                </div>
-                <div>
-                    <label for="stay-region" class="block text-sm font-semibold">Region</label>
-                    <select id="stay-region" name="region" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
-                        <option value="">Anywhere in Uganda</option>
-                        @foreach ($regions as $option)
-                            <option value="{{ $option }}" @selected($region === $option)>{{ $option }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="flex flex-wrap gap-2 sm:col-span-3">
-                    <button type="submit" class="inline-flex min-h-11 items-center rounded-xl bg-emerald-800 px-5 text-sm font-bold text-white hover:bg-emerald-900">Search</button>
-                    <a href="{{ route('accommodation.index') }}" class="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-5 text-sm font-bold text-slate-700">Reset</a>
-                </div>
-            </form>
+            {{-- Two fields only, so both stay in the primary row and the panel
+                 needs no collapsed section at all. --}}
+            <x-filter-panel :action="route('accommodation.index')" eyebrow="Places to stay"
+                            heading="Find somewhere to stay"
+                            :filters="['q' => $search, 'region' => $region]" submit="Search">
+                <x-slot:primary>
+                    <div>
+                        <label for="stay-q" class="block text-slate-800">Search</label>
+                        <input id="stay-q" name="q" type="search" maxlength="100" value="{{ $search }}"
+                               placeholder="Name, town, or district"
+                               class="mt-1 block w-full border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                    </div>
+                    <div>
+                        <label for="stay-region" class="block text-slate-800">Region</label>
+                        <select id="stay-region" name="region" class="mt-1 block w-full border-slate-300">
+                            <option value="">Anywhere in Uganda</option>
+                            @foreach ($regions as $option)
+                                <option value="{{ $option }}" @selected($region === $option)>{{ $option }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </x-slot:primary>
+            </x-filter-panel>
 
             @if ($properties->isEmpty())
                 <div class="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center">

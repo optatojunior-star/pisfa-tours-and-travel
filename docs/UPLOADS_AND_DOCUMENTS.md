@@ -36,6 +36,28 @@ Every one of these rules has an adversarial test in
 `tests/Feature/Documents/FileInspectorTest.php`, including a PHP script renamed
 `.jpg` and a JPEG-magic-bytes polyglot with `<?php system('id'); ?>` in its body.
 
+## `GalleryImage`, and where the home-page gallery lives
+
+Public, a collection, and image-only. The photographs are marketing, so they sit
+on the public disk with direct URLs and cache like any other picture on the site
+— the opposite call from `DriverPhoto` below, and for the opposite reason.
+
+They need an owner, because documents are polymorphic and `documentable` is not
+nullable. `MediaAlbum::homeGallery()` supplies one: the album mechanism already
+exists to be "a real record standing in for no particular thing", so the gallery
+reuses it rather than introducing a second owner type. The slug `home-gallery`
+is reserved, and `firstOrCreate` on a unique column means two people uploading
+at once get one album rather than a duplicate-key error for whoever was second.
+
+Captions go in the document's `metadata` bag — one per file, belonging to the
+file, and `Document` already carries JSON metadata for exactly this. Order is
+`sort_order`, ascending, which `HandlesImageUploads` increments per upload, so
+adding a photograph never reshuffles the ones already arranged.
+
+`PublicPageController::home()` reads the album with `where('slug', ...)->first()`
+rather than calling `homeGallery()`: the public site must never create a record
+just by being viewed.
+
 ## A note on `DriverPhoto`
 
 It is the one image category that looks like public media and is not.

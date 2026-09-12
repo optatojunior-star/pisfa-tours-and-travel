@@ -43,5 +43,22 @@
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
+
+        {{--
+            The way out for somebody who has no account yet.
+
+            This page offered "Forgot your password?" and "Log in" and nothing
+            else, so a first-time customer who reached it had to guess the
+            /register address or give up. Most give up.
+        --}}
+        @if (Route::has('register'))
+            <p class="mt-6 border-t border-ink-200 pt-5 text-center text-sm text-ink-600">
+                New to PISFA?
+                <a href="{{ route('register') }}" class="font-bold text-brand-800 underline decoration-accent-400 decoration-2 underline-offset-4 hover:text-brand-900">
+                    Create an account
+                </a>
+                — it takes a minute and lets you track your bookings.
+            </p>
+        @endif
     </form>
 </x-guest-layout>

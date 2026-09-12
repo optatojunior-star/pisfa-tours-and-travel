@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\GalleryController;
 use App\Http\Controllers\Admin\MediaLibraryController;
 use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Admin\ServiceImageController;
@@ -62,6 +63,14 @@ Route::prefix('admin')
         Route::get('/service-images', [ServiceImageController::class, 'index'])->name('service-images.index');
         Route::post('/service-images', [ServiceImageController::class, 'store'])->name('service-images.store');
         Route::delete('/service-images/{serviceImage}', [ServiceImageController::class, 'destroy'])->name('service-images.destroy');
+
+        // The sliding gallery on the home page.
+        Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery.index');
+        Route::post('/gallery', [GalleryController::class, 'store'])
+            ->middleware('throttle:30,1')
+            ->name('gallery.store');
+        Route::patch('/gallery/{document}/caption', [GalleryController::class, 'caption'])->name('gallery.caption');
+        Route::delete('/gallery/{document}', [GalleryController::class, 'destroy'])->name('gallery.destroy');
 
         Route::get('/media', [MediaLibraryController::class, 'index'])->name('media.index');
         Route::post('/media', [MediaLibraryController::class, 'store'])

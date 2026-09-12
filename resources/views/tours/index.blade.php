@@ -21,61 +21,80 @@
             </div>
         @endif
 
-        <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="tour-filters-heading">
-            <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <x-filter-panel :action="route('tours.index')" eyebrow="Live catalogue" heading="Find your tour"
+                        :filters="$filters" submit="Search"
+                        note="Choose a currency for price limits or lowest-price sorting. Dates are interpreted in Africa/Kampala.">
+            <x-slot:primary>
                 <div>
-                    <h2 id="tour-filters-heading" class="text-xl font-black text-emerald-950">Find your tour</h2>
-                    <p class="mt-1 text-sm text-slate-600">Use any combination of filters, then update the results.</p>
-                </div>
-                @if (collect($filters)->filter(fn ($value) => filled($value))->isNotEmpty())
-                    <a href="{{ route('tours.index') }}" class="text-sm font-bold text-emerald-800 underline decoration-amber-400 decoration-2 underline-offset-4 hover:text-emerald-950">Clear all filters</a>
-                @endif
-            </div>
-
-            <form method="GET" action="{{ route('tours.index') }}" class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="sm:col-span-2">
-                    <label for="tour-search" class="block text-sm font-semibold text-slate-800">Search</label>
-                    <input id="tour-search" name="q" type="search" value="{{ $filters['q'] ?? '' }}" maxlength="100" placeholder="Tour name or destination" class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                    <label for="tour-search" class="block text-slate-800">Search</label>
+                    <input id="tour-search" name="q" type="search" value="{{ $filters['q'] ?? '' }}" maxlength="100"
+                           placeholder="Tour name or destination" class="mt-1 block w-full border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
                 </div>
                 <div>
-                    <label for="tour-category" class="block text-sm font-semibold text-slate-800">Category</label>
-                    <select id="tour-category" name="category" class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                        <option value="">All categories</option>
-                        @foreach ($categories as $category)
-                            <option value="{{ $category->slug }}" @selected(($filters['category'] ?? '') === $category->slug)>{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label for="departure-from" class="block text-sm font-semibold text-slate-800">Departing on or after</label>
-                    <input id="departure-from" name="date" type="date" value="{{ $filters['date'] ?? '' }}" min="{{ now(config('pisfa.business_timezone'))->toDateString() }}" class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                </div>
-                <div>
-                    <label for="travelers" class="block text-sm font-semibold text-slate-800">Travelers</label>
-                    <input id="travelers" name="party_size" type="number" min="1" max="{{ config('tours.maximum_booking_travelers', 50) }}" inputmode="numeric" value="{{ $filters['party_size'] ?? '' }}" placeholder="Any group size" class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <div><label for="duration-min" class="block text-sm font-semibold text-slate-800">Min days</label><input id="duration-min" name="duration_min" type="number" min="1" max="{{ config('tours.maximum_duration_days', 90) }}" inputmode="numeric" value="{{ $filters['duration_min'] ?? '' }}" placeholder="1" class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600"></div>
-                    <div><label for="duration-max" class="block text-sm font-semibold text-slate-800">Max days</label><input id="duration-max" name="duration_max" type="number" min="1" max="{{ config('tours.maximum_duration_days', 90) }}" inputmode="numeric" value="{{ $filters['duration_max'] ?? '' }}" placeholder="{{ config('tours.maximum_duration_days', 90) }}" class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600"></div>
-                </div>
-                <div><label for="minimum-price" class="block text-sm font-semibold text-slate-800">Minimum base price</label><input id="minimum-price" name="min_price" type="text" inputmode="decimal" value="{{ $filters['min_price'] ?? '' }}" placeholder="No separators" class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600"></div>
-                <div><label for="maximum-price" class="block text-sm font-semibold text-slate-800">Maximum base price</label><input id="maximum-price" name="max_price" type="text" inputmode="decimal" value="{{ $filters['max_price'] ?? '' }}" placeholder="No separators" class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600"></div>
-                <div><label for="tour-currency" class="block text-sm font-semibold text-slate-800">Price currency</label><select id="tour-currency" name="currency" aria-describedby="tour-currency-help" class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600"><option value="">All currencies</option>@foreach (config('tours.currencies', ['UGX', 'USD']) as $currency)<option value="{{ $currency }}" @selected(($filters['currency'] ?? '') === $currency)>{{ $currency }}</option>@endforeach</select><p id="tour-currency-help" class="mt-1 text-xs text-slate-500">Choose a currency for price limits or lowest-price sorting.</p></div>
-                <div>
-                    <label for="tour-sort" class="block text-sm font-semibold text-slate-800">Sort by</label>
-                    <select id="tour-sort" name="sort" class="mt-1 block w-full rounded-xl border-slate-300 shadow-sm focus:border-emerald-600 focus:ring-emerald-600">
+                    <label for="tour-sort" class="block text-slate-800">Sort by</label>
+                    <select id="tour-sort" name="sort" class="mt-1 block w-full border-slate-300">
                         <option value="recommended" @selected(($filters['sort'] ?? 'recommended') === 'recommended')>Recommended</option>
                         <option value="earliest" @selected(($filters['sort'] ?? '') === 'earliest')>Earliest departure</option>
-                        <option value="price_asc" @selected(($filters['sort'] ?? '') === 'price_asc')>Lowest base price (one currency)</option>
+                        <option value="price_asc" @selected(($filters['sort'] ?? '') === 'price_asc')>Lowest base price</option>
                         <option value="duration" @selected(($filters['sort'] ?? '') === 'duration')>Shortest duration</option>
                         <option value="newest" @selected(($filters['sort'] ?? '') === 'newest')>Newest</option>
                     </select>
                 </div>
-                <div class="flex items-end sm:col-span-2 lg:col-span-4">
-                    <button type="submit" class="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-emerald-800 px-6 py-3 font-bold text-white transition hover:bg-emerald-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 sm:w-auto">Update results</button>
+            </x-slot:primary>
+
+            <div>
+                <label for="tour-category" class="block text-slate-800">Category</label>
+                <select id="tour-category" name="category" class="mt-1 block w-full border-slate-300">
+                    <option value="">All categories</option>
+                    @foreach ($categories as $category)
+                        <option value="{{ $category->slug }}" @selected(($filters['category'] ?? '') === $category->slug)>{{ $category->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div>
+                <label for="departure-from" class="block text-slate-800">Departing on or after</label>
+                <input id="departure-from" name="date" type="date" value="{{ $filters['date'] ?? '' }}"
+                       min="{{ now(config('pisfa.business_timezone'))->toDateString() }}" class="mt-1 block w-full border-slate-300">
+            </div>
+            <div>
+                <label for="travelers" class="block text-slate-800">Travelers</label>
+                <input id="travelers" name="party_size" type="number" min="1" max="{{ config('tours.maximum_booking_travelers', 50) }}"
+                       inputmode="numeric" value="{{ $filters['party_size'] ?? '' }}" placeholder="Any group size" class="mt-1 block w-full border-slate-300">
+            </div>
+            <div>
+                <label for="tour-currency" class="block text-slate-800">Price currency</label>
+                <select id="tour-currency" name="currency" class="mt-1 block w-full border-slate-300">
+                    <option value="">All currencies</option>
+                    @foreach (config('tours.currencies', ['UGX', 'USD']) as $currency)
+                        <option value="{{ $currency }}" @selected(($filters['currency'] ?? '') === $currency)>{{ $currency }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label for="duration-min" class="block text-slate-800">Min days</label>
+                    <input id="duration-min" name="duration_min" type="number" min="1" max="{{ config('tours.maximum_duration_days', 90) }}"
+                           inputmode="numeric" value="{{ $filters['duration_min'] ?? '' }}" placeholder="1" class="mt-1 block w-full border-slate-300">
                 </div>
-            </form>
-        </section>
+                <div>
+                    <label for="duration-max" class="block text-slate-800">Max days</label>
+                    <input id="duration-max" name="duration_max" type="number" min="1" max="{{ config('tours.maximum_duration_days', 90) }}"
+                           inputmode="numeric" value="{{ $filters['duration_max'] ?? '' }}" placeholder="{{ config('tours.maximum_duration_days', 90) }}" class="mt-1 block w-full border-slate-300">
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label for="minimum-price" class="block text-slate-800">Min price</label>
+                    <input id="minimum-price" name="min_price" type="text" inputmode="decimal" value="{{ $filters['min_price'] ?? '' }}"
+                           placeholder="No separators" class="mt-1 block w-full border-slate-300">
+                </div>
+                <div>
+                    <label for="maximum-price" class="block text-slate-800">Max price</label>
+                    <input id="maximum-price" name="max_price" type="text" inputmode="decimal" value="{{ $filters['max_price'] ?? '' }}"
+                           placeholder="No separators" class="mt-1 block w-full border-slate-300">
+                </div>
+            </div>
+        </x-filter-panel>
 
         <section class="mt-10" aria-labelledby="tour-results-heading" aria-live="polite">
             <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

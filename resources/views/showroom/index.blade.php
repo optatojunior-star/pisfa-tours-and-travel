@@ -32,41 +32,37 @@
 
     <section class="px-4 py-16 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-7xl">
-            <form method="GET" action="{{ route('showroom.index') }}"
-                  class="grid gap-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-4 sm:items-end">
-                <div class="sm:col-span-2">
-                    <label for="showroom-q" class="block text-sm font-semibold">Search</label>
-                    <input id="showroom-q" name="q" type="search" maxlength="100" value="{{ $search }}"
-                           placeholder="Make, model, or reference"
-                           class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
-                </div>
+            <x-filter-panel :action="route('showroom.index')" eyebrow="Cars for sale" heading="Search the showroom"
+                            :filters="$filters + ['q' => $search]" submit="Search"
+                            note="A price filter only matches cars listed in that currency.">
+                <x-slot:primary>
+                    <div class="sm:col-span-2">
+                        <label for="showroom-q" class="block text-slate-800">Search</label>
+                        <input id="showroom-q" name="q" type="search" maxlength="100" value="{{ $search }}"
+                               placeholder="Make, model, or reference"
+                               class="mt-1 block w-full border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                    </div>
+                </x-slot:primary>
+
                 <div>
-                    <label for="showroom-min" class="block text-sm font-semibold">Price from</label>
+                    <label for="showroom-min" class="block text-slate-800">Price from</label>
                     <input id="showroom-min" name="min_price" type="text" inputmode="numeric" maxlength="24"
-                           value="{{ $filters['min_price'] }}"
-                           class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                           value="{{ $filters['min_price'] }}" class="mt-1 block w-full border-slate-300">
                 </div>
                 <div>
-                    <label for="showroom-max" class="block text-sm font-semibold">Price to</label>
+                    <label for="showroom-max" class="block text-slate-800">Price to</label>
                     <input id="showroom-max" name="max_price" type="text" inputmode="numeric" maxlength="24"
-                           value="{{ $filters['max_price'] }}"
-                           class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                           value="{{ $filters['max_price'] }}" class="mt-1 block w-full border-slate-300">
                 </div>
-                <div class="sm:col-span-2">
-                    <label for="showroom-currency" class="block text-sm font-semibold">Currency</label>
-                    <select id="showroom-currency" name="currency"
-                            class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                <div>
+                    <label for="showroom-currency" class="block text-slate-800">Currency</label>
+                    <select id="showroom-currency" name="currency" class="mt-1 block w-full border-slate-300">
                         @foreach (config('pisfa.currency.supported', ['UGX', 'USD']) as $code)
                             <option value="{{ $code }}" @selected($filters['currency'] === $code)>{{ $code }}</option>
                         @endforeach
                     </select>
-                    <p class="mt-1 text-xs text-slate-500">A price filter only matches cars listed in that currency.</p>
                 </div>
-                <div class="flex flex-wrap gap-2 sm:col-span-2">
-                    <button type="submit" class="inline-flex min-h-11 items-center rounded-xl bg-emerald-800 px-5 text-sm font-bold text-white hover:bg-emerald-900">Search</button>
-                    <a href="{{ route('showroom.index') }}" class="inline-flex min-h-11 items-center rounded-xl border border-slate-300 px-5 text-sm font-bold text-slate-700">Reset</a>
-                </div>
-            </form>
+            </x-filter-panel>
 
             @if ($listings->isEmpty())
                 <div class="mt-8 rounded-3xl border border-dashed border-slate-300 bg-white p-12 text-center">

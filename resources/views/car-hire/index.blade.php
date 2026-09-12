@@ -7,34 +7,97 @@
 
 <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
     @if ($errors->any())<div class="mb-6 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800" role="alert"><p class="font-bold">Check the search details.</p><ul class="mt-2 list-disc pl-5">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
-    <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="hire-filters-heading">
-        <div class="flex items-end justify-between gap-4"><div><p class="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Live catalogue</p><h2 id="hire-filters-heading" class="mt-1 text-xl font-black text-emerald-950">Search vehicles</h2></div><a href="{{ route('car-hire.index') }}" class="text-sm font-bold text-emerald-800 underline decoration-amber-400 decoration-2 underline-offset-4">Clear filters</a></div>
-        <form method="GET" action="{{ route('car-hire.index') }}" class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="sm:col-span-2"><label for="hire-q" class="block text-sm font-semibold text-slate-800">Search</label><input id="hire-q" name="q" type="search" maxlength="100" value="{{ $filters['q'] ?? '' }}" placeholder="Make, model or vehicle type" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600"></div>
-            <div><label for="pickup-at" class="block text-sm font-semibold text-slate-800">Pickup (Uganda time)</label><input id="pickup-at" name="pickup_at" type="datetime-local" value="{{ $filters['pickup_at'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600"></div>
-            <div><label for="return-at" class="block text-sm font-semibold text-slate-800">Return (Uganda time)</label><input id="return-at" name="return_at" type="datetime-local" value="{{ $filters['return_at'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600"></div>
-            <div><label for="hire-mode" class="block text-sm font-semibold text-slate-800">Hire mode</label><select id="hire-mode" name="hire_mode" class="mt-1 block w-full rounded-xl border-slate-300"><option value="">Either mode</option>@foreach (\App\Enums\HireMode::cases() as $case)<option value="{{ $case->value }}" @selected(($filters['hire_mode'] ?? '') === $case->value)>{{ $case->label() }}</option>@endforeach</select></div>
-            <div><label for="vehicle-type" class="block text-sm font-semibold text-slate-800">Vehicle type</label><select id="vehicle-type" name="vehicle_type" class="mt-1 block w-full rounded-xl border-slate-300"><option value="">All types</option>@foreach ($vehicleTypes as $value => $label)<option value="{{ $value }}" @selected(($filters['vehicle_type'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
-            <div><label for="transmission" class="block text-sm font-semibold text-slate-800">Transmission</label><select id="transmission" name="transmission" class="mt-1 block w-full rounded-xl border-slate-300"><option value="">Any transmission</option>@foreach ($transmissions as $value => $label)<option value="{{ $value }}" @selected(($filters['transmission'] ?? '') === $value)>{{ $label }}</option>@endforeach</select></div>
-            {{-- The filter a customer heading upcountry reaches for first. --}}
+    <x-filter-panel :action="route('car-hire.index')" eyebrow="Live catalogue" heading="Search vehicles"
+                    :filters="$filters" submit="Search"
+                    note="Choose a hire mode and currency when filtering or sorting by price. Dates and times are interpreted in Africa/Kampala.">
+        <x-slot:primary>
             <div>
-                <label for="drive-type" class="block text-sm font-semibold text-slate-800">Drive</label>
-                <select id="drive-type" name="drive_type" class="mt-1 block w-full rounded-xl border-slate-300" aria-describedby="drive-type-help">
-                    <option value="">Any drive</option>
-                    @foreach ($driveTypes as $value => $label)
-                        <option value="{{ $value }}" @selected(($filters['drive_type'] ?? '') === $value)>{{ $label }}</option>
-                    @endforeach
-                </select>
-                <p id="drive-type-help" class="mt-1 text-xs text-slate-500">Choose 4WD for the parks and murram roads.</p>
+                <label for="hire-q" class="block text-slate-800">Search</label>
+                <input id="hire-q" name="q" type="search" maxlength="100" value="{{ $filters['q'] ?? '' }}"
+                       placeholder="Make, model or type" class="mt-1 block w-full border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
             </div>
-            <div><label for="min-seats" class="block text-sm font-semibold text-slate-800">Minimum seats</label><input id="min-seats" name="min_seats" type="number" min="1" max="100" value="{{ $filters['min_seats'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300"></div>
-            <div><label for="hire-currency" class="block text-sm font-semibold text-slate-800">Price currency</label><select id="hire-currency" name="currency" aria-describedby="hire-price-help" class="mt-1 block w-full rounded-xl border-slate-300"><option value="">All currencies</option>@foreach (config('car_hire.currencies', ['UGX','USD']) as $code)<option value="{{ $code }}" @selected(($filters['currency'] ?? '') === $code)>{{ $code }}</option>@endforeach</select></div>
-            <div class="grid grid-cols-2 gap-2"><div><label for="min-price" class="block text-sm font-semibold text-slate-800">Min/day</label><input id="min-price" name="min_price" inputmode="decimal" value="{{ $filters['min_price'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300"></div><div><label for="max-price" class="block text-sm font-semibold text-slate-800">Max/day</label><input id="max-price" name="max_price" inputmode="decimal" value="{{ $filters['max_price'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300"></div></div>
-            <div><label for="hire-sort" class="block text-sm font-semibold text-slate-800">Sort by</label><select id="hire-sort" name="sort" class="mt-1 block w-full rounded-xl border-slate-300"><option value="recommended">Recommended</option><option value="price_asc" @selected(($filters['sort'] ?? '') === 'price_asc')>Lowest daily rate</option><option value="price_desc" @selected(($filters['sort'] ?? '') === 'price_desc')>Highest daily rate</option><option value="newest" @selected(($filters['sort'] ?? '') === 'newest')>Newest</option><option value="seats_desc" @selected(($filters['sort'] ?? '') === 'seats_desc')>Most seats</option></select></div>
-            <div class="flex items-end"><button type="submit" class="min-h-11 w-full rounded-xl bg-emerald-800 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-900">Search availability</button></div>
-            <p id="hire-price-help" class="text-xs leading-5 text-slate-500 sm:col-span-2 lg:col-span-4">Choose a hire mode and currency when filtering or sorting by price. Dates and times are interpreted in Africa/Kampala.</p>
-        </form>
-    </section>
+            <div>
+                <label for="hire-sort" class="block text-slate-800">Sort by</label>
+                <select id="hire-sort" name="sort" class="mt-1 block w-full border-slate-300">
+                    <option value="recommended">Recommended</option>
+                    <option value="price_asc" @selected(($filters['sort'] ?? '') === 'price_asc')>Lowest daily rate</option>
+                    <option value="price_desc" @selected(($filters['sort'] ?? '') === 'price_desc')>Highest daily rate</option>
+                    <option value="newest" @selected(($filters['sort'] ?? '') === 'newest')>Newest</option>
+                    <option value="seats_desc" @selected(($filters['sort'] ?? '') === 'seats_desc')>Most seats</option>
+                </select>
+            </div>
+        </x-slot:primary>
+
+        <div>
+            <label for="pickup-at" class="block text-slate-800">Pickup</label>
+            <input id="pickup-at" name="pickup_at" type="datetime-local" value="{{ $filters['pickup_at'] ?? '' }}" class="mt-1 block w-full border-slate-300">
+        </div>
+        <div>
+            <label for="return-at" class="block text-slate-800">Return</label>
+            <input id="return-at" name="return_at" type="datetime-local" value="{{ $filters['return_at'] ?? '' }}" class="mt-1 block w-full border-slate-300">
+        </div>
+        <div>
+            <label for="hire-mode" class="block text-slate-800">Hire mode</label>
+            <select id="hire-mode" name="hire_mode" class="mt-1 block w-full border-slate-300">
+                <option value="">Either mode</option>
+                @foreach (\App\Enums\HireMode::cases() as $case)
+                    <option value="{{ $case->value }}" @selected(($filters['hire_mode'] ?? '') === $case->value)>{{ $case->label() }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label for="vehicle-type" class="block text-slate-800">Vehicle type</label>
+            <select id="vehicle-type" name="vehicle_type" class="mt-1 block w-full border-slate-300">
+                <option value="">All types</option>
+                @foreach ($vehicleTypes as $value => $label)
+                    <option value="{{ $value }}" @selected(($filters['vehicle_type'] ?? '') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+        {{-- The filter a customer heading upcountry reaches for first. --}}
+        <div>
+            <label for="drive-type" class="block text-slate-800">Drive</label>
+            <select id="drive-type" name="drive_type" class="mt-1 block w-full border-slate-300" aria-describedby="drive-type-help">
+                <option value="">Any drive</option>
+                @foreach ($driveTypes as $value => $label)
+                    <option value="{{ $value }}" @selected(($filters['drive_type'] ?? '') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+            <p id="drive-type-help" class="mt-1 text-xs text-slate-500">4WD for the parks and murram roads.</p>
+        </div>
+        <div>
+            <label for="transmission" class="block text-slate-800">Transmission</label>
+            <select id="transmission" name="transmission" class="mt-1 block w-full border-slate-300">
+                <option value="">Any transmission</option>
+                @foreach ($transmissions as $value => $label)
+                    <option value="{{ $value }}" @selected(($filters['transmission'] ?? '') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div>
+            <label for="min-seats" class="block text-slate-800">Minimum seats</label>
+            <input id="min-seats" name="min_seats" type="number" min="1" max="100" value="{{ $filters['min_seats'] ?? '' }}" class="mt-1 block w-full border-slate-300">
+        </div>
+        <div>
+            <label for="hire-currency" class="block text-slate-800">Price currency</label>
+            <select id="hire-currency" name="currency" class="mt-1 block w-full border-slate-300">
+                <option value="">All currencies</option>
+                @foreach (config('car_hire.currencies', ['UGX','USD']) as $code)
+                    <option value="{{ $code }}" @selected(($filters['currency'] ?? '') === $code)>{{ $code }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+            <div>
+                <label for="min-price" class="block text-slate-800">Min/day</label>
+                <input id="min-price" name="min_price" inputmode="decimal" value="{{ $filters['min_price'] ?? '' }}" class="mt-1 block w-full border-slate-300">
+            </div>
+            <div>
+                <label for="max-price" class="block text-slate-800">Max/day</label>
+                <input id="max-price" name="max_price" inputmode="decimal" value="{{ $filters['max_price'] ?? '' }}" class="mt-1 block w-full border-slate-300">
+            </div>
+        </div>
+    </x-filter-panel>
 
     <section class="mt-10" aria-labelledby="vehicle-results-heading" aria-live="polite">
         <div class="flex items-end justify-between"><div><h2 id="vehicle-results-heading" class="text-2xl font-black text-emerald-950">Available vehicles</h2><p class="mt-1 text-sm text-slate-600">{{ $vehicles->total() }} {{ str('vehicle')->plural($vehicles->total()) }} found</p></div></div>

@@ -136,37 +136,34 @@
         </section>
     @endif
 
-    <section class="scroll-mt-8 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="transfer-quote-heading">
-        <div class="flex flex-wrap items-end justify-between gap-4">
-            <div>
-                <p class="text-xs font-bold uppercase tracking-[0.14em] text-emerald-700">Step 1</p>
-                <h2 id="transfer-quote-heading" class="mt-1 text-xl font-black text-emerald-950">Price your transfer</h2>
-            </div>
-            <a href="{{ route('airport-transfers.index') }}" class="text-sm font-bold text-emerald-800 underline decoration-amber-400 decoration-2 underline-offset-4">Clear</a>
-        </div>
+    <div id="transfer-quote-heading" class="scroll-mt-8">
+        <x-filter-panel :action="route('airport-transfers.index')" eyebrow="Step 1" heading="Price your transfer"
+                        :filters="$filters" submit="Show prices"
+                        note="Landing time for a pickup, departure time for a drop-off. Times are interpreted in Africa/Kampala.">
+            <x-slot:primary>
+                <div>
+                    <label for="transfer-type" class="block text-slate-800">Direction</label>
+                    <select id="transfer-type" name="transfer_type" class="mt-1 block w-full border-slate-300">
+                        <option value="">Select direction</option>
+                        @foreach (AirportTransferType::cases() as $case)
+                            <option value="{{ $case->value }}" @selected($selectedType === $case->value)>{{ $case->label() }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label for="transfer-airport" class="block text-slate-800">Airport</label>
+                    <select id="transfer-airport" name="airport_id" class="mt-1 block w-full border-slate-300">
+                        <option value="">Select airport</option>
+                        @foreach ($airports as $airport)
+                            <option value="{{ $airport->id }}" @selected((int) ($filters['airport_id'] ?? 0) === $airport->id)>{{ $airport->code }} — {{ $airport->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </x-slot:primary>
 
-        <form method="GET" action="{{ route('airport-transfers.index') }}" class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-                <label for="transfer-type" class="block text-sm font-semibold text-slate-800">Direction</label>
-                <select id="transfer-type" name="transfer_type" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
-                    <option value="">Select direction</option>
-                    @foreach (AirportTransferType::cases() as $case)
-                        <option value="{{ $case->value }}" @selected($selectedType === $case->value)>{{ $case->label() }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label for="transfer-airport" class="block text-sm font-semibold text-slate-800">Airport</label>
-                <select id="transfer-airport" name="airport_id" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
-                    <option value="">Select airport</option>
-                    @foreach ($airports as $airport)
-                        <option value="{{ $airport->id }}" @selected((int) ($filters['airport_id'] ?? 0) === $airport->id)>{{ $airport->code }} — {{ $airport->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div>
-                <label for="transfer-location" class="block text-sm font-semibold text-slate-800">Service location</label>
-                <select id="transfer-location" name="airport_transfer_location_id" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                <label for="transfer-location" class="block text-slate-800">Service location</label>
+                <select id="transfer-location" name="airport_transfer_location_id" class="mt-1 block w-full border-slate-300">
                     <option value="">Select location</option>
                     @foreach ($locations as $location)
                         <option value="{{ $location->id }}" @selected((int) ($filters['airport_transfer_location_id'] ?? 0) === $location->id)>{{ $location->name }} ({{ $location->region }})</option>
@@ -174,35 +171,39 @@
                 </select>
             </div>
             <div>
-                <label for="transfer-currency" class="block text-sm font-semibold text-slate-800">Currency</label>
-                <select id="transfer-currency" name="currency" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                <label for="transfer-currency" class="block text-slate-800">Currency</label>
+                <select id="transfer-currency" name="currency" class="mt-1 block w-full border-slate-300">
                     @foreach ($currencies as $currency)
                         <option value="{{ $currency }}" @selected($selectedCurrency === $currency)>{{ $currency }}</option>
                     @endforeach
                 </select>
             </div>
             <div>
-                <label for="flight-scheduled-at" class="block text-sm font-semibold text-slate-800">Flight time (Uganda time)</label>
-                <input id="flight-scheduled-at" name="flight_scheduled_at" type="datetime-local" value="{{ $filters['flight_scheduled_at'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600" aria-describedby="flight-scheduled-help">
-                <p id="flight-scheduled-help" class="mt-1 text-xs text-slate-600">Landing time for a pickup, departure time for a drop-off.</p>
+                <label for="flight-scheduled-at" class="block text-slate-800">Flight time</label>
+                <input id="flight-scheduled-at" name="flight_scheduled_at" type="datetime-local"
+                       value="{{ $filters['flight_scheduled_at'] ?? '' }}" class="mt-1 block w-full border-slate-300">
             </div>
             <div>
-                <label for="service-starts-at" class="block text-sm font-semibold text-slate-800">Address pickup (drop-off only)</label>
-                <input id="service-starts-at" name="service_starts_at" type="datetime-local" min="{{ $earliestValue }}" value="{{ $filters['service_starts_at'] ?? '' }}" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+                <label for="service-starts-at" class="block text-slate-800">Address pickup <span class="font-normal text-slate-500">(drop-off only)</span></label>
+                <input id="service-starts-at" name="service_starts_at" type="datetime-local" min="{{ $earliestValue }}"
+                       value="{{ $filters['service_starts_at'] ?? '' }}" class="mt-1 block w-full border-slate-300">
             </div>
-            <div>
-                <label for="passenger-count" class="block text-sm font-semibold text-slate-800">Passengers</label>
-                <input id="passenger-count" name="passenger_count" type="number" inputmode="numeric" min="1" max="{{ config('airport_transfers.maximum_passengers', 50) }}" value="{{ $filters['passenger_count'] ?? 1 }}" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label for="passenger-count" class="block text-slate-800">Passengers</label>
+                    <input id="passenger-count" name="passenger_count" type="number" inputmode="numeric" min="1"
+                           max="{{ config('airport_transfers.maximum_passengers', 50) }}"
+                           value="{{ $filters['passenger_count'] ?? 1 }}" class="mt-1 block w-full border-slate-300">
+                </div>
+                <div>
+                    <label for="luggage-count" class="block text-slate-800">Luggage</label>
+                    <input id="luggage-count" name="luggage_count" type="number" inputmode="numeric" min="0"
+                           max="{{ config('airport_transfers.maximum_luggage', 100) }}"
+                           value="{{ $filters['luggage_count'] ?? 0 }}" class="mt-1 block w-full border-slate-300">
+                </div>
             </div>
-            <div>
-                <label for="luggage-count" class="block text-sm font-semibold text-slate-800">Luggage pieces</label>
-                <input id="luggage-count" name="luggage_count" type="number" inputmode="numeric" min="0" max="{{ config('airport_transfers.maximum_luggage', 100) }}" value="{{ $filters['luggage_count'] ?? 0 }}" class="mt-1 block w-full rounded-xl border-slate-300 focus:border-emerald-600 focus:ring-emerald-600">
-            </div>
-            <div class="sm:col-span-2 lg:col-span-4">
-                <button type="submit" class="inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-800 px-6 py-3 text-sm font-bold text-white transition hover:bg-emerald-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2">Show transfer prices</button>
-            </div>
-        </form>
-    </section>
+        </x-filter-panel>
+    </div>
 
     @if ($transferType !== null && $serviceStartsAt !== null)
         <section class="mt-10" aria-labelledby="transfer-options-heading">

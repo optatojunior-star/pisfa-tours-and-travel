@@ -74,6 +74,44 @@ class MediaAlbum extends Model
         ]);
     }
 
+    /**
+     * The album that owns the home-page gallery.
+     *
+     * The gallery needed an owner for its uploads and an album is already
+     * exactly that — a real record standing in for "no particular thing" — so
+     * this reuses the mechanism rather than inventing a second one. The slug is
+     * reserved: `firstOrCreate` on a unique column means two people uploading at
+     * once get one album, not a duplicate-key error for whoever was second.
+     */
+    public static function homeGallery(): self
+    {
+        return static::query()->firstOrCreate(
+            ['slug' => 'home-gallery'],
+            [
+                'name' => 'Home page gallery',
+                'description' => 'Photographs shown in the sliding gallery on the home page.',
+            ],
+        );
+    }
+
+    /**
+     * The gallery photographs, in the order they are shown.
+     *
+     * Oldest first, unlike `images()`: a gallery is a sequence somebody arranged
+     * and `sort_order` records that arrangement, so newest-first would shuffle
+     * it every time a picture was added.
+     *
+     * @return MorphMany<Document, $this>
+     */
+    public function galleryImages(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable')
+            ->where('category', DocumentCategory::GalleryImage->value)
+            ->where('is_current', true)
+            ->orderBy('sort_order')
+            ->orderBy('id');
+    }
+
     public static function makeSlug(string $name): string
     {
         $base = Str::slug($name) ?: 'album';

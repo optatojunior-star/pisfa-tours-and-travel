@@ -201,6 +201,7 @@ final class ConsoleNavigation
                     ['label' => 'Journal', 'route' => 'admin.posts.index', 'active' => 'admin.posts.*'],
                     ['label' => 'Our team', 'route' => 'admin.team.index', 'active' => 'admin.team.*'],
                     ['label' => 'Service pictures', 'route' => 'admin.service-images.index', 'active' => 'admin.service-images.*'],
+                    ['label' => 'Home page gallery', 'route' => 'admin.gallery.index', 'active' => 'admin.gallery.*'],
                     ['label' => 'Image library', 'route' => 'admin.media.index', 'active' => 'admin.media.*'],
                     ['label' => 'Reviews', 'route' => 'admin.reviews.index', 'active' => 'admin.reviews.*'],
                 ],

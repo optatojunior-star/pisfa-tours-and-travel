@@ -71,13 +71,34 @@ browser journeys, live provider credentials).
 | Services/actions | — (controllers write directly) |
 | Routes | `home`, `about`, `contact`, `request-quotation`, `privacy`, `terms`, `contact.store`, `newsletter.store` |
 | Controllers | `Marketing\PublicPageController`, `Marketing\ContactMessageController`, `Marketing\NewsletterSubscriptionController` |
-| Screens | `resources/views/marketing/` (7 Blade files), `layouts/public.blade.php`, `components/hero-slider.blade.php`, `components/image-gallery.blade.php` |
+| Screens | `resources/views/marketing/` (7 Blade files), `layouts/public.blade.php`, `components/hero-slider.blade.php`, `components/gallery-slider.blade.php`, `components/image-gallery.blade.php`, `components/filter-panel.blade.php`, `admin/gallery/index.blade.php` |
 | Notifications/jobs | — |
 | Integrations | — (Google Analytics not configured) |
 | Tests | `tests/Feature/MarketingPagesTest.php` |
 | **Status** | **In progress** |
 
 **Gaps:** multi-service search, featured tours/vehicles/properties, testimonials, company statistics, chat entry point, Open Graph metadata, sitemap, robots rules, Google Analytics, web manifest and branded icons, admin management of subscribers/messages. Featured journal posts and editable SEO landed with F12.
+
+`x-gallery-slider` is the sliding photo gallery below the service cards, fed
+from the reserved `home-gallery` album and managed at Content → Home page
+gallery (`admin.gallery.*`). It renders **nothing at all** when empty — no
+heading, no placeholder — because a section that announces its own emptiness is
+worse than one that is not there. Captions live in the document's `metadata`
+bag. Covered by `tests/Feature/Content/HomeGalleryTest` (14).
+
+`x-filter-panel` is the one compact filter bar used by car hire, tours, the
+showroom, accommodation and the transfer planner. Each page had grown its own
+always-expanded grid — car hire had eleven fields in four columns — so the
+search form was taller than the first row of results and pushed the catalogue
+below the fold. The primary row stays visible and the rest collapses into a
+`<details>`, which still submits because collapsed fields remain in the DOM, and
+re-opens itself when filters are active so a narrowed result set never looks
+like an empty catalogue. Control sizing is one scoped style block rather than
+forty edited class lists.
+
+Registration is reachable: "Create account" sits beside "Sign in" in the desktop
+nav and at the foot of the sign-in form. It previously existed only in the
+mobile menu, so a desktop visitor saw "Sign in" and no way to get an account.
 
 The home page header is `x-hero-slider`, which reads `ServiceCatalogue` and the
 uploaded `ServiceImage` for each entry — so a module that ships appears in the

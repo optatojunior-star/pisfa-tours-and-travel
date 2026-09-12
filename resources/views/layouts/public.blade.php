@@ -114,10 +114,20 @@
 
                 <span class="mx-2 h-6 w-px bg-ink-200" aria-hidden="true"></span>
 
+                {{--
+                    Sign in *and* create an account.
+
+                    "Create account" existed only in the mobile menu, so on a
+                    desktop a new customer saw "Sign in" and nothing else — no
+                    visible way to get an account in the first place. Signing in
+                    is the returning customer's link; registering is the new
+                    one's, and the new one is the whole point of the website.
+                --}}
                 @auth
                     <a href="{{ route('dashboard') }}" class="rounded-control px-3 py-2 text-ink-700 transition hover:bg-brand-50 hover:text-brand-800">Dashboard</a>
                 @else
                     <a href="{{ route('login') }}" class="rounded-control px-3 py-2 text-ink-700 transition hover:bg-brand-50 hover:text-brand-800">Sign in</a>
+                    <a href="{{ route('register') }}" class="whitespace-nowrap rounded-control border border-brand-700 px-3 py-2 font-semibold text-brand-800 transition hover:bg-brand-50">Create account</a>
                 @endauth
                 <a href="{{ route('request-quotation') }}" class="ml-1 whitespace-nowrap rounded-full bg-brand-800 px-5 py-2.5 text-white shadow-sm transition hover:bg-brand-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-700 focus-visible:ring-offset-2">Request a quotation</a>
             </div>

@@ -92,8 +92,8 @@ XAMPP ships MariaDB, which is enough:
 DB_CONNECTION=mysql DB_HOST=127.0.0.1 DB_PORT=3306 DB_DATABASE=pisfa_test DB_USERNAME=root DB_PASSWORD= php artisan test --configuration=phpunit.mysql.xml
 ```
 
-**What SQLite hides.** Three real bugs reached production because the local
-suite was green:
+**What SQLite hides.** Four real bugs, three of which reached production because
+the local suite was green:
 
 1. **Identifier length.** MySQL caps names at 64 characters; SQLite has no
    limit. A 70-character foreign key name failed the first deployment.
@@ -106,10 +106,31 @@ suite was green:
    an XML comment, which is illegal. The file never parsed, so the
    production-engine suite never ran once — in CI or anywhere else — while
    appearing to be configured and enforced.
+4. **String comparison is case-sensitive on SQLite and case-insensitive on
+   MySQL.** Caught before deployment, and only because the migration was run
+   against MariaDB first. `2026_09_10_000200_normalise_vehicle_specification_values`
+   read `SELECT DISTINCT fuel_type` and skipped any value that already equalled
+   its normalised form. Under `utf8mb4_unicode_ci`, MariaDB folds `Diesel`,
+   `diesel` and `DIESEL` into **one** row and hands back the lowercase spelling
+   — so the skip fired and every capitalised row survived un-normalised. SQLite
+   returned all three and passed. Verified directly:
+
+   ```sql
+   CREATE TABLE probe (v VARCHAR(40)) COLLATE utf8mb4_unicode_ci;
+   INSERT INTO probe VALUES ('diesel'),('Diesel'),('DIESEL');
+   SELECT COUNT(*) FROM (SELECT DISTINCT v FROM probe) d;  -- 1, not 3
+   SELECT COUNT(*) FROM probe WHERE v = 'diesel';          -- 3, not 1
+   ```
 
 The third is the one worth remembering: a gate that has never been observed to
 pass is not a gate. If you add a CI job, watch it go green at least once before
 believing it protects anything.
+
+The fourth is the one worth generalising: **any data migration that reads
+`DISTINCT` on a text column, or compares strings in PHP, behaves differently on
+the two engines.** Put the logic in a class rather than inside the anonymous
+migration — `App\Support\VehicleSpecificationNormaliser` is the pattern — so it
+can be tested against both, and run the test against MariaDB before deploying.
 
 ## Two test configurations, and why
 

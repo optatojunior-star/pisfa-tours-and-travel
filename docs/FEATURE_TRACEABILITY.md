@@ -153,7 +153,7 @@ can pay through `payments.checkout` and settlement records a durable
 | Screens | `views/car-hire/` (3), `views/car-hire-bookings/` (5), `views/admin/vehicles/`, `views/admin/car-hire-bookings/` |
 | Notifications/jobs | `Notifications\CarHire\*` (7); `ExpireCarHireBookings`, `SendCarHireReturnReminders` commands |
 | Integrations | SMTP; private local storage for identity documents |
-| Tests | `tests/Feature/CarHire/` (12 files) |
+| Tests | `tests/Feature/CarHire/` (15 files) |
 | **Status** | **In progress** |
 
 **Gaps:** MySQL race evidence, browser/accessibility journeys.
@@ -162,6 +162,12 @@ can pay through `payments.checkout` and settlement records a durable
 filters on `drive_type` — see [docs/CAR_HIRE.md](CAR_HIRE.md) for why the
 selection lives in the URL and why the comparison re-applies the catalogue's own
 visibility rule. Covered by `tests/Feature/CarHire/VehicleComparisonTest` (11).
+
+`App\Support\VehicleSpecificationNormaliser` carries the data migration's logic
+so it can be tested on both engines —
+`tests/Feature/CarHire/VehicleSpecificationNormalisationTest` (7), run against
+MariaDB as well as SQLite because the first version passed on one and was wrong
+on the other.
 
 The vehicle specification vocabulary (`App\Support\VehicleSpecification`) and the
 publication checklist (`App\Support\Publishing\VehicleReadiness`, rendered on

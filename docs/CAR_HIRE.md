@@ -42,9 +42,16 @@ current value in its own dropdown, and `allowedValues()` keeps the same value
 valid. A vehicle recorded before the lists existed stays editable and is never
 silently rewritten by a screen nobody touched.
 `2026_09_10_000200_normalise_vehicle_specification_values` folds the unambiguous
-variants together. Condition is deliberately not force-mapped: "good" does not
-say whether a vehicle was imported or bought locally, and that is the
-distinction the new list draws.
+variants together, through `App\Support\VehicleSpecificationNormaliser`. The
+logic sits in a class rather than inside the migration because it rewrites
+production rows and therefore needs tests on both engines — its first version
+passed on SQLite and was wrong on MySQL, where a case-insensitive `DISTINCT`
+hid every capitalised spelling. See the fourth item under "What SQLite hides"
+in [docs/TESTING.md](TESTING.md).
+
+Condition is deliberately not force-mapped: "good" does not say whether a
+vehicle was imported or bought locally, and that is the distinction the new list
+draws.
 
 ## Side-by-side comparison
 
